@@ -12,16 +12,35 @@ function submitForm(e) {
     e.preventDefault();
     const form = document.getElementById('appointmentForm');
     const success = document.getElementById('formSuccess');
+    const submitButton = form.querySelector('button[type="submit"]');
+    const phoneValue = document.getElementById('phone').value.replace(/\D/g, '');
+
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
+    if (phoneValue.length !== 11) {
+        showFormMessage('Пожалуйста, введите полный номер телефона в формате +7 (XXX) XXX-XX-XX.', 'error');
+        return;
+    }
+
+    showFormMessage('Отправляем заявку...', 'info');
+    submitButton.disabled = true;
+    submitButton.classList.add('loading');
 
     // Имитация отправки формы
     form.style.display = 'none';
     success.classList.add('active');
+    showFormMessage('', 'info');
 
     // Сброс формы через 5 секунд
     setTimeout(() => {
         form.style.display = 'block';
         success.classList.remove('active');
         form.reset();
+        submitButton.disabled = false;
+        submitButton.classList.remove('loading');
     }, 5000);
 }
 
@@ -65,4 +84,17 @@ if (phoneInput) {
 
         e.target.value = formatted;
     });
+}
+
+function showFormMessage(text, type) {
+    const message = document.getElementById('formMessage');
+    if (!message) return;
+
+    message.textContent = text;
+    message.classList.remove('error', 'info');
+
+    if (text) {
+        message.classList.add(type);
+        message.setAttribute('aria-live', 'polite');
+    }
 }

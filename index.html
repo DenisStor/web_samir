@@ -30,16 +30,16 @@
                 <li><a href="#location">Контакты</a></li>
             </ul>
             <a href="#booking" class="nav-cta">Онлайн-запись</a>
-            <div class="burger" onclick="toggleMenu()">
+            <button class="burger" type="button" aria-expanded="false" aria-controls="mobileMenu" aria-label="Открыть меню" onclick="toggleMenu()">
                 <span></span>
                 <span></span>
                 <span></span>
-            </div>
+            </button>
         </div>
     </nav>
 
     <!-- Mobile Menu -->
-    <div class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
         <a href="#services" onclick="closeMenu()">Услуги</a>
         <a href="#podology" onclick="closeMenu()">Подологический кабинет</a>
         <a href="#masters" onclick="closeMenu()">Мастера</a>
@@ -1011,16 +1011,17 @@
                                 <input type="time" id="time" class="form-input" required>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label for="comment">Комментарий</label>
-                            <textarea id="comment" class="form-input" placeholder="Укажите желаемую услугу или дополнительные пожелания"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-submit">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            Записаться онлайн
-                        </button>
-                    </form>
-                    <div class="form-success" id="formSuccess">
+                    <div class="form-group">
+                        <label for="comment">Комментарий</label>
+                        <textarea id="comment" class="form-input" placeholder="Укажите желаемую услугу или дополнительные пожелания"></textarea>
+                    </div>
+                    <div class="form-message" id="formMessage" role="status" aria-live="polite"></div>
+                    <button type="submit" class="btn btn-primary btn-submit">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Записаться онлайн
+                    </button>
+                </form>
+                    <div class="form-success" id="formSuccess" role="status" aria-live="polite">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                         <h3>Заявка отправлена!</h3>
                         <p>Мы свяжемся с вами в ближайшее время для подтверждения записи.</p>

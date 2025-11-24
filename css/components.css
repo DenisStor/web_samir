@@ -21,6 +21,15 @@
     font-family: inherit;
 }
 
+.btn:focus-visible,
+.nav-links a:focus-visible,
+.mobile-menu a:focus-visible,
+.price-tag:focus-visible {
+    outline: 2px solid var(--accent-green);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 4px rgba(0, 255, 136, 0.2);
+}
+
 .btn-primary {
     background: var(--accent-green);
     color: var(--bg-dark);
@@ -53,6 +62,13 @@
     justify-content: center;
     font-size: 1.1rem;
     padding: 20px;
+}
+
+.btn:disabled,
+.btn.loading {
+    opacity: 0.7;
+    cursor: not-allowed;
+    box-shadow: none;
 }
 
 /* Badges */
@@ -158,6 +174,25 @@
 
 .form-input::placeholder {
     color: var(--text-gray);
+}
+
+.form-input:focus::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.form-message {
+    min-height: 24px;
+    margin-bottom: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.form-message.error {
+    color: var(--badge-pink);
+}
+
+.form-message.info {
+    color: var(--badge-blue);
 }
 
 select.form-input {
