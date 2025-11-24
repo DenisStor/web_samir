@@ -105,6 +105,8 @@
     cursor: pointer;
     padding: 10px;
     z-index: 1001;
+    background: transparent;
+    border: none;
 }
 
 .burger span {
