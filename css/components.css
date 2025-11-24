@@ -1,0 +1,225 @@
+/* =====================================================================
+   COMPONENTS.CSS - Компоненты UI
+   =====================================================================
+   Содержит стили переиспользуемых компонентов: кнопки, бейджи,
+   карточки, формы и другие элементы UI.
+   ===================================================================== */
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 18px 36px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+}
+
+.btn-primary {
+    background: var(--accent-green);
+    color: var(--bg-dark);
+    box-shadow: 0 0 40px var(--accent-green-glow);
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 60px var(--accent-green-glow), 0 15px 40px rgba(0, 0, 0, 0.3);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--text-white);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-secondary:hover {
+    border-color: var(--accent-green);
+    color: var(--accent-green);
+    background: var(--accent-green-subtle);
+}
+
+.btn-route {
+    margin-top: 16px;
+}
+
+.btn-submit {
+    width: 100%;
+    justify-content: center;
+    font-size: 1.1rem;
+    padding: 20px;
+}
+
+/* Badges */
+.legend-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+.badge-green {
+    background: rgba(0, 255, 136, 0.15);
+    color: var(--badge-green);
+}
+
+.badge-pink {
+    background: rgba(255, 107, 157, 0.15);
+    color: var(--badge-pink);
+}
+
+.badge-blue {
+    background: rgba(77, 124, 255, 0.15);
+    color: var(--badge-blue);
+}
+
+/* Price Tags */
+.price-tag {
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.price-tag:hover {
+    transform: translateY(-2px) scale(1.05);
+}
+
+.price-green {
+    background: rgba(0, 255, 136, 0.1);
+    color: var(--badge-green);
+    border: 1px solid rgba(0, 255, 136, 0.2);
+}
+
+.price-green:hover {
+    background: rgba(0, 255, 136, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 255, 136, 0.2);
+}
+
+.price-pink {
+    background: rgba(255, 107, 157, 0.1);
+    color: var(--badge-pink);
+    border: 1px solid rgba(255, 107, 157, 0.2);
+}
+
+.price-pink:hover {
+    background: rgba(255, 107, 157, 0.15);
+    box-shadow: 0 4px 12px rgba(255, 107, 157, 0.2);
+}
+
+.price-blue {
+    background: rgba(77, 124, 255, 0.1);
+    color: var(--badge-blue);
+    border: 1px solid rgba(77, 124, 255, 0.2);
+}
+
+.price-blue:hover {
+    background: rgba(77, 124, 255, 0.15);
+    box-shadow: 0 4px 12px rgba(77, 124, 255, 0.2);
+}
+
+/* Forms */
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.form-input {
+    width: 100%;
+    padding: 16px 20px;
+    background: var(--content-bg-light);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: var(--text-white);
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--accent-green);
+    box-shadow: 0 0 20px var(--accent-green-glow);
+}
+
+.form-input::placeholder {
+    color: var(--text-gray);
+}
+
+select.form-input {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2300ff88' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 20px;
+}
+
+select.form-input option {
+    background: var(--content-bg);
+    color: var(--text-white);
+}
+
+textarea.form-input {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* Success Message */
+.form-success {
+    display: none;
+    text-align: center;
+    padding: 40px;
+}
+
+.form-success.active {
+    display: block;
+}
+
+.form-success svg {
+    width: 80px;
+    height: 80px;
+    color: var(--accent-green);
+    margin-bottom: 24px;
+}
+
+.form-success h3 {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+}
+
+.form-success p {
+    color: var(--text-gray);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}

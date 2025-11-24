@@ -1,0 +1,25 @@
+/* =====================================================================
+   VARIABLES.CSS - CSS переменные темы
+   =====================================================================
+   Содержит все CSS переменные для цветов, типографии и других
+   глобальных значений, используемых по всему приложению.
+   ===================================================================== */
+
+:root {
+    --bg-dark: #0d0d0d;
+    --bg-darker: #080808;
+    --content-bg: #1a1a1a;
+    --content-bg-light: #242424;
+    --accent-green: #00ff88;
+    --accent-green-dim: #00cc6a;
+    --accent-green-glow: rgba(0, 255, 136, 0.3);
+    --accent-green-subtle: rgba(0, 255, 136, 0.1);
+    --text-white: #ffffff;
+    --text-gray: #a0a0a0;
+    --text-gray-light: #c0c0c0;
+    --badge-green: #00ff88;
+    --badge-pink: #ff6b9d;
+    --badge-blue: #4d7cff;
+    --medical-bg: #f5f7f5;
+    --medical-text: #1a1a1a;
+}
