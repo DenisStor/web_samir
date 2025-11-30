@@ -1,3 +1,16 @@
+// Preloader
+window.addEventListener('load', function() {
+    const preloader = document.getElementById('preloader');
+    if (preloader) {
+        setTimeout(() => {
+            preloader.classList.add('hidden');
+            setTimeout(() => {
+                preloader.style.display = 'none';
+            }, 500);
+        }, 800);
+    }
+});
+
 // Mobile Menu
 function toggleMenu() {
     const burger = document.querySelector('.burger');
