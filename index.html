@@ -15,24 +15,6 @@
     <link rel="stylesheet" href="css/sections.css">
 </head>
 <body>
-    <!-- Preloader -->
-    <div class="preloader" id="preloader">
-        <div class="preloader-content">
-            <div class="preloader-logo">
-                Say's<span class="preloader-logo-accent">Barbers</span>
-            </div>
-            <div class="preloader-spinner">
-                <div class="spinner-blade"></div>
-                <div class="spinner-blade"></div>
-                <div class="spinner-blade"></div>
-                <div class="spinner-blade"></div>
-                <div class="spinner-blade"></div>
-                <div class="spinner-blade"></div>
-            </div>
-            <div class="preloader-text">Загрузка...</div>
-        </div>
-    </div>
-
     <!-- Navigation -->
     <nav class="nav">
         <div class="container nav-content">
@@ -169,15 +151,15 @@
 
             <!-- Service Tabs -->
             <div class="service-tabs fade-in">
-                <button class="service-tab active" onclick="switchServiceTab('main')">
+                <button class="service-tab active" data-tab-target="main">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>
                     Основные услуги
                 </button>
-                <button class="service-tab" onclick="switchServiceTab('complex')">
+                <button class="service-tab" data-tab-target="complex">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
                     Комплексные услуги
                 </button>
-                <button class="service-tab" onclick="switchServiceTab('additional')">
+                <button class="service-tab" data-tab-target="additional">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                     Дополнительные услуги
                 </button>
@@ -287,7 +269,7 @@
                 </div>
 
                 <!-- Complex Services -->
-                <div class="service-category fade-in">
+                <div class="service-category service-tab-content" data-tab="complex">
                     <h3 class="category-title">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
                         Комплексные услуги
@@ -358,7 +340,7 @@
                 </div>
 
                 <!-- Additional Services -->
-                <div class="service-category fade-in">
+                <div class="service-category service-tab-content" data-tab="additional">
                     <h3 class="category-title">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                         Дополнительные услуги
@@ -1200,6 +1182,7 @@
     </footer>
 
     <!-- JavaScript Modules -->
+    <script src="js/main.js"></script>
     <script src="js/navigation.js"></script>
     <script src="js/animations.js"></script>
     <script src="js/forms.js"></script>

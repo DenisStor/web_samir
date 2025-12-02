@@ -169,9 +169,101 @@
     background: var(--bg-darker);
 }
 
+/* Service Tabs */
+.service-tabs {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 48px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.service-tab {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 32px;
+    background: var(--content-bg);
+    border: 2px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    color: var(--text-gray);
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.service-tab::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.service-tab:hover::before {
+    left: 100%;
+}
+
+.service-tab svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+.service-tab:hover {
+    border-color: rgba(0, 255, 136, 0.3);
+    color: var(--text-white);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 255, 136, 0.15);
+}
+
+.service-tab:hover svg {
+    color: var(--accent-green);
+    transform: scale(1.1);
+}
+
+.service-tab.active {
+    background: var(--accent-green);
+    border-color: var(--accent-green);
+    color: var(--bg-dark);
+    box-shadow: 0 0 40px var(--accent-green-glow), 0 8px 24px rgba(0, 255, 136, 0.3);
+}
+
+.service-tab.active svg {
+    color: var(--bg-dark);
+}
+
 .services-grid {
     display: grid;
     gap: 32px;
+}
+
+.service-tab-content {
+    display: none;
+    animation: fadeInUp 0.5s ease;
+}
+
+.service-tab-content.active {
+    display: block;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .service-category {
@@ -1220,6 +1312,20 @@
 
     .hero-buttons {
         flex-direction: column;
+    }
+
+    .service-tabs {
+        gap: 12px;
+    }
+
+    .service-tab {
+        padding: 12px 20px;
+        font-size: 0.9rem;
+    }
+
+    .service-tab svg {
+        width: 18px;
+        height: 18px;
     }
 
     .service-item {
