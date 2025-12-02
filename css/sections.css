@@ -1,11 +1,15 @@
 /* =====================================================================
    SECTIONS.CSS - Стили секций сайта
    =====================================================================
-   Содержит все стили для основных секций: hero, services, podology,
-   masters, quality, location, social, blog, faq, booking, footer.
+   Hero, Services, Podology, Masters, Quality, Location, Social,
+   Blog, FAQ, Booking, Footer.
+   Зависит от: variables.css, utilities.css
    ===================================================================== */
 
-/* Section Styles */
+/* =================================================================
+   SECTION - Общие стили
+   ================================================================= */
+
 .section {
     padding: 100px 0;
     position: relative;
@@ -38,7 +42,10 @@
     margin: 0 auto;
 }
 
-/* Hero Section */
+/* =================================================================
+   HERO SECTION
+   ================================================================= */
+
 .hero {
     min-height: 100vh;
     display: flex;
@@ -68,7 +75,7 @@
 
 .hero-content {
     position: relative;
-    z-index: 1;
+    z-index: var(--z-base);
     max-width: 900px;
 }
 
@@ -77,9 +84,9 @@
     align-items: center;
     gap: 8px;
     background: var(--accent-green-subtle);
-    border: 1px solid rgba(0, 255, 136, 0.2);
+    border: 1px solid var(--border-accent);
     padding: 8px 20px;
-    border-radius: 50px;
+    border-radius: var(--radius-full);
     font-size: 0.85rem;
     color: var(--accent-green);
     margin-bottom: 32px;
@@ -95,11 +102,6 @@
     animation: pulse 2s ease infinite;
 }
 
-@keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(1.2); }
-}
-
 .hero h1 {
     font-size: clamp(2.5rem, 6vw, 5rem);
     font-weight: 900;
@@ -110,7 +112,7 @@
 
 .hero h1 .accent {
     color: var(--accent-green);
-    text-shadow: 0 0 40px var(--accent-green-glow);
+    text-shadow: var(--shadow-glow-lg);
 }
 
 .hero-description {
@@ -153,18 +155,10 @@
     opacity: 0;
 }
 
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+/* =================================================================
+   SERVICES SECTION
+   ================================================================= */
 
-/* Services Section */
 .services {
     background: var(--bg-darker);
 }
@@ -184,14 +178,14 @@
     gap: 10px;
     padding: 16px 32px;
     background: var(--content-bg);
-    border: 2px solid rgba(255, 255, 255, 0.05);
-    border-radius: 16px;
+    border: 2px solid var(--border-subtle);
+    border-radius: var(--radius-md);
     color: var(--text-gray);
     font-family: inherit;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all var(--transition-smooth);
     position: relative;
     overflow: hidden;
 }
@@ -203,7 +197,7 @@
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.1), transparent);
+    background: linear-gradient(90deg, transparent, var(--accent-green-subtle), transparent);
     transition: left 0.5s ease;
 }
 
@@ -215,14 +209,14 @@
     width: 20px;
     height: 20px;
     flex-shrink: 0;
-    transition: all 0.3s ease;
+    transition: all var(--transition-base);
 }
 
 .service-tab:hover {
-    border-color: rgba(0, 255, 136, 0.3);
+    border-color: var(--border-accent-hover);
     color: var(--text-white);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 255, 136, 0.15);
+    box-shadow: 0 8px 24px var(--accent-green-hover);
 }
 
 .service-tab:hover svg {
@@ -234,13 +228,14 @@
     background: var(--accent-green);
     border-color: var(--accent-green);
     color: var(--bg-dark);
-    box-shadow: 0 0 40px var(--accent-green-glow), 0 8px 24px rgba(0, 255, 136, 0.3);
+    box-shadow: var(--shadow-glow-lg), 0 8px 24px var(--accent-green-glow);
 }
 
 .service-tab.active svg {
     color: var(--bg-dark);
 }
 
+/* Service Grid */
 .services-grid {
     display: grid;
     gap: 32px;
@@ -255,27 +250,17 @@
     display: block;
 }
 
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
+/* Service Category */
 .service-category {
     background: var(--content-bg);
-    border-radius: 24px;
+    border-radius: var(--radius-xl);
     padding: 40px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: all 0.3s ease;
+    border: 1px solid var(--border-subtle);
+    transition: all var(--transition-base);
 }
 
 .service-category:hover {
-    border-color: rgba(0, 255, 136, 0.2);
+    border-color: var(--border-accent);
     box-shadow: 0 0 40px rgba(0, 255, 136, 0.05);
 }
 
@@ -328,8 +313,8 @@
     align-items: center;
     padding: 20px 24px;
     background: var(--content-bg-light);
-    border-radius: 16px;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-bounce);
     position: relative;
     border: 1px solid transparent;
 }
@@ -344,14 +329,14 @@
     height: 0;
     background: var(--accent-green);
     border-radius: 0 3px 3px 0;
-    transition: height 0.3s ease;
+    transition: height var(--transition-base);
 }
 
 .service-item:hover {
     background: rgba(0, 255, 136, 0.08);
     transform: translateX(12px);
-    border-color: rgba(0, 255, 136, 0.2);
-    box-shadow: 0 4px 20px rgba(0, 255, 136, 0.1);
+    border-color: var(--border-accent);
+    box-shadow: var(--shadow-card);
 }
 
 .service-item:hover::before {
@@ -375,10 +360,16 @@
     flex-wrap: wrap;
 }
 
-/* Podology Section */
+/* =================================================================
+   PODOLOGY SECTION (Светлая тема)
+   ================================================================= */
+
 .podology {
-    background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 50%, #e8f5ed 100%);
-    color: var(--medical-text);
+    background: linear-gradient(180deg,
+        var(--medical-bg-gradient-start) 0%,
+        var(--medical-bg-gradient-mid) 50%,
+        var(--medical-bg-gradient-end) 100%);
+    color: var(--medical-text-dark);
     position: relative;
     overflow: hidden;
     padding: 120px 0;
@@ -391,53 +382,50 @@
     left: 0;
     right: 0;
     height: 6px;
-    background: linear-gradient(90deg, #00cc6a 0%, #00ff88 50%, #00cc6a 100%);
+    background: linear-gradient(90deg, var(--accent-green-dim) 0%, var(--accent-green) 50%, var(--accent-green-dim) 100%);
     background-size: 200% 100%;
     animation: shimmerMove 3s ease-in-out infinite;
 }
 
-@keyframes shimmerMove {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-}
-
 .podology .section-tag {
-    color: #00cc6a;
+    color: var(--accent-green-dim);
     background: rgba(0, 204, 106, 0.1);
     padding: 8px 20px;
-    border-radius: 50px;
+    border-radius: var(--radius-full);
 }
 
 .podology .section-title {
-    color: #0d3320;
+    color: var(--medical-text-dark);
     font-size: clamp(2.5rem, 5vw, 3.5rem);
     margin-bottom: 20px;
 }
 
 .podology .section-subtitle {
-    color: #2d5a3d;
+    color: var(--medical-text-light);
     font-size: 1.2rem;
 }
 
+/* Podology Intro */
 .podology-intro {
     text-align: center;
     max-width: 900px;
     margin: 0 auto 80px;
     padding: 40px;
     background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(240,253,244,0.9) 100%);
-    border-radius: 32px;
+    border-radius: var(--radius-2xl);
     backdrop-filter: blur(10px);
-    box-shadow: 0 10px 40px rgba(0, 204, 106, 0.12);
-    border: 2px solid rgba(0, 255, 136, 0.15);
+    box-shadow: var(--shadow-medical-md);
+    border: 2px solid var(--accent-green-hover);
 }
 
 .podology-intro p {
-    color: #1a472a;
+    color: var(--medical-text-medium);
     font-size: 1.15rem;
     line-height: 2;
     margin-bottom: 32px;
 }
 
+/* Podology Specialist */
 .podology-specialist {
     display: inline-flex;
     align-items: center;
@@ -446,21 +434,21 @@
     background: linear-gradient(135deg, #ffffff 0%, #f9fffe 100%);
     border-radius: 100px;
     box-shadow: 0 12px 48px rgba(0, 204, 106, 0.2), 0 4px 12px rgba(0, 0, 0, 0.08);
-    border: 2px solid rgba(0, 255, 136, 0.2);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 2px solid var(--border-accent);
+    transition: all var(--transition-bounce);
 }
 
 .podology-specialist:hover {
     transform: translateY(-4px) scale(1.02);
     box-shadow: 0 16px 56px rgba(0, 204, 106, 0.25), 0 6px 16px rgba(0, 0, 0, 0.1);
-    border-color: rgba(0, 255, 136, 0.4);
+    border-color: var(--border-accent-strong);
 }
 
 .specialist-avatar {
     width: 72px;
     height: 72px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #00cc6a 0%, #00ff88 100%);
+    background: linear-gradient(135deg, var(--accent-green-dim) 0%, var(--accent-green) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -474,16 +462,17 @@
 .specialist-info h4 {
     font-size: 1.3rem;
     font-weight: 700;
-    color: #0d3320;
+    color: var(--medical-text-dark);
     margin-bottom: 4px;
 }
 
 .specialist-info span {
-    color: #2d5a3d;
+    color: var(--medical-text-light);
     font-size: 1rem;
     font-weight: 500;
 }
 
+/* Podology Grid */
 .podology-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
@@ -492,6 +481,7 @@
     margin: 0 auto;
 }
 
+/* Podology Item */
 .podology-item {
     display: flex;
     justify-content: space-between;
@@ -499,10 +489,10 @@
     gap: 24px;
     padding: 32px 36px;
     background: linear-gradient(135deg, #ffffff 0%, #fafffe 100%);
-    border-radius: 24px;
-    box-shadow: 0 6px 24px rgba(0, 204, 106, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-medical-sm);
     border: 2px solid rgba(0, 255, 136, 0.12);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all var(--transition-bounce);
     position: relative;
     overflow: hidden;
 }
@@ -514,9 +504,9 @@
     top: 0;
     bottom: 0;
     width: 6px;
-    background: linear-gradient(180deg, #00cc6a 0%, #00ff88 100%);
+    background: linear-gradient(180deg, var(--accent-green-dim) 0%, var(--accent-green) 100%);
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity var(--transition-base);
 }
 
 .podology-item::after {
@@ -528,19 +518,16 @@
     height: 200%;
     background: radial-gradient(circle, rgba(0, 255, 136, 0.08) 0%, transparent 70%);
     opacity: 0;
-    transition: opacity 0.4s ease;
+    transition: opacity var(--transition-slow);
 }
 
 .podology-item:hover {
     transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 16px 48px rgba(0, 204, 106, 0.2), 0 6px 16px rgba(0, 0, 0, 0.08);
-    border-color: rgba(0, 255, 136, 0.3);
+    box-shadow: var(--shadow-medical-hover);
+    border-color: var(--border-accent-hover);
 }
 
-.podology-item:hover::before {
-    opacity: 1;
-}
-
+.podology-item:hover::before,
 .podology-item:hover::after {
     opacity: 1;
 }
@@ -548,63 +535,371 @@
 .podology-item-info {
     flex: 1;
     position: relative;
-    z-index: 1;
+    z-index: var(--z-base);
 }
 
 .podology-item-info h4 {
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: #0d3320;
-    margin-bottom: 8px;
+    font-size: 1.02rem;
+    font-weight: 600;
+    color: var(--medical-text-dark);
+    margin-bottom: 6px;
     line-height: 1.4;
 }
 
 .podology-item-info span {
-    font-size: 0.9rem;
-    color: #5a8a6a;
+    font-size: 0.82rem;
+    color: var(--medical-text-muted);
     font-weight: 500;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
 }
 
 .podology-item-info span::before {
     content: '⏱';
-    font-size: 1rem;
+    font-size: 0.85rem;
 }
 
 .podology-price {
     font-family: 'Unbounded', sans-serif;
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: #00cc6a;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--accent-green-dim);
     white-space: nowrap;
-    padding: 12px 24px;
+    padding: 8px 16px;
     background: rgba(0, 204, 106, 0.08);
-    border-radius: 16px;
+    border-radius: var(--radius-md);
     position: relative;
-    z-index: 1;
-    transition: all 0.3s ease;
+    z-index: var(--z-base);
+    transition: all var(--transition-base);
 }
 
 .podology-item:hover .podology-price {
-    background: rgba(0, 204, 106, 0.15);
+    background: var(--accent-green-hover);
     transform: scale(1.05);
 }
 
+/* Text-based prices (e.g. "По прайсу") */
+.podology-price-text {
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
 .podology-free {
-    background: linear-gradient(135deg, rgba(0, 255, 136, 0.15), rgba(0, 204, 106, 0.12));
-    border: 2px solid #00cc6a;
+    background: linear-gradient(135deg, var(--accent-green-hover), rgba(0, 204, 106, 0.12));
+    border: 2px solid var(--accent-green-dim);
     box-shadow: 0 8px 32px rgba(0, 204, 106, 0.2);
 }
 
 .podology-free .podology-price {
-    color: #00cc6a;
+    color: var(--accent-green-dim);
     background: rgba(255, 255, 255, 0.8);
     font-size: 1.3rem;
 }
 
-/* Masters Section */
+/* Podology Consultation Banner */
+.podology-consultation {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 32px 40px;
+    background: linear-gradient(135deg, rgba(0, 204, 106, 0.15) 0%, rgba(0, 255, 136, 0.08) 100%);
+    border: 2px solid var(--accent-green-dim);
+    border-radius: var(--radius-2xl);
+    margin-bottom: 48px;
+    box-shadow: 0 8px 32px rgba(0, 204, 106, 0.15);
+    transition: all var(--transition-bounce);
+}
+
+.podology-consultation:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 204, 106, 0.2);
+}
+
+.podology-consultation-icon {
+    width: 72px;
+    height: 72px;
+    min-width: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-green-dim) 0%, var(--accent-green) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(0, 204, 106, 0.3);
+}
+
+.podology-consultation-icon svg {
+    color: white;
+}
+
+.podology-consultation-content {
+    flex: 1;
+}
+
+.podology-consultation-content h4 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--medical-text-dark);
+    margin-bottom: 8px;
+}
+
+.podology-consultation-content p {
+    color: var(--medical-text-light);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.podology-consultation-btn {
+    padding: 16px 32px;
+    background: linear-gradient(135deg, var(--accent-green-dim) 0%, var(--accent-green) 100%);
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+    border-radius: var(--radius-full);
+    white-space: nowrap;
+    transition: all var(--transition-base);
+    box-shadow: 0 4px 16px rgba(0, 204, 106, 0.3);
+}
+
+.podology-consultation-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 24px rgba(0, 204, 106, 0.4);
+}
+
+/* Podology Category */
+.podology-category {
+    background: linear-gradient(135deg, #ffffff 0%, #fafffe 100%);
+    border-radius: var(--radius-xl);
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-medical-sm);
+    border: 1px solid rgba(0, 255, 136, 0.1);
+}
+
+.podology-category-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(0, 204, 106, 0.1);
+}
+
+.podology-category-icon {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, rgba(0, 204, 106, 0.15) 0%, rgba(0, 255, 136, 0.08) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.podology-category-icon svg {
+    color: var(--accent-green-dim);
+    width: 20px;
+    height: 20px;
+}
+
+.podology-category-title {
+    flex: 1;
+}
+
+.podology-category-title h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--medical-text-dark);
+    margin-bottom: 2px;
+}
+
+.podology-category-title p {
+    color: var(--medical-text-muted);
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.podology-category-badge {
+    padding: 6px 12px;
+    background: linear-gradient(135deg, var(--accent-green-dim) 0%, var(--accent-green) 100%);
+    color: white;
+    font-weight: 700;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: var(--radius-full);
+    box-shadow: 0 4px 12px rgba(0, 204, 106, 0.3);
+}
+
+.podology-category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+}
+
+.podology-category-grid-sm {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+/* Podology Items inside Category */
+.podology-category .podology-item {
+    padding: 18px 22px;
+    margin: 0;
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(0, 204, 106, 0.08);
+}
+
+.podology-category .podology-item:hover {
+    background: rgba(255, 255, 255, 0.95);
+    transform: translateY(-3px) scale(1.01);
+}
+
+.podology-category .podology-item::before {
+    width: 4px;
+    border-radius: 4px;
+}
+
+/* Featured Items (Комплексы) */
+.podology-item-featured {
+    background: linear-gradient(135deg, rgba(0, 204, 106, 0.08) 0%, rgba(255, 255, 255, 0.9) 100%) !important;
+    border: 2px solid rgba(0, 204, 106, 0.2) !important;
+}
+
+.podology-item-featured:hover {
+    border-color: var(--accent-green-dim) !important;
+    box-shadow: 0 8px 32px rgba(0, 204, 106, 0.15);
+}
+
+.podology-item-featured .podology-price {
+    background: linear-gradient(135deg, var(--accent-green-dim) 0%, var(--accent-green) 100%);
+    color: white;
+}
+
+.podology-item-featured:hover .podology-price {
+    background: linear-gradient(135deg, var(--accent-green) 0%, #00e07a 100%);
+    color: white;
+    transform: scale(1.05);
+    box-shadow: 0 4px 16px rgba(0, 204, 106, 0.3);
+}
+
+/* Small Items (Дополнительные) */
+.podology-item-sm {
+    padding: 14px 18px !important;
+}
+
+.podology-item-sm .podology-item-info h4 {
+    font-size: 0.92rem;
+}
+
+.podology-item-sm .podology-price {
+    font-size: 1rem;
+    padding: 6px 14px;
+}
+
+/* Responsive Podology Categories */
+@media (max-width: 768px) {
+    .podology-consultation {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px 18px;
+        gap: 16px;
+    }
+
+    .podology-consultation-icon {
+        width: 52px;
+        height: 52px;
+        min-width: 52px;
+    }
+
+    .podology-consultation-btn {
+        width: 100%;
+        text-align: center;
+        padding: 12px 20px;
+        font-size: 0.9rem;
+    }
+
+    .podology-category {
+        padding: 18px 16px;
+    }
+
+    .podology-category-header {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .podology-category-icon {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+    }
+
+    .podology-category-title h3 {
+        font-size: 1rem;
+    }
+
+    .podology-category-badge {
+        order: 3;
+        width: 100%;
+        text-align: center;
+        padding: 5px 10px;
+        font-size: 0.65rem;
+    }
+
+    .podology-category-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .podology-category .podology-item {
+        padding: 14px 16px;
+    }
+
+    .podology-item-info h4 {
+        font-size: 0.95rem;
+    }
+
+    .podology-price {
+        font-size: 1rem;
+        padding: 6px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .podology-consultation-content h4 {
+        font-size: 1.05rem;
+    }
+
+    .podology-consultation-content p {
+        font-size: 0.85rem;
+    }
+
+    .podology-category-title h3 {
+        font-size: 0.95rem;
+    }
+
+    .podology-category-title p {
+        font-size: 0.8rem;
+    }
+
+    .podology-item-info h4 {
+        font-size: 0.9rem;
+    }
+
+    .podology-price {
+        font-size: 0.95rem;
+        padding: 5px 10px;
+    }
+}
+
+/* =================================================================
+   MASTERS SECTION
+   ================================================================= */
+
 .masters {
     background: var(--bg-dark);
 }
@@ -615,22 +910,24 @@
     gap: 32px;
 }
 
+/* Master Card */
 .master-card {
     background: var(--content-bg);
-    border-radius: 24px;
+    border-radius: var(--radius-xl);
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                border-color 0.4s ease,
-                box-shadow 0.4s ease;
+    border: 1px solid var(--border-subtle);
+    transition:
+        transform var(--transition-smooth),
+        border-color var(--transition-slow),
+        box-shadow var(--transition-slow);
     position: relative;
     will-change: transform;
 }
 
 .master-card:hover {
     transform: translateY(-6px);
-    border-color: rgba(0, 255, 136, 0.3);
-    box-shadow: 0 0 30px rgba(0, 255, 136, 0.15), 0 12px 35px rgba(0, 0, 0, 0.25);
+    border-color: var(--border-accent-hover);
+    box-shadow: var(--shadow-glow-md), 0 12px 35px rgba(0, 0, 0, 0.25);
 }
 
 .master-image {
@@ -663,7 +960,7 @@
     font-weight: 800;
     color: white;
     position: relative;
-    z-index: 1;
+    z-index: var(--z-base);
 }
 
 .master-badge {
@@ -728,12 +1025,14 @@
     margin-top: 2px;
 }
 
+/* Master Extra (reveal on hover) */
 .master-extra {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-                opacity 0.5s ease 0.1s,
-                margin-top 0.5s ease;
+    transition:
+        max-height var(--transition-spring),
+        opacity 0.5s ease 0.1s,
+        margin-top 0.5s ease;
     opacity: 0;
     margin-top: 0;
 }
@@ -746,14 +1045,17 @@
 
 .master-extra .master-principle {
     transform: translateY(-10px);
-    transition: transform 0.4s ease, opacity 0.4s ease;
+    transition: transform var(--transition-slow), opacity var(--transition-slow);
 }
 
 .master-card:hover .master-extra .master-principle {
     transform: translateY(0);
 }
 
-/* Quality Section */
+/* =================================================================
+   QUALITY SECTION
+   ================================================================= */
+
 .quality {
     background: var(--bg-darker);
 }
@@ -767,21 +1069,21 @@
 .quality-item {
     background: var(--content-bg);
     padding: 40px 32px;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
     text-align: center;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: all 0.3s ease;
+    border: 1px solid var(--border-subtle);
+    transition: all var(--transition-base);
 }
 
 .quality-item:hover {
-    border-color: rgba(0, 255, 136, 0.3);
+    border-color: var(--border-accent-hover);
     transform: translateY(-4px);
 }
 
 .quality-icon {
     width: 72px;
     height: 72px;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
     background: var(--accent-green-subtle);
     display: flex;
     align-items: center;
@@ -805,7 +1107,10 @@
     font-size: 0.95rem;
 }
 
-/* Location Section */
+/* =================================================================
+   LOCATION SECTION
+   ================================================================= */
+
 .location {
     background: var(--bg-dark);
 }
@@ -843,11 +1148,11 @@
 }
 
 .location-map {
-    border-radius: 24px;
+    border-radius: var(--radius-xl);
     overflow: hidden;
     height: 400px;
     background: var(--content-bg);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-light);
 }
 
 .location-map iframe {
@@ -857,7 +1162,10 @@
     filter: grayscale(0.5) contrast(1.1);
 }
 
-/* Social Section */
+/* =================================================================
+   SOCIAL SECTION
+   ================================================================= */
+
 .social {
     background: var(--bg-darker);
     padding: 60px 0;
@@ -877,34 +1185,37 @@
 .social-link {
     width: 60px;
     height: 60px;
-    border-radius: 16px;
+    border-radius: var(--radius-md);
     background: var(--content-bg);
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all var(--transition-base);
+    border: 1px solid var(--border-subtle);
 }
 
 .social-link svg {
     width: 28px;
     height: 28px;
     color: var(--text-gray-light);
-    transition: color 0.3s ease;
+    transition: color var(--transition-base);
 }
 
 .social-link:hover {
     background: var(--accent-green-subtle);
     border-color: var(--accent-green);
     transform: translateY(-4px);
-    box-shadow: 0 0 30px var(--accent-green-glow);
+    box-shadow: var(--shadow-glow-md);
 }
 
 .social-link:hover svg {
     color: var(--accent-green);
 }
 
-/* Blog Section */
+/* =================================================================
+   BLOG SECTION
+   ================================================================= */
+
 .blog {
     background: var(--bg-dark);
 }
@@ -915,19 +1226,20 @@
     gap: 32px;
 }
 
+/* Blog Card */
 .blog-card {
     background: var(--content-bg);
-    border-radius: 24px;
+    border-radius: var(--radius-xl);
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid var(--border-subtle);
+    transition: all var(--transition-bounce);
     cursor: pointer;
 }
 
 .blog-card:hover {
     transform: translateY(-8px);
-    border-color: rgba(0, 255, 136, 0.2);
-    box-shadow: 0 12px 40px rgba(0, 255, 136, 0.1), 0 4px 12px rgba(0, 0, 0, 0.2);
+    border-color: var(--border-accent);
+    box-shadow: var(--shadow-card-hover);
 }
 
 .blog-image {
@@ -953,7 +1265,7 @@
     color: var(--accent-green);
     opacity: 0.3;
     position: relative;
-    z-index: 1;
+    z-index: var(--z-base);
 }
 
 .blog-content {
@@ -974,7 +1286,7 @@
     font-weight: 600;
     background: var(--accent-green-subtle);
     color: var(--accent-green);
-    border: 1px solid rgba(0, 255, 136, 0.2);
+    border: 1px solid var(--border-accent);
 }
 
 .blog-date {
@@ -1010,7 +1322,7 @@
     color: var(--accent-green);
     font-weight: 600;
     font-size: 0.9rem;
-    transition: gap 0.3s ease;
+    transition: gap var(--transition-base);
 }
 
 .blog-read-more svg {
@@ -1022,7 +1334,10 @@
     gap: 12px;
 }
 
-/* Blog Modal */
+/* =================================================================
+   BLOG MODAL
+   ================================================================= */
+
 .blog-modal {
     display: none;
     position: fixed;
@@ -1031,11 +1346,11 @@
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.9);
-    z-index: 2000;
+    z-index: var(--z-modal);
     padding: 40px 20px;
     overflow-y: auto;
     backdrop-filter: blur(10px);
-    animation: fadeIn 0.3s ease;
+    animation: fadeIn var(--transition-base);
 }
 
 .blog-modal.active {
@@ -1046,29 +1361,13 @@
 
 .blog-modal-content {
     background: var(--content-bg);
-    border-radius: 24px;
+    border-radius: var(--radius-xl);
     max-width: 900px;
     width: 100%;
     padding: 48px;
     position: relative;
-    border: 1px solid rgba(0, 255, 136, 0.1);
-    animation: slideUp 0.4s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    border: 1px solid var(--accent-green-subtle);
+    animation: slideUp var(--transition-slow);
 }
 
 .blog-modal-close {
@@ -1078,13 +1377,13 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: var(--border-light);
+    border: 1px solid var(--border-medium);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all var(--transition-base);
 }
 
 .blog-modal-close:hover {
@@ -1138,7 +1437,10 @@
     color: var(--accent-green);
 }
 
-/* FAQ Section */
+/* =================================================================
+   FAQ SECTION
+   ================================================================= */
+
 .faq {
     background: var(--bg-darker);
 }
@@ -1150,15 +1452,15 @@
 
 .faq-item {
     background: var(--content-bg);
-    border-radius: 16px;
+    border-radius: var(--radius-md);
     margin-bottom: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-subtle);
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: all var(--transition-base);
 }
 
 .faq-item:hover {
-    border-color: rgba(0, 255, 136, 0.2);
+    border-color: var(--border-accent);
 }
 
 .faq-question {
@@ -1168,7 +1470,7 @@
     justify-content: space-between;
     align-items: center;
     gap: 20px;
-    transition: all 0.3s ease;
+    transition: all var(--transition-base);
     user-select: none;
 }
 
@@ -1188,7 +1490,7 @@
     height: 24px;
     color: var(--accent-green);
     flex-shrink: 0;
-    transition: transform 0.3s ease;
+    transition: transform var(--transition-base);
 }
 
 .faq-item.active .faq-icon {
@@ -1198,7 +1500,10 @@
 .faq-answer {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), padding 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+    transition:
+        max-height var(--transition-expand),
+        padding var(--transition-expand),
+        opacity var(--transition-slow);
     opacity: 0;
 }
 
@@ -1215,7 +1520,10 @@
     margin: 0;
 }
 
-/* Booking Section */
+/* =================================================================
+   BOOKING SECTION
+   ================================================================= */
+
 .booking {
     background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
     position: relative;
@@ -1232,33 +1540,116 @@
 
 .booking-content {
     position: relative;
-    z-index: 1;
+    z-index: var(--z-base);
 }
 
-.booking-form {
+/* Booking CTA Card */
+.booking-cta {
     max-width: 600px;
     margin: 0 auto;
-    background: var(--content-bg);
+}
+
+.booking-cta-card {
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.08) 0%, rgba(0, 200, 100, 0.03) 100%);
+    border: 1px solid var(--border-accent);
+    border-radius: var(--radius-2xl);
     padding: 48px;
-    border-radius: 32px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.booking-alt {
     text-align: center;
-    margin-top: 32px;
+    position: relative;
+    overflow: hidden;
 }
 
-.booking-alt p {
+.booking-cta-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
+}
+
+.booking-cta-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    background: rgba(0, 255, 136, 0.1);
+    border-radius: 50%;
+    margin-bottom: 24px;
+    color: var(--accent-green);
+}
+
+.booking-cta-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--text-white);
+}
+
+.booking-cta-text {
     color: var(--text-gray);
-    margin-bottom: 16px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 32px;
+    max-width: 450px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-/* Footer */
+.booking-cta-features {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 32px;
+}
+
+.booking-cta-feature {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: var(--text-light);
+    font-size: 0.95rem;
+}
+
+.booking-cta-feature svg {
+    color: var(--accent-green);
+    flex-shrink: 0;
+}
+
+.booking-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 40px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-glow-sm);
+}
+
+.booking-cta-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-glow-md);
+}
+
+.booking-cta-hint {
+    margin-top: 16px;
+    color: var(--text-gray);
+    font-size: 0.85rem;
+}
+
+/* =================================================================
+   FOOTER
+   ================================================================= */
+
 .footer {
     background: var(--bg-darker);
     padding: 40px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid var(--border-subtle);
 }
 
 .footer-content {
@@ -1283,14 +1674,17 @@
     color: var(--text-gray);
     text-decoration: none;
     font-size: 0.9rem;
-    transition: color 0.3s ease;
+    transition: color var(--transition-base);
 }
 
 .footer-links a:hover {
     color: var(--accent-green);
 }
 
-/* Responsive Styles */
+/* =================================================================
+   RESPONSIVE
+   ================================================================= */
+
 @media (max-width: 1024px) {
     .location-content {
         grid-template-columns: 1fr;
@@ -1337,8 +1731,33 @@
         justify-content: flex-start;
     }
 
-    .booking-form {
+    .booking-cta-card {
         padding: 32px 24px;
+    }
+
+    .booking-cta-icon {
+        width: 64px;
+        height: 64px;
+    }
+
+    .booking-cta-icon svg {
+        width: 36px;
+        height: 36px;
+    }
+
+    .booking-cta-title {
+        font-size: 1.4rem;
+    }
+
+    .booking-cta-text {
+        font-size: 1rem;
+    }
+
+    .booking-cta-btn {
+        padding: 16px 32px;
+        font-size: 1rem;
+        width: 100%;
+        justify-content: center;
     }
 
     .podology {
@@ -1355,7 +1774,7 @@
         text-align: center;
         padding: 28px 24px;
         gap: 16px;
-        border-radius: 24px;
+        border-radius: var(--radius-xl);
         max-width: 100%;
     }
 
@@ -1381,13 +1800,15 @@
     .podology-item {
         flex-direction: column;
         align-items: flex-start;
-        gap: 16px;
-        padding: 24px;
+        gap: 12px;
+        padding: 16px;
     }
 
     .podology-price {
         width: 100%;
         text-align: center;
+        font-size: 1rem;
+        padding: 6px 12px;
     }
 
     .footer-content {
@@ -1446,7 +1867,7 @@
 
     .podology-intro {
         padding: 24px 20px;
-        border-radius: 20px;
+        border-radius: var(--radius-lg);
     }
 
     .podology-intro p {
@@ -1457,7 +1878,7 @@
     .podology-specialist {
         padding: 20px;
         gap: 12px;
-        border-radius: 20px;
+        border-radius: var(--radius-lg);
     }
 
     .specialist-avatar {
@@ -1476,11 +1897,11 @@
     }
 
     .podology-item {
-        padding: 20px;
+        padding: 14px;
     }
 
     .podology-price {
-        font-size: 1.3rem;
-        padding: 10px 20px;
+        font-size: 0.95rem;
+        padding: 5px 10px;
     }
 }

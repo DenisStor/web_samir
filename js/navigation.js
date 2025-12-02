@@ -1,62 +1,110 @@
 /**
  * Navigation Module
  *
- * Модуль для работы с навигацией:
- * - Управление мобильным меню (открытие/закрытие)
- * - Эффект изменения стиля при прокрутке страницы
+ * Управление навигацией:
+ * - Мобильное меню (открытие/закрытие)
+ * - Эффект при прокрутке
+ *
+ * Зависит от: utils.js
  */
 
-// Переключение мобильного меню
-function toggleMenu() {
-    const burger = document.querySelector('.burger');
-    const mobileMenu = document.getElementById('mobileMenu');
-    const isActive = !mobileMenu.classList.contains('active');
+(function() {
+    'use strict';
 
-    burger.classList.toggle('active', isActive);
-    mobileMenu.classList.toggle('active', isActive);
-    document.body.style.overflow = isActive ? 'hidden' : '';
-    burger.setAttribute('aria-expanded', isActive.toString());
-    burger.setAttribute('aria-label', isActive ? 'Закрыть меню' : 'Открыть меню');
-    mobileMenu.setAttribute('aria-hidden', (!isActive).toString());
-}
+    const { $, byId, lockScroll, setAria, toggleClass, hasClass, on, ready, onEscape } = SaysApp;
 
-// Закрытие мобильного меню
-function closeMenu() {
-    const burger = document.querySelector('.burger');
-    const mobileMenu = document.getElementById('mobileMenu');
-    burger.classList.remove('active');
-    mobileMenu.classList.remove('active');
-    document.body.style.overflow = '';
-    burger.setAttribute('aria-expanded', 'false');
-    burger.setAttribute('aria-label', 'Открыть меню');
-    mobileMenu.setAttribute('aria-hidden', 'true');
-}
+    // Кэшированные элементы
+    let burger = null;
+    let mobileMenu = null;
+    let nav = null;
 
-// Эффект навигации при прокрутке страницы
-window.addEventListener('scroll', () => {
-    const nav = document.querySelector('.nav');
-    if (window.scrollY > 50) {
-        nav.classList.add('scrolled');
-    } else {
-        nav.classList.remove('scrolled');
-    }
-});
+    // =================================================================
+    // MOBILE MENU
+    // =================================================================
 
-// Настройки доступности и закрытие меню по Esc
-document.addEventListener('DOMContentLoaded', () => {
-    const burger = document.querySelector('.burger');
-    const mobileMenu = document.getElementById('mobileMenu');
+    /**
+     * Переключить мобильное меню
+     */
+    function toggleMenu() {
+        if (!burger || !mobileMenu) return;
 
-    if (burger && mobileMenu) {
-        burger.setAttribute('aria-expanded', 'false');
-        burger.setAttribute('aria-controls', 'mobileMenu');
-        burger.setAttribute('aria-label', 'Открыть меню');
-        mobileMenu.setAttribute('aria-hidden', 'true');
+        const isActive = !hasClass(mobileMenu, 'active');
 
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape' && mobileMenu.classList.contains('active')) {
-                closeMenu();
-            }
+        toggleClass(burger, 'active', isActive);
+        toggleClass(mobileMenu, 'active', isActive);
+        lockScroll(isActive);
+
+        setAria(burger, {
+            expanded: isActive,
+            label: isActive ? 'Закрыть меню' : 'Открыть меню'
         });
+        setAria(mobileMenu, { hidden: !isActive });
     }
-});
+
+    /**
+     * Закрыть мобильное меню
+     */
+    function closeMenu() {
+        if (!burger || !mobileMenu) return;
+
+        toggleClass(burger, 'active', false);
+        toggleClass(mobileMenu, 'active', false);
+        lockScroll(false);
+
+        setAria(burger, {
+            expanded: false,
+            label: 'Открыть меню'
+        });
+        setAria(mobileMenu, { hidden: true });
+    }
+
+    // =================================================================
+    // SCROLL EFFECT
+    // =================================================================
+
+    /**
+     * Обработчик скролла для навигации
+     */
+    function handleScroll() {
+        if (!nav) return;
+        toggleClass(nav, 'scrolled', window.scrollY > 50);
+    }
+
+    // =================================================================
+    // ИНИЦИАЛИЗАЦИЯ
+    // =================================================================
+
+    function init() {
+        burger = $('.burger');
+        mobileMenu = byId('mobileMenu');
+        nav = $('.nav');
+
+        if (burger && mobileMenu) {
+            // Начальные aria-атрибуты
+            setAria(burger, {
+                expanded: false,
+                controls: 'mobileMenu',
+                label: 'Открыть меню'
+            });
+            setAria(mobileMenu, { hidden: true });
+
+            // Закрытие по Escape
+            onEscape(() => {
+                if (hasClass(mobileMenu, 'active')) {
+                    closeMenu();
+                }
+            });
+        }
+
+        // Scroll эффект
+        on(window, 'scroll', handleScroll, { passive: true });
+    }
+
+    // Запуск при готовности DOM
+    ready(init);
+
+    // Экспорт глобальных функций для onclick в HTML
+    window.toggleMenu = toggleMenu;
+    window.closeMenu = closeMenu;
+
+})();

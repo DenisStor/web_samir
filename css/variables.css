@@ -1,25 +1,113 @@
 /* =====================================================================
    VARIABLES.CSS - CSS переменные темы
    =====================================================================
-   Содержит все CSS переменные для цветов, типографии и других
-   глобальных значений, используемых по всему приложению.
+   Единый источник истины для всех дизайн-токенов.
+   Группировка: цвета → тени → бордеры → анимации → размеры
    ===================================================================== */
 
 :root {
+    /* =================================================================
+       ЦВЕТА - Основная палитра
+       ================================================================= */
+
+    /* Фон */
     --bg-dark: #0d0d0d;
     --bg-darker: #080808;
     --content-bg: #1a1a1a;
     --content-bg-light: #242424;
+
+    /* Акцентный цвет (зелёный) */
     --accent-green: #00ff88;
     --accent-green-dim: #00cc6a;
     --accent-green-glow: rgba(0, 255, 136, 0.3);
     --accent-green-subtle: rgba(0, 255, 136, 0.1);
+    --accent-green-hover: rgba(0, 255, 136, 0.15);
+
+    /* Текст */
     --text-white: #ffffff;
     --text-gray: #a0a0a0;
     --text-gray-light: #c0c0c0;
+
+    /* Цвета для бейджей */
     --badge-green: #00ff88;
     --badge-pink: #ff6b9d;
     --badge-blue: #4d7cff;
+
+    /* Полупрозрачные версии для бейджей */
+    --badge-green-bg: rgba(0, 255, 136, 0.15);
+    --badge-pink-bg: rgba(255, 107, 157, 0.15);
+    --badge-blue-bg: rgba(77, 124, 255, 0.15);
+
+    /* =================================================================
+       ЦВЕТА - Подологическая секция (светлая тема)
+       ================================================================= */
     --medical-bg: #f5f7f5;
-    --medical-text: #1a1a1a;
+    --medical-bg-gradient-start: #ffffff;
+    --medical-bg-gradient-mid: #f0fdf4;
+    --medical-bg-gradient-end: #e8f5ed;
+    --medical-text-dark: #0d3320;
+    --medical-text-medium: #1a472a;
+    --medical-text-light: #2d5a3d;
+    --medical-text-muted: #5a8a6a;
+
+    /* =================================================================
+       БОРДЕРЫ
+       ================================================================= */
+    --border-subtle: rgba(255, 255, 255, 0.05);
+    --border-light: rgba(255, 255, 255, 0.1);
+    --border-medium: rgba(255, 255, 255, 0.2);
+    --border-accent: rgba(0, 255, 136, 0.2);
+    --border-accent-hover: rgba(0, 255, 136, 0.3);
+    --border-accent-strong: rgba(0, 255, 136, 0.4);
+
+    /* =================================================================
+       ТЕНИ
+       ================================================================= */
+    --shadow-glow-sm: 0 0 20px var(--accent-green-glow);
+    --shadow-glow-md: 0 0 30px var(--accent-green-glow);
+    --shadow-glow-lg: 0 0 40px var(--accent-green-glow);
+    --shadow-glow-xl: 0 0 50px var(--accent-green-glow);
+    --shadow-card: 0 4px 20px rgba(0, 255, 136, 0.1);
+    --shadow-card-hover: 0 12px 40px rgba(0, 255, 136, 0.1), 0 4px 12px rgba(0, 0, 0, 0.2);
+    --shadow-elevated: 0 15px 40px rgba(0, 0, 0, 0.3);
+
+    /* Тени для подологии */
+    --shadow-medical-sm: 0 6px 24px rgba(0, 204, 106, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05);
+    --shadow-medical-md: 0 10px 40px rgba(0, 204, 106, 0.12);
+    --shadow-medical-lg: 0 12px 48px rgba(0, 204, 106, 0.2), 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-medical-hover: 0 16px 48px rgba(0, 204, 106, 0.2), 0 6px 16px rgba(0, 0, 0, 0.08);
+
+    /* =================================================================
+       АНИМАЦИИ И ПЕРЕХОДЫ
+       ================================================================= */
+    --transition-fast: 0.2s ease;
+    --transition-base: 0.3s ease;
+    --transition-slow: 0.4s ease;
+    --transition-bounce: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-expand: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-spring: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* =================================================================
+       РАЗМЕРЫ И ОТСТУПЫ
+       ================================================================= */
+    --radius-sm: 12px;
+    --radius-md: 16px;
+    --radius-lg: 20px;
+    --radius-xl: 24px;
+    --radius-2xl: 32px;
+    --radius-full: 50px;
+
+    --container-max: 1400px;
+    --container-padding: 24px;
+
+    /* =================================================================
+       Z-INDEX СЛОИ
+       ================================================================= */
+    --z-base: 1;
+    --z-dropdown: 100;
+    --z-sticky: 500;
+    --z-fixed: 1000;
+    --z-modal-backdrop: 1500;
+    --z-modal: 2000;
 }

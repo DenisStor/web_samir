@@ -19,34 +19,45 @@ python3 -m http.server 8000
 ## Architecture
 
 ### CSS Modules (load order matters)
-1. `css/variables.css` - CSS custom properties (colors, theme values)
-2. `css/base.css` - Reset, typography, scrollbar, fade-in animations
-3. `css/navigation.css` - Fixed nav, mobile menu, marquee
-4. `css/components.css` - Buttons, badges, price tags, forms
-5. `css/sections.css` - All page sections (Hero, Services, Podology, Masters, Blog, FAQ, Booking, Footer)
+1. `css/variables.css` - Design tokens: colors, shadows, borders, transitions, spacing, z-index
+2. `css/utilities.css` - Shared keyframes, card styles, flex/grid utilities, icon sizes
+3. `css/base.css` - Reset, typography, scrollbar, container
+4. `css/navigation.css` - Fixed nav, mobile menu, marquee
+5. `css/components.css` - Buttons, badges, price tags, forms
+6. `css/sections.css` - All page sections (Hero, Services, Podology, Masters, Blog, FAQ, Booking, Footer)
 
-### JavaScript Modules
-- `js/navigation.js` - `toggleMenu()`, `closeMenu()`, scroll effects
-- `js/animations.js` - IntersectionObserver for scroll-triggered fade-ins
-- `js/forms.js` - Form submission, date validation, phone mask (+7 format)
-- `js/modals.js` - `openBlogModal(articleId)`, `closeBlogModal()`, `toggleFaq(element)`
-- `js/main.js` - Service tabs initialization
+### JavaScript Modules (load order matters)
+1. `js/utils.js` - Core utilities: `SaysApp` namespace with DOM helpers, scroll lock, aria, events
+2. `js/navigation.js` - Mobile menu: `toggleMenu()`, `closeMenu()`, scroll effect
+3. `js/animations.js` - IntersectionObserver for fade-in animations
+4. `js/forms.js` - Form validation, phone mask (+7 format), `submitForm()`
+5. `js/modals.js` - `openBlogModal()`, `closeBlogModal()`, `toggleFaq()`
+6. `js/main.js` - Service tabs initialization
 
-### Key Files
-- `index.html` - Main production HTML
-- `says_barbers.html` - Backup/original HTML file
-- `server.py` - Custom Python HTTP server with cache-control headers
-
-### Theme Colors (in variables.css)
+### Key Design Tokens (variables.css)
 ```css
---bg-dark: #0d0d0d        /* Main background */
---accent-green: #00ff88   /* Primary accent */
---medical-bg: #f5f7f5     /* Podology section (light theme) */
+--accent-green: #00ff88         /* Primary accent */
+--transition-base: 0.3s ease    /* Standard transition */
+--transition-bounce: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)
+--radius-xl: 24px               /* Card radius */
+--border-subtle: rgba(255, 255, 255, 0.05)
+--shadow-glow-md: 0 0 30px var(--accent-green-glow)
+```
+
+### Global JavaScript API (SaysApp)
+```javascript
+SaysApp.$('.selector')     // querySelector
+SaysApp.$$('.selector')    // querySelectorAll
+SaysApp.byId('id')         // getElementById
+SaysApp.lockScroll(bool)   // Lock/unlock body scroll
+SaysApp.toggleClass(el, 'class', force)
+SaysApp.onEscape(callback) // Handle Escape key
+SaysApp.ready(fn)          // DOMContentLoaded wrapper
 ```
 
 ## Notes
 
 - Site is in Russian language
-- Podology section uses inverted light theme
-- All animations use IntersectionObserver for performance
+- Podology section uses inverted light theme (medical colors in variables.css)
+- All JS modules use IIFE pattern and depend on SaysApp from utils.js
 - Phone input has mask: +7 (XXX) XXX-XX-XX

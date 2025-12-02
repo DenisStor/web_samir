@@ -1,36 +1,56 @@
-// Service Tabs - Initialize on DOM load
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Service tabs initializing...');
-    const tabButtons = document.querySelectorAll('.service-tab');
-    console.log('Found tab buttons:', tabButtons.length);
+/**
+ * Main Module
+ *
+ * Инициализация табов услуг.
+ *
+ * Зависит от: utils.js
+ */
 
-    tabButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            console.log('Tab clicked');
+(function() {
+    'use strict';
 
-            const targetTab = this.getAttribute('data-tab-target');
-            console.log('Target tab:', targetTab);
+    const { $, $$, toggleClass, ready, on } = SaysApp;
 
-            // Remove active class from all tabs
-            tabButtons.forEach(btn => btn.classList.remove('active'));
+    // =================================================================
+    // SERVICE TABS
+    // =================================================================
 
-            // Add active class to clicked tab
-            this.classList.add('active');
+    /**
+     * Инициализировать табы услуг
+     */
+    function initServiceTabs() {
+        const tabButtons = $$('.service-tab');
 
-            // Hide all tab contents
-            document.querySelectorAll('.service-tab-content').forEach(content => {
-                content.classList.remove('active');
+        if (!tabButtons.length) return;
+
+        tabButtons.forEach(button => {
+            on(button, 'click', (e) => {
+                e.preventDefault();
+
+                const targetTab = button.getAttribute('data-tab-target');
+                if (!targetTab) return;
+
+                // Убрать active со всех табов
+                tabButtons.forEach(btn => toggleClass(btn, 'active', false));
+
+                // Добавить active на кликнутый таб
+                toggleClass(button, 'active', true);
+
+                // Скрыть все контенты табов
+                $$('.service-tab-content').forEach(content => {
+                    toggleClass(content, 'active', false);
+                });
+
+                // Показать выбранный контент
+                const targetContent = $(`.service-tab-content[data-tab="${targetTab}"]`);
+                if (targetContent) {
+                    toggleClass(targetContent, 'active', true);
+                }
             });
-
-            // Show selected tab content
-            const targetContent = document.querySelector(`.service-tab-content[data-tab="${targetTab}"]`);
-            if (targetContent) {
-                targetContent.classList.add('active');
-                console.log('Content shown for:', targetTab);
-            } else {
-                console.log('Content not found for:', targetTab);
-            }
         });
-    });
-});
+    }
+
+    // Запуск при готовности DOM
+    ready(initServiceTabs);
+
+})();

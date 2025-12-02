@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- CSS Modules -->
     <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/utilities.css">
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/navigation.css">
     <link rel="stylesheet" href="css/components.css">
@@ -441,118 +442,181 @@
                 </div>
             </div>
 
-            <div class="podology-grid">
-                <div class="podology-item fade-in">
-                    <div class="podology-item-info">
-                        <h4>Подологический ногтевой сервис рук</h4>
-                        <span>1 час</span>
-                    </div>
-                    <div class="podology-price">1700 ₽</div>
+            <!-- Бесплатная консультация - выделенный блок -->
+            <div class="podology-consultation fade-in">
+                <div class="podology-consultation-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                 </div>
-                <div class="podology-item fade-in">
-                    <div class="podology-item-info">
-                        <h4>Подологический ногтевой сервис ног</h4>
-                        <span>1 час, без обработки стоп</span>
-                    </div>
-                    <div class="podology-price">1800 ₽</div>
+                <div class="podology-consultation-content">
+                    <h4>Бесплатная консультация</h4>
+                    <p>Не знаете, какая услуга вам нужна? Запишитесь на бесплатную 15-минутную консультацию, и Елена подберёт оптимальную программу ухода.</p>
                 </div>
-                <div class="podology-item fade-in">
-                    <div class="podology-item-info">
-                        <h4>Подологическая обработка стоп</h4>
-                        <span>30 минут</span>
+                <a href="#booking" class="podology-consultation-btn">Записаться</a>
+            </div>
+
+            <!-- Комплексные программы -->
+            <div class="podology-category fade-in">
+                <div class="podology-category-header">
+                    <div class="podology-category-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
                     </div>
-                    <div class="podology-price">1100 ₽</div>
+                    <div class="podology-category-title">
+                        <h3>Комплексные программы</h3>
+                        <p>Выгодные пакеты услуг со скидкой</p>
+                    </div>
+                    <span class="podology-category-badge">Выгодно</span>
                 </div>
-                <div class="podology-item fade-in">
-                    <div class="podology-item-info">
-                        <h4>Коррекция длины ногтей рук или ног</h4>
-                        <span>30 минут</span>
+                <div class="podology-category-grid">
+                    <div class="podology-item podology-item-featured">
+                        <div class="podology-item-info">
+                            <h4>Полный уход: руки + ноги + стопы</h4>
+                            <span>2 часа</span>
+                        </div>
+                        <div class="podology-price">4000 ₽</div>
                     </div>
-                    <div class="podology-price">1000 ₽</div>
+                    <div class="podology-item podology-item-featured">
+                        <div class="podology-item-info">
+                            <h4>Комплекс для ног: ногти + стопы</h4>
+                            <span>1 час 30 минут</span>
+                        </div>
+                        <div class="podology-price">2500 ₽</div>
+                    </div>
+                    <div class="podology-item podology-item-featured">
+                        <div class="podology-item-info">
+                            <h4>Лечение грибка: стопы + ногти</h4>
+                            <span>1 час 45 минут</span>
+                        </div>
+                        <div class="podology-price">4000 ₽</div>
+                    </div>
                 </div>
-                <div class="podology-item fade-in">
-                    <div class="podology-item-info">
-                        <h4>Обработка ногтей, поражённых грибком</h4>
-                        <span>1 час 15 минут</span>
+            </div>
+
+            <!-- Базовые услуги -->
+            <div class="podology-category fade-in">
+                <div class="podology-category-header">
+                    <div class="podology-category-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                     </div>
-                    <div class="podology-price">3000 ₽</div>
+                    <div class="podology-category-title">
+                        <h3>Базовый уход</h3>
+                        <p>Ногтевой сервис и обработка стоп</p>
+                    </div>
                 </div>
-                <div class="podology-item fade-in">
-                    <div class="podology-item-info">
-                        <h4>Обработка стоп, поражённых грибком</h4>
-                        <span>45 минут</span>
+                <div class="podology-category-grid">
+                    <div class="podology-item">
+                        <div class="podology-item-info">
+                            <h4>Ногтевой сервис рук</h4>
+                            <span>1 час</span>
+                        </div>
+                        <div class="podology-price">1700 ₽</div>
                     </div>
-                    <div class="podology-price">2000 ₽</div>
+                    <div class="podology-item">
+                        <div class="podology-item-info">
+                            <h4>Ногтевой сервис ног</h4>
+                            <span>1 час, без обработки стоп</span>
+                        </div>
+                        <div class="podology-price">1800 ₽</div>
+                    </div>
+                    <div class="podology-item">
+                        <div class="podology-item-info">
+                            <h4>Обработка стоп</h4>
+                            <span>30 минут</span>
+                        </div>
+                        <div class="podology-price">1100 ₽</div>
+                    </div>
+                    <div class="podology-item">
+                        <div class="podology-item-info">
+                            <h4>Коррекция длины ногтей</h4>
+                            <span>30 минут, руки или ноги</span>
+                        </div>
+                        <div class="podology-price">1000 ₽</div>
+                    </div>
                 </div>
-                <div class="podology-item podology-free fade-in">
-                    <div class="podology-item-info">
-                        <h4>Консультация</h4>
-                        <span>15 минут</span>
+            </div>
+
+            <!-- Лечебные процедуры -->
+            <div class="podology-category fade-in">
+                <div class="podology-category-header">
+                    <div class="podology-category-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
                     </div>
-                    <div class="podology-price">Бесплатно</div>
+                    <div class="podology-category-title">
+                        <h3>Лечебные процедуры</h3>
+                        <p>Решение проблем со здоровьем ног</p>
+                    </div>
                 </div>
-                <div class="podology-item fade-in">
-                    <div class="podology-item-info">
-                        <h4>Обработка проблемного ногтя</h4>
-                        <span>30 минут</span>
+                <div class="podology-category-grid">
+                    <div class="podology-item">
+                        <div class="podology-item-info">
+                            <h4>Лечение грибка ногтей</h4>
+                            <span>1 час 15 минут</span>
+                        </div>
+                        <div class="podology-price">3000 ₽</div>
                     </div>
-                    <div class="podology-price">900 ₽</div>
+                    <div class="podology-item">
+                        <div class="podology-item-info">
+                            <h4>Лечение грибка стоп</h4>
+                            <span>45 минут</span>
+                        </div>
+                        <div class="podology-price">2000 ₽</div>
+                    </div>
+                    <div class="podology-item">
+                        <div class="podology-item-info">
+                            <h4>Обработка проблемного ногтя</h4>
+                            <span>30 минут</span>
+                        </div>
+                        <div class="podology-price">900 ₽</div>
+                    </div>
+                    <div class="podology-item">
+                        <div class="podology-item-info">
+                            <h4>Удаление мозоли</h4>
+                            <span>30 минут</span>
+                        </div>
+                        <div class="podology-price">900 ₽</div>
+                    </div>
+                    <div class="podology-item">
+                        <div class="podology-item-info">
+                            <h4>Удаление бородавки</h4>
+                            <span>30 минут</span>
+                        </div>
+                        <div class="podology-price">900 ₽</div>
+                    </div>
+                    <div class="podology-item">
+                        <div class="podology-item-info">
+                            <h4>Титановая нить (коррекция)</h4>
+                            <span>Уточняйте у специалиста</span>
+                        </div>
+                        <div class="podology-price podology-price-text">По прайсу</div>
+                    </div>
                 </div>
-                <div class="podology-item fade-in">
-                    <div class="podology-item-info">
-                        <h4>Обработка мозоли</h4>
-                        <span>30 минут</span>
+            </div>
+
+            <!-- Дополнительные услуги -->
+            <div class="podology-category fade-in">
+                <div class="podology-category-header">
+                    <div class="podology-category-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                     </div>
-                    <div class="podology-price">900 ₽</div>
+                    <div class="podology-category-title">
+                        <h3>Дополнительно</h3>
+                        <p>Вспомогательные процедуры</p>
+                    </div>
                 </div>
-                <div class="podology-item fade-in">
-                    <div class="podology-item-info">
-                        <h4>Обработка бородавки</h4>
-                        <span>30 минут</span>
+                <div class="podology-category-grid podology-category-grid-sm">
+                    <div class="podology-item podology-item-sm">
+                        <div class="podology-item-info">
+                            <h4>Антисептическая повязка</h4>
+                            <span>15 минут</span>
+                        </div>
+                        <div class="podology-price">600 ₽</div>
                     </div>
-                    <div class="podology-price">900 ₽</div>
-                </div>
-                <div class="podology-item fade-in">
-                    <div class="podology-item-info">
-                        <h4>Антисептическая повязка</h4>
-                        <span>15 минут</span>
+                    <div class="podology-item podology-item-sm">
+                        <div class="podology-item-info">
+                            <h4>Разгрузка стопы</h4>
+                            <span>15 минут</span>
+                        </div>
+                        <div class="podology-price">600 ₽</div>
                     </div>
-                    <div class="podology-price">600 ₽</div>
-                </div>
-                <div class="podology-item fade-in">
-                    <div class="podology-item-info">
-                        <h4>Разгрузка</h4>
-                        <span>15 минут, снятие избыточной нагрузки</span>
-                    </div>
-                    <div class="podology-price">600 ₽</div>
-                </div>
-                <div class="podology-item fade-in">
-                    <div class="podology-item-info">
-                        <h4>Комплекс: ногтевой сервис рук + ног + обработка стоп</h4>
-                        <span>2 часа</span>
-                    </div>
-                    <div class="podology-price">4000 ₽</div>
-                </div>
-                <div class="podology-item fade-in">
-                    <div class="podology-item-info">
-                        <h4>Комплекс: ногтевой сервис ног + обработка стоп</h4>
-                        <span>1 час 30 минут</span>
-                    </div>
-                    <div class="podology-price">2500 ₽</div>
-                </div>
-                <div class="podology-item fade-in">
-                    <div class="podology-item-info">
-                        <h4>Обработка стоп и ногтей, поражённых грибком</h4>
-                        <span>1 час 45 минут</span>
-                    </div>
-                    <div class="podology-price">4000 ₽</div>
-                </div>
-                <div class="podology-item fade-in">
-                    <div class="podology-item-info">
-                        <h4>Установка корректирующей системы «титановая нить»</h4>
-                        <span>Уточняйте у специалиста</span>
-                    </div>
-                    <div class="podology-price">По прайсу</div>
                 </div>
             </div>
         </div>
@@ -995,59 +1059,47 @@
                     <p class="section-subtitle">Выберите удобное время и запишитесь к любимому мастеру</p>
                 </div>
 
-                <div class="booking-form fade-in" id="bookingForm">
-                    <form id="appointmentForm" onsubmit="submitForm(event)">
-                        <div class="form-group">
-                            <label for="name">Ваше имя</label>
-                            <input type="text" id="name" class="form-input" placeholder="Как к вам обращаться?" required>
+                <div class="booking-cta fade-in">
+                    <div class="booking-cta-card">
+                        <div class="booking-cta-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                                <path d="M9 16l2 2 4-4"></path>
+                            </svg>
                         </div>
-                        <div class="form-group">
-                            <label for="phone">Телефон</label>
-                            <input type="tel" id="phone" class="form-input" placeholder="+7 (___) ___-__-__" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="master">Выберите мастера</label>
-                            <select id="master" class="form-input">
-                                <option value="">Любой свободный мастер</option>
-                                <option value="samir">Самир (Dark Blue)</option>
-                                <option value="daniel">Даниэль (Pink)</option>
-                                <option value="andrey">Андрей (Pink)</option>
-                                <option value="raf">Раф (Green)</option>
-                                <option value="elena">Елена — подолог</option>
-                            </select>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="date">Желаемая дата</label>
-                                <input type="date" id="date" class="form-input" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="time">Желаемое время</label>
-                                <input type="time" id="time" class="form-input" required>
-                            </div>
-                        </div>
-                    <div class="form-group">
-                        <label for="comment">Комментарий</label>
-                        <textarea id="comment" class="form-input" placeholder="Укажите желаемую услугу или дополнительные пожелания"></textarea>
-                    </div>
-                    <div class="form-message" id="formMessage" role="status" aria-live="polite"></div>
-                    <button type="submit" class="btn btn-primary btn-submit">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        Записаться онлайн
-                    </button>
-                </form>
-                    <div class="form-success" id="formSuccess" role="status" aria-live="polite">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                        <h3>Заявка отправлена!</h3>
-                        <p>Мы свяжемся с вами в ближайшее время для подтверждения записи.</p>
-                    </div>
-                </div>
+                        <h3 class="booking-cta-title">Быстрая онлайн-запись</h3>
+                        <p class="booking-cta-text">Выберите мастера, услугу и удобное время — всё в пару кликов через наш сервис онлайн-записи</p>
 
-                <div class="booking-alt fade-in">
-                    <p>Или запишитесь напрямую через сервис онлайн-записи</p>
-                    <a href="https://n919675.yclients.com/company/855934/personal/select-master?o=" target="_blank" class="btn btn-secondary">
-                        Записаться онлайн
-                    </a>
+                        <div class="booking-cta-features">
+                            <div class="booking-cta-feature">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <span>Мгновенное подтверждение</span>
+                            </div>
+                            <div class="booking-cta-feature">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <span>Выбор любого мастера</span>
+                            </div>
+                            <div class="booking-cta-feature">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <span>Актуальное расписание</span>
+                            </div>
+                        </div>
+
+                        <a href="https://n919675.yclients.com/company/855934/personal/select-master?o=" target="_blank" rel="noopener" class="btn btn-primary booking-cta-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            Записаться онлайн
+                        </a>
+
+                        <p class="booking-cta-hint">Бесплатно и без регистрации</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1182,10 +1234,10 @@
     </footer>
 
     <!-- JavaScript Modules -->
-    <script src="js/main.js"></script>
+    <script src="js/utils.js"></script>
     <script src="js/navigation.js"></script>
     <script src="js/animations.js"></script>
-    <script src="js/forms.js"></script>
     <script src="js/modals.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>

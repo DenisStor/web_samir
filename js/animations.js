@@ -1,25 +1,39 @@
 /**
  * Animations Module
  *
- * Модуль для работы с анимациями и эффектами:
- * - IntersectionObserver для обнаружения видимых элементов
- * - Fade-in анимации при прокрутке страницы
+ * IntersectionObserver для fade-in анимаций при скролле.
+ *
+ * Зависит от: utils.js
  */
 
-// Параметры для наблюдателя пересечений
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
+(function() {
+    'use strict';
 
-// Создание IntersectionObserver для анимации элементов при появлении в поле зрения
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-        }
-    });
-}, observerOptions);
+    const { $$, ready } = SaysApp;
 
-// Начало наблюдения за всеми элементами с классом fade-in
-document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    // Конфигурация IntersectionObserver
+    const OBSERVER_CONFIG = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    /**
+     * Создать и запустить наблюдатель для анимаций
+     */
+    function initAnimations() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, OBSERVER_CONFIG);
+
+        // Наблюдать за всеми элементами с классом fade-in
+        $$('.fade-in').forEach(el => observer.observe(el));
+    }
+
+    // Запуск при готовности DOM
+    ready(initAnimations);
+
+})();
