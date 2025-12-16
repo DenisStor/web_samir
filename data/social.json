@@ -1,0 +1,49 @@
+{
+  "social": [
+    {
+      "id": "vk",
+      "name": "VKontakte",
+      "icon": "vk",
+      "url": "https://vk.com/saysbarbers",
+      "active": true
+    },
+    {
+      "id": "telegram",
+      "name": "Telegram",
+      "icon": "telegram",
+      "url": "https://t.me/saysbarbers",
+      "active": true
+    },
+    {
+      "id": "whatsapp",
+      "name": "WhatsApp",
+      "icon": "whatsapp",
+      "url": "https://wa.me/79110701107",
+      "active": true
+    },
+    {
+      "id": "youtube",
+      "name": "YouTube",
+      "icon": "youtube",
+      "url": "https://www.youtube.com/@SaysBarbers",
+      "active": true
+    },
+    {
+      "id": "instagram",
+      "name": "Instagram",
+      "icon": "instagram",
+      "url": "https://vk.com/saysbarbers",
+      "active": false
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "icon": "tiktok",
+      "url": "",
+      "active": false
+    }
+  ],
+  "phone": "+7 (911) 070-11-07",
+  "email": "info@saysbarbers.ru",
+  "address": "г. Санкт-Петербург, ул. Примерная, д. 1"
+}

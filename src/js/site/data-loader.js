@@ -1,0 +1,595 @@
+/**
+ * Say's Barbers - Data Loader
+ * Загружает данные из API и обновляет контент на главной странице
+ */
+
+(function() {
+    'use strict';
+
+    // Проверяем, что мы на главной странице, а не в админке
+    if (window.location.pathname.includes('admin')) {
+        return;
+    }
+
+    const API_BASE = '/api';
+
+    // =================================================================
+    // ICONS
+    // =================================================================
+
+    const icons = {
+        check: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`,
+        calendar: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`,
+        arrow: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`,
+        scissors: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>`,
+        image: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`
+    };
+
+    // =================================================================
+    // TEMPLATES
+    // =================================================================
+
+    function createMasterCard(master) {
+        const badgeClass = {
+            green: 'badge-green',
+            pink: 'badge-pink',
+            blue: 'badge-blue'
+        }[master.badge] || 'badge-green';
+
+        const badgeLabel = {
+            green: 'Green',
+            pink: 'Pink',
+            blue: 'Dark Blue'
+        }[master.badge] || 'Green';
+
+        // First 2 principles shown, rest in expandable section
+        const firstPrinciples = (master.principles || []).slice(0, 2);
+        const extraPrinciples = (master.principles || []).slice(2);
+
+        return `
+            <div class="master-card fade-in visible">
+                <div class="master-image">
+                    ${master.photo
+                        ? `<img src="${master.photo}" alt="${master.name}" class="master-photo">`
+                        : `<div class="master-avatar">${master.initial || master.name.charAt(0)}</div>`
+                    }
+                    <span class="master-badge ${badgeClass}">${badgeLabel}</span>
+                </div>
+                <div class="master-content">
+                    <h3 class="master-name">${master.name}</h3>
+                    <div class="master-role">${master.role || 'Мастер'}</div>
+                    <p class="master-specialization">${master.specialization || ''}</p>
+                    <div class="master-principles">
+                        ${firstPrinciples.map(p => `
+                            <div class="master-principle">
+                                ${icons.check}
+                                <span>${p}</span>
+                            </div>
+                        `).join('')}
+                        ${extraPrinciples.length > 0 ? `
+                            <div class="master-extra">
+                                ${extraPrinciples.map(p => `
+                                    <div class="master-principle">
+                                        ${icons.check}
+                                        <span>${p}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function createServiceItem(service) {
+        return `
+            <div class="service-item">
+                <div>
+                    <div class="service-name">${service.name}</div>
+                </div>
+                <div class="service-prices">
+                    <span class="price-tag price-green">${service.priceGreen || 0} ₽</span>
+                    <span class="price-tag price-pink">${service.pricePink || 0} ₽</span>
+                    <span class="price-tag price-blue">${service.priceBlue || 0} ₽</span>
+                </div>
+            </div>
+        `;
+    }
+
+    function createPodologyServiceItem(service) {
+        return `
+            <div class="podology-service-item">
+                <div class="podology-service-info">
+                    <div class="podology-service-name">${service.name}</div>
+                </div>
+                <div class="podology-service-price">${service.price}</div>
+            </div>
+        `;
+    }
+
+    function createBlogCard(article) {
+        const formattedDate = formatDate(article.date);
+
+        return `
+            <article class="blog-card fade-in visible" onclick="openBlogModal('${article.id}')">
+                <div class="blog-image">
+                    ${article.image
+                        ? `<img src="${article.image}" alt="${article.title}">`
+                        : icons.scissors
+                    }
+                </div>
+                <div class="blog-content">
+                    <div class="blog-meta">
+                        <span class="blog-tag">${article.tag || 'Статья'}</span>
+                        <div class="blog-date">
+                            ${icons.calendar}
+                            ${formattedDate}
+                        </div>
+                    </div>
+                    <h3 class="blog-title">${article.title}</h3>
+                    <p class="blog-excerpt">${article.excerpt || ''}</p>
+                    <div class="blog-read-more">
+                        <span>Читать далее</span>
+                        ${icons.arrow}
+                    </div>
+                </div>
+            </article>
+        `;
+    }
+
+    // =================================================================
+    // UTILITIES
+    // =================================================================
+
+    function formatDate(dateStr) {
+        if (!dateStr) return '';
+        try {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('ru-RU', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        } catch {
+            return dateStr;
+        }
+    }
+
+    // =================================================================
+    // DATA LOADING
+    // =================================================================
+
+    async function loadMasters() {
+        try {
+            const response = await fetch(`${API_BASE}/masters`);
+            if (!response.ok) return;
+
+            const data = await response.json();
+
+            // Если есть данные из API (даже пустой массив), используем их
+            if (data.masters !== undefined) {
+                const mastersGrid = document.querySelector('.masters-grid');
+                if (mastersGrid) {
+                    const activeMasters = (data.masters || []).filter(m => m.active !== false);
+                    if (activeMasters.length > 0) {
+                        mastersGrid.innerHTML = activeMasters.map(createMasterCard).join('');
+                        console.log(`Loaded ${activeMasters.length} masters from API`);
+                    } else {
+                        // Пустой массив - скрываем секцию или показываем заглушку
+                        mastersGrid.innerHTML = '<p class="empty-message" style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,0.5); padding: 40px;">Информация о мастерах скоро появится</p>';
+                        console.log('Masters: empty array from API');
+                    }
+                }
+            }
+        } catch (error) {
+            console.log('Using static masters data:', error.message);
+        }
+    }
+
+    async function loadServices() {
+        try {
+            const response = await fetch(`${API_BASE}/services`);
+            if (!response.ok) return;
+
+            const data = await response.json();
+
+            // Загружаем услуги барбершопа по категориям
+            if (data.categories !== undefined) {
+                (data.categories || []).forEach(category => {
+                    const container = document.querySelector(`[data-tab="${category.id}"] .service-list`);
+                    if (container) {
+                        const services = category.services || [];
+                        if (services.length > 0) {
+                            container.innerHTML = services.map(createServiceItem).join('');
+                        } else {
+                            container.innerHTML = '<p class="empty-message" style="text-align: center; color: rgba(255,255,255,0.5); padding: 20px;">Услуги скоро появятся</p>';
+                        }
+                    }
+                });
+                console.log('Loaded services from API');
+            }
+
+            // Загружаем услуги подологии (если есть контейнер на странице)
+            if (data.podology !== undefined) {
+                const podologyContainer = document.querySelector('.podology-services .podology-list');
+                if (podologyContainer) {
+                    const services = data.podology?.services || [];
+                    if (services.length > 0) {
+                        podologyContainer.innerHTML = services.map(createPodologyServiceItem).join('');
+                        console.log('Loaded podology services from API');
+                    } else {
+                        podologyContainer.innerHTML = '<p class="empty-message">Услуги подологии скоро появятся</p>';
+                    }
+                }
+            }
+        } catch (error) {
+            console.log('Using static services data:', error.message);
+        }
+    }
+
+    const ARTICLES_PER_PAGE = 3;
+    let allArticles = [];
+    let articlesShown = 0;
+
+    async function loadArticles() {
+        try {
+            const response = await fetch(`${API_BASE}/articles`);
+            if (!response.ok) return;
+
+            const data = await response.json();
+
+            // Если есть данные из API (даже пустой массив), используем их
+            if (data.articles !== undefined) {
+                const blogGrid = document.querySelector('.blog-grid');
+                const blogSection = document.querySelector('.blog .container');
+                if (blogGrid) {
+                    allArticles = (data.articles || []).filter(a => a.active !== false);
+                    // Сортируем по дате (новые первые)
+                    allArticles.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                    if (allArticles.length > 0) {
+                        // Показываем только первые 3 статьи
+                        const articlesToShow = allArticles.slice(0, ARTICLES_PER_PAGE);
+                        blogGrid.innerHTML = articlesToShow.map(createBlogCard).join('');
+                        articlesShown = articlesToShow.length;
+
+                        // Добавляем кнопку "Показать ещё" если статей больше 3
+                        updateShowMoreButton(blogSection, blogGrid);
+
+                        console.log(`Loaded ${articlesToShow.length}/${allArticles.length} articles from API`);
+
+                        // Store articles data for modal
+                        window.dynamicArticlesData = allArticles;
+                    } else {
+                        // Пустой массив - показываем заглушку
+                        blogGrid.innerHTML = '<p class="empty-message" style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,0.5); padding: 40px;">Статьи скоро появятся</p>';
+                        window.dynamicArticlesData = [];
+                        removeShowMoreButton();
+                        console.log('Articles: empty array from API');
+                    }
+                }
+            }
+        } catch (error) {
+            console.log('Using static articles data:', error.message);
+        }
+    }
+
+    // Иконки для принципов
+    const principleIcons = {
+        book: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>`,
+        shield: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`,
+        clock: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
+        check: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`,
+        star: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`,
+        heart: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`,
+        award: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>`,
+        target: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>`
+    };
+
+    function createQualityItem(principle) {
+        const iconHtml = principle.image
+            ? `<img src="${principle.image}" alt="${principle.title}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`
+            : principleIcons[principle.icon] || principleIcons.check;
+
+        return `
+            <div class="quality-item fade-in visible">
+                <div class="quality-icon">
+                    ${iconHtml}
+                </div>
+                <h3>${principle.title}</h3>
+                <p>${principle.description}</p>
+            </div>
+        `;
+    }
+
+    async function loadPrinciples() {
+        try {
+            const response = await fetch(`${API_BASE}/principles`);
+            if (!response.ok) return;
+
+            const data = await response.json();
+
+            if (data.principles !== undefined) {
+                const qualityGrid = document.querySelector('.quality-grid');
+                if (qualityGrid) {
+                    const principles = data.principles || [];
+                    if (principles.length > 0) {
+                        qualityGrid.innerHTML = principles.map(createQualityItem).join('');
+                        console.log(`Loaded ${principles.length} principles from API`);
+                    } else {
+                        qualityGrid.innerHTML = '<p class="empty-message" style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,0.5); padding: 40px;">Принципы работы скоро появятся</p>';
+                        console.log('Principles: empty array from API');
+                    }
+                }
+            }
+        } catch (error) {
+            console.log('Using static principles data:', error.message);
+        }
+    }
+
+    function createFaqItem(item) {
+        return `
+            <div class="faq-item fade-in visible">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <h3>${item.question}</h3>
+                    <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+                <div class="faq-answer">
+                    <p>${item.answer}</p>
+                </div>
+            </div>
+        `;
+    }
+
+    async function loadFaq() {
+        try {
+            const response = await fetch(`${API_BASE}/faq`);
+            if (!response.ok) return;
+
+            const data = await response.json();
+
+            if (data.faq !== undefined) {
+                const faqContainer = document.getElementById('faqContainer');
+                if (faqContainer) {
+                    const faqItems = data.faq || [];
+                    if (faqItems.length > 0) {
+                        faqContainer.innerHTML = faqItems.map(createFaqItem).join('');
+                        console.log(`Loaded ${faqItems.length} FAQ items from API`);
+                    } else {
+                        faqContainer.innerHTML = '<p class="empty-message" style="text-align: center; color: rgba(255,255,255,0.5); padding: 40px;">FAQ скоро появятся</p>';
+                        console.log('FAQ: empty array from API');
+                    }
+                }
+            }
+        } catch (error) {
+            console.log('Using static FAQ data:', error.message);
+        }
+    }
+
+    // Social icons SVG
+    const socialIconsSvg = {
+        vk: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 8.316 24h7.368C22.408 24 24 22.408 24 15.684V8.316C24 1.592 22.408 0 15.684 0zm3.692 17.123h-1.744c-.66 0-.864-.525-2.05-1.727-1.033-1-1.49-1.135-1.744-1.135-.356 0-.458.102-.458.593v1.575c0 .424-.135.678-1.253.678-1.846 0-3.896-1.118-5.335-3.202C4.624 10.857 4 8.97 4 8.463c0-.254.102-.491.593-.491h1.744c.44 0 .61.203.78.678.847 2.455 2.27 4.607 2.862 4.607.22 0 .322-.102.322-.66V9.721c-.068-1.186-.695-1.287-.695-1.71 0-.203.17-.407.44-.407h2.744c.373 0 .508.203.508.643v3.473c0 .372.17.508.271.508.22 0 .407-.136.813-.542 1.254-1.406 2.15-3.574 2.15-3.574.119-.254.305-.491.745-.491h1.744c.525 0 .644.27.525.643-.22 1.017-2.354 4.031-2.354 4.031-.186.305-.254.44 0 .78.186.254.796.779 1.203 1.253.745.847 1.32 1.558 1.473 2.05.17.49-.085.744-.576.744z"/></svg>`,
+        telegram: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>`,
+        whatsapp: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`,
+        youtube: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`,
+        instagram: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z"/></svg>`,
+        tiktok: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>`
+    };
+
+    function createSocialLink(socialItem) {
+        const iconSvg = socialIconsSvg[socialItem.icon] || socialIconsSvg.vk;
+        return `
+            <a href="${socialItem.url}" target="_blank" class="social-link" title="${socialItem.name}">
+                ${iconSvg}
+            </a>
+        `;
+    }
+
+    async function loadSocial() {
+        try {
+            const response = await fetch(`${API_BASE}/social`);
+            if (!response.ok) return;
+
+            const data = await response.json();
+
+            if (data.social !== undefined) {
+                const socialLinksContainer = document.querySelector('.social-links');
+                if (socialLinksContainer) {
+                    const activeSocialLinks = (data.social || []).filter(s => s.active && s.url);
+                    if (activeSocialLinks.length > 0) {
+                        socialLinksContainer.innerHTML = activeSocialLinks.map(createSocialLink).join('');
+                        console.log(`Loaded ${activeSocialLinks.length} social links from API`);
+                    } else {
+                        console.log('Social: no active links from API');
+                    }
+                }
+            }
+
+            // Update phone if exists
+            if (data.phone) {
+                const phoneLinks = document.querySelectorAll('a[href^="tel:"]');
+                phoneLinks.forEach(link => {
+                    const phoneClean = data.phone.replace(/[^\d+]/g, '');
+                    link.href = `tel:${phoneClean}`;
+                    // Preserve existing text structure if there's additional text
+                    const parent = link.parentElement;
+                    if (parent && parent.tagName === 'P') {
+                        const textNodes = Array.from(parent.childNodes).filter(n => n.nodeType === 3);
+                        if (textNodes.length === 0) {
+                            link.textContent = data.phone;
+                        }
+                    } else {
+                        link.textContent = data.phone;
+                    }
+                });
+                console.log('Updated phone:', data.phone);
+            }
+        } catch (error) {
+            console.log('Using static social data:', error.message);
+        }
+    }
+
+    function updateShowMoreButton(container, blogGrid) {
+        // Удаляем существующую кнопку
+        removeShowMoreButton();
+
+        if (allArticles.length > articlesShown) {
+            const remaining = allArticles.length - articlesShown;
+            const showMoreDiv = document.createElement('div');
+            showMoreDiv.className = 'blog-show-more';
+            showMoreDiv.id = 'blogShowMore';
+            showMoreDiv.innerHTML = `
+                <button class="btn btn-secondary" onclick="window.showMoreArticles()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    Показать ещё ${remaining} ${getArticleWord(remaining)}
+                </button>
+            `;
+            container.appendChild(showMoreDiv);
+        }
+    }
+
+    function removeShowMoreButton() {
+        const existingBtn = document.getElementById('blogShowMore');
+        if (existingBtn) existingBtn.remove();
+    }
+
+    function getArticleWord(count) {
+        const lastDigit = count % 10;
+        const lastTwoDigits = count % 100;
+
+        if (lastTwoDigits >= 11 && lastTwoDigits <= 19) return 'статей';
+        if (lastDigit === 1) return 'статью';
+        if (lastDigit >= 2 && lastDigit <= 4) return 'статьи';
+        return 'статей';
+    }
+
+    window.showMoreArticles = function() {
+        const blogGrid = document.querySelector('.blog-grid');
+        const blogSection = document.querySelector('.blog .container');
+        if (!blogGrid) return;
+
+        // Показываем следующие 3 статьи
+        const nextArticles = allArticles.slice(articlesShown, articlesShown + ARTICLES_PER_PAGE);
+        nextArticles.forEach(article => {
+            blogGrid.insertAdjacentHTML('beforeend', createBlogCard(article));
+        });
+        articlesShown += nextArticles.length;
+
+        // Обновляем кнопку
+        updateShowMoreButton(blogSection, blogGrid);
+    };
+
+    // =================================================================
+    // BLOG MODAL OVERRIDE
+    // =================================================================
+
+    // Store original function if exists
+    const originalOpenBlogModal = window.openBlogModal;
+
+    window.openBlogModal = function(articleId) {
+        // Try dynamic data first
+        if (window.dynamicArticlesData) {
+            const article = window.dynamicArticlesData.find(a => a.id === articleId);
+            if (article) {
+                showDynamicArticleModal(article);
+                return;
+            }
+        }
+
+        // Fallback to original function
+        if (typeof originalOpenBlogModal === 'function') {
+            originalOpenBlogModal(articleId);
+        }
+    };
+
+    function showDynamicArticleModal(article) {
+        const modal = document.getElementById('blogModal');
+        if (!modal) return;
+
+        // Update modal content
+        const modalImage = modal.querySelector('.blog-modal-image');
+        const modalTag = modal.querySelector('.blog-modal-tag');
+        const modalDate = modal.querySelector('.blog-modal-date span, .blog-modal-date');
+        const modalTitle = modal.querySelector('.blog-modal-title');
+        const modalContent = modal.querySelector('.blog-modal-text, .blog-modal-body');
+
+        if (modalImage) {
+            if (article.image) {
+                modalImage.innerHTML = `<img src="${article.image}" alt="${article.title}" style="width:100%; height:100%; object-fit:cover;">`;
+            } else {
+                modalImage.innerHTML = icons.scissors;
+            }
+        }
+
+        if (modalTag) {
+            modalTag.textContent = article.tag || 'Статья';
+        }
+
+        if (modalDate) {
+            const dateText = formatDate(article.date);
+            if (modalDate.querySelector('span')) {
+                modalDate.querySelector('span').textContent = dateText;
+            } else {
+                const svg = modalDate.querySelector('svg');
+                modalDate.innerHTML = (svg ? svg.outerHTML : icons.calendar) + ' ' + dateText;
+            }
+        }
+
+        if (modalTitle) {
+            modalTitle.textContent = article.title;
+        }
+
+        if (modalContent) {
+            // Convert content to paragraphs
+            const content = article.content || article.excerpt || '';
+            const paragraphs = content.split('\n\n')
+                .filter(p => p.trim())
+                .map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`)
+                .join('');
+            modalContent.innerHTML = paragraphs || `<p>${article.excerpt}</p>`;
+        }
+
+        // Show modal
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+
+        // Handle escape key
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                closeBlogModal();
+                document.removeEventListener('keydown', handleEscape);
+            }
+        };
+        document.addEventListener('keydown', handleEscape);
+    }
+
+    // =================================================================
+    // INITIALIZATION
+    // =================================================================
+
+    async function init() {
+        console.log('Data Loader: Initializing...');
+
+        // Load all data in parallel
+        await Promise.all([
+            loadMasters(),
+            loadServices(),
+            loadArticles(),
+            loadPrinciples(),
+            loadFaq(),
+            loadSocial()
+        ]);
+
+        console.log('Data Loader: Complete');
+    }
+
+    // Run on DOM ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        // Small delay to ensure other scripts have loaded
+        setTimeout(init, 100);
+    }
+
+})();

@@ -1,0 +1,32 @@
+{
+  "name": "says-barbers",
+  "version": "1.0.0",
+  "description": "Say's Barbers - Barbershop website with admin CMS",
+  "scripts": {
+    "build": "python3 scripts/build.py",
+    "build:watch": "python3 scripts/build.py --watch",
+    "build:admin": "python3 scripts/build.py --admin-only",
+    "start": "python3 server.py",
+    "lint": "eslint src/js/ --ext .js",
+    "lint:fix": "eslint src/js/ --ext .js --fix",
+    "format": "prettier --write 'src/js/**/*.js' 'src/css/**/*.css'",
+    "format:check": "prettier --check 'src/js/**/*.js' 'src/css/**/*.css'",
+    "test": "python3 -m pytest tests/ -v",
+    "test:server": "python3 -m pytest tests/test_server.py -v"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": [
+    "barbershop",
+    "cms",
+    "admin-panel"
+  ],
+  "author": "Say's Barbers",
+  "license": "UNLICENSED",
+  "private": true
+}

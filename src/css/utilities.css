@@ -1,0 +1,227 @@
+/* =====================================================================
+   UTILITIES.CSS - Утилитарные классы
+   =====================================================================
+   Переиспользуемые классы для уменьшения дублирования.
+   Использовать совместно с основными классами компонентов.
+   ===================================================================== */
+
+/* =================================================================
+   АНИМАЦИИ - Keyframes
+   ================================================================= */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.2);
+    }
+}
+
+@keyframes shimmerMove {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+@keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* =================================================================
+   КАРТОЧКИ - Базовые стили
+   ================================================================= */
+
+/* Базовая карточка */
+.card {
+    background: var(--content-bg);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border-subtle);
+    transition:
+        transform var(--transition-base),
+        border-color var(--transition-base),
+        box-shadow var(--transition-base);
+}
+
+.card:hover {
+    border-color: var(--border-accent);
+}
+
+/* Карточка с эффектом подъёма */
+.card--lift:hover {
+    transform: translateY(-4px);
+}
+
+.card--lift-lg:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-card-hover);
+}
+
+/* Карточка с glow эффектом */
+.card--glow:hover {
+    box-shadow: 0 0 40px rgba(0, 255, 136, 0.05);
+}
+
+/* =================================================================
+   ИНТЕРАКТИВНЫЕ ЭЛЕМЕНТЫ
+   ================================================================= */
+
+/* Базовый интерактивный элемент */
+.interactive {
+    transition: all var(--transition-base);
+    cursor: pointer;
+}
+
+.interactive:hover {
+    transform: translateY(-2px);
+}
+
+/* Элемент со свечением при наведении */
+.glow-hover:hover {
+    box-shadow: var(--shadow-glow-md);
+}
+
+/* =================================================================
+   FLEXBOX И GRID УТИЛИТЫ
+   ================================================================= */
+
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flex-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.gap-sm { gap: 8px; }
+.gap-md { gap: 16px; }
+.gap-lg { gap: 24px; }
+.gap-xl { gap: 32px; }
+
+/* =================================================================
+   ТЕКСТ
+   ================================================================= */
+
+.text-accent {
+    color: var(--accent-green);
+}
+
+.text-gray {
+    color: var(--text-gray);
+}
+
+.text-gray-light {
+    color: var(--text-gray-light);
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* =================================================================
+   SVG ИКОНКИ - Стандартные размеры
+   ================================================================= */
+
+.icon-sm {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.icon-md {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.icon-lg {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.icon-xl {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+}
+
+.icon-2xl {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+}
+
+.icon-accent {
+    color: var(--accent-green);
+}
+
+/* =================================================================
+   СКРЫТИЕ ЭЛЕМЕНТОВ
+   ================================================================= */
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* =================================================================
+   СОСТОЯНИЯ
+   ================================================================= */
+
+.is-hidden {
+    display: none !important;
+}
+
+.is-visible {
+    display: block !important;
+}
+
+.no-scroll {
+    overflow: hidden;
+}

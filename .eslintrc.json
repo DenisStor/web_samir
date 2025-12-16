@@ -1,0 +1,73 @@
+{
+  "env": {
+    "browser": true,
+    "es6": true
+  },
+  "globals": {
+    "DOMPurify": "readonly",
+    "AdminPanel": "writable",
+    "AdminState": "writable",
+    "AdminAPI": "writable",
+    "AdminAuth": "writable",
+    "AdminModals": "writable",
+    "AdminNavigation": "writable",
+    "AdminWYSIWYG": "writable",
+    "AdminImageUpload": "writable",
+    "AdminStatsRenderer": "writable",
+    "AdminMastersRenderer": "writable",
+    "AdminServicesRenderer": "writable",
+    "AdminArticlesRenderer": "writable",
+    "AdminPrinciplesRenderer": "writable",
+    "AdminFaqRenderer": "writable",
+    "AdminSocialRenderer": "writable",
+    "AdminMasterForm": "writable",
+    "AdminServiceForm": "writable",
+    "AdminArticleForm": "writable",
+    "AdminPrincipleForm": "writable",
+    "AdminFaqForm": "writable",
+    "SharedIcons": "writable",
+    "showToast": "writable",
+    "escapeHtml": "writable",
+    "sanitize": "writable",
+    "openModal": "writable",
+    "closeModal": "writable"
+  },
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "script"
+  },
+  "rules": {
+    "no-unused-vars": ["warn", {
+      "vars": "all",
+      "args": "none",
+      "varsIgnorePattern": "^_"
+    }],
+    "no-console": "off",
+    "no-debugger": "warn",
+    "eqeqeq": ["error", "always", { "null": "ignore" }],
+    "curly": ["error", "multi-line"],
+    "no-var": "off",
+    "prefer-const": "off",
+    "semi": ["error", "always"],
+    "quotes": ["warn", "single", { "avoidEscape": true }],
+    "indent": ["warn", 4, { "SwitchCase": 1 }],
+    "no-trailing-spaces": "warn",
+    "comma-dangle": ["warn", "never"],
+    "no-multiple-empty-lines": ["warn", { "max": 2 }],
+    "space-before-function-paren": ["warn", {
+      "anonymous": "never",
+      "named": "never",
+      "asyncArrow": "always"
+    }],
+    "keyword-spacing": "warn",
+    "space-infix-ops": "warn",
+    "brace-style": ["warn", "1tbs", { "allowSingleLine": true }],
+    "no-undef": "error",
+    "no-redeclare": "error"
+  },
+  "ignorePatterns": [
+    "src/js/admin.bundle.js",
+    "*.min.js",
+    "node_modules/"
+  ]
+}

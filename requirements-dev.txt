@@ -1,0 +1,9 @@
+# Development dependencies for Say's Barbers
+
+# Testing
+pytest>=7.0.0
+pytest-cov>=4.0.0
+
+# Code quality (optional - can use npm packages instead)
+# flake8>=6.0.0
+# black>=23.0.0

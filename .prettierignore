@@ -1,0 +1,21 @@
+# Build artifacts
+src/js/admin.bundle.js
+index.html
+*.min.js
+*.min.css
+
+# Dependencies
+node_modules/
+
+# Data files
+data/
+uploads/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Editor
+.vscode/
+.idea/

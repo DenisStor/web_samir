@@ -1,0 +1,155 @@
+{
+  "categories": [
+    {
+      "id": "main",
+      "name": "Основные услуги",
+      "icon": "scissors",
+      "description": "Классические и современные стрижки, работа с бородой и бритьё",
+      "services": [
+        {
+          "id": 1764958757756,
+          "name": "пенис",
+          "priceGreen": 100,
+          "pricePink": 200,
+          "priceBlue": 300
+        }
+      ]
+    },
+    {
+      "id": "complex",
+      "name": "Комплексные услуги",
+      "icon": "layers",
+      "description": "Выгодные комплексы услуг со скидкой",
+      "services": [
+        {
+          "id": 8,
+          "name": "Стрижка + Борода",
+          "priceGreen": 1500,
+          "pricePink": 2000,
+          "priceBlue": 2300
+        },
+        {
+          "id": 9,
+          "name": "Стрижка + Камуфляж",
+          "priceGreen": 1800,
+          "pricePink": 2300,
+          "priceBlue": 2700
+        },
+        {
+          "id": 10,
+          "name": "Борода + Камуфляж",
+          "priceGreen": 1500,
+          "pricePink": 1900,
+          "priceBlue": 2200
+        },
+        {
+          "id": 11,
+          "name": "Стрижка + Борода + Камуфляж",
+          "priceGreen": 2300,
+          "pricePink": 3000,
+          "priceBlue": 3500
+        },
+        {
+          "id": 12,
+          "name": "Отец + Сын",
+          "priceGreen": 1600,
+          "pricePink": 2100,
+          "priceBlue": 2500
+        },
+        {
+          "id": 13,
+          "name": "Стрижка + Королевское бритьё",
+          "priceGreen": 1800,
+          "pricePink": 2300,
+          "priceBlue": 2700
+        }
+      ]
+    },
+    {
+      "id": "additional",
+      "name": "Дополнительные услуги",
+      "icon": "heart",
+      "description": "Дополнительные процедуры для полного ухода",
+      "services": [
+        {
+          "id": 14,
+          "name": "Воск (нос/уши)",
+          "priceGreen": 200,
+          "pricePink": 250,
+          "priceBlue": 300
+        },
+        {
+          "id": 15,
+          "name": "Чёрная маска",
+          "priceGreen": 300,
+          "pricePink": 400,
+          "priceBlue": 500
+        },
+        {
+          "id": 16,
+          "name": "Массаж головы",
+          "priceGreen": 300,
+          "pricePink": 400,
+          "priceBlue": 500
+        },
+        {
+          "id": 17,
+          "name": "Тонирование бороды",
+          "priceGreen": 500,
+          "pricePink": 600,
+          "priceBlue": 700
+        },
+        {
+          "id": 18,
+          "name": "Мытьё головы",
+          "priceGreen": 200,
+          "pricePink": 250,
+          "priceBlue": 300
+        },
+        {
+          "id": 19,
+          "name": "Коррекция бровей",
+          "priceGreen": 300,
+          "pricePink": 400,
+          "priceBlue": 500
+        }
+      ]
+    }
+  ],
+  "podology": {
+    "title": "Подологический кабинет",
+    "description": "Профессиональный уход за здоровьем стоп",
+    "services": [
+      {
+        "id": 20,
+        "name": "Консультация подолога",
+        "price": "Бесплатно"
+      },
+      {
+        "id": 21,
+        "name": "Обработка стоп",
+        "price": "от 2000 ₽"
+      },
+      {
+        "id": 22,
+        "name": "Лечение вросшего ногтя",
+        "price": "от 2500 ₽"
+      },
+      {
+        "id": 23,
+        "name": "Удаление мозолей",
+        "price": "от 1500 ₽"
+      },
+      {
+        "id": 24,
+        "name": "Обработка трещин",
+        "price": "от 1800 ₽"
+      },
+      {
+        "id": 25,
+        "name": "Комплексный педикюр",
+        "price": "от 3000 ₽"
+      }
+    ]
+  }
+}

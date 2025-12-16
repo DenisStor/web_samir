@@ -1,0 +1,28 @@
+{
+  "masters": [
+    {
+      "id": "master_1764865856858",
+      "name": "Елена",
+      "initial": "Е",
+      "badge": "blue",
+      "role": "Патолог",
+      "specialization": "",
+      "principles": [],
+      "photo": "/uploads/f08de508993c4483848067b928be6e16.jpg",
+      "active": true
+    },
+    {
+      "id": "master_1764865876624",
+      "name": "Елена",
+      "initial": "Е",
+      "badge": "pink",
+      "role": "патолог",
+      "specialization": "",
+      "principles": [
+        "ооо"
+      ],
+      "photo": "/uploads/2e7e94def7ba4e078411bc69d7faae8b.jpg",
+      "active": true
+    }
+  ]
+}

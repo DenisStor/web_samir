@@ -4,60 +4,130 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Say's Barbers - a static barbershop website with dark theme and green accents (#00ff88). Built with vanilla HTML, CSS, and JavaScript (no frameworks).
+Say's Barbers - a barbershop website with integrated admin CMS for content management, visitor analytics, and image uploads.
 
-## Running the Project
+## Project Structure
+
+```
+web_samir/
+├── src/                    # Source code
+│   ├── css/                # Stylesheets
+│   │   ├── variables.css   # CSS variables
+│   │   ├── base.css        # Base styles
+│   │   ├── components.css  # Reusable components
+│   │   ├── navigation.css  # Navigation styles
+│   │   ├── sections.css    # Section-specific styles
+│   │   ├── utilities.css   # Utility classes
+│   │   └── admin.css       # Admin panel styles
+│   ├── js/
+│   │   ├── site/           # Main site scripts
+│   │   │   ├── utils.js
+│   │   │   ├── navigation.js
+│   │   │   ├── animations.js
+│   │   │   ├── modals.js
+│   │   │   ├── main.js
+│   │   │   ├── data-loader.js
+│   │   │   ├── analytics.js
+│   │   │   └── sanitizer.js
+│   │   ├── admin/          # Admin panel modules
+│   │   │   ├── renderers/  # Data renderers
+│   │   │   └── forms/      # Form handlers
+│   │   ├── shared/         # Shared modules
+│   │   │   └── icons.js
+│   │   └── admin.bundle.js # Generated admin bundle
+│   └── sections/           # HTML sections for index.html
+├── scripts/
+│   └── build.py            # Build script
+├── data/                   # JSON data storage
+├── uploads/                # Uploaded images
+├── tests/                  # Python tests
+├── admin.html              # Admin panel
+├── index.html              # Generated main page
+├── server.py               # HTTP server
+├── config.json             # Server config
+├── package.json            # NPM config
+└── requirements-dev.txt    # Python dev deps
+```
+
+## Tech Stack
+
+- **Backend**: Python 3 with built-in `http.server` (server.py)
+- **Frontend**: Vanilla JavaScript (ES6 modules with IIFE pattern)
+- **Data Storage**: JSON files in `/data/` directory (no database)
+- **Styling**: Modular CSS with CSS variables
+
+## Development Commands
 
 ```bash
-# Start local dev server (auto-opens browser at http://localhost:8000)
+# Start development server (auto-opens browser at http://localhost:8000)
 python3 server.py
 
-# Alternative: Python built-in server
-python3 -m http.server 8000
+# Rebuild index.html from sections
+python3 scripts/build.py
+
+# Watch sections and auto-rebuild on changes
+python3 scripts/build.py --watch
+
+# Build admin bundle only
+python3 scripts/build.py --admin-only
 ```
 
 ## Architecture
 
-### CSS Modules (load order matters)
-1. `css/variables.css` - Design tokens: colors, shadows, borders, transitions, spacing, z-index
-2. `css/utilities.css` - Shared keyframes, card styles, flex/grid utilities, icon sizes
-3. `css/base.css` - Reset, typography, scrollbar, container
-4. `css/navigation.css` - Fixed nav, mobile menu, marquee
-5. `css/components.css` - Buttons, badges, price tags, forms
-6. `css/sections.css` - All page sections (Hero, Services, Podology, Masters, Blog, FAQ, Booking, Footer)
+### Modular HTML Assembly
 
-### JavaScript Modules (load order matters)
-1. `js/utils.js` - Core utilities: `SaysApp` namespace with DOM helpers, scroll lock, aria, events
-2. `js/navigation.js` - Mobile menu: `toggleMenu()`, `closeMenu()`, scroll effect
-3. `js/animations.js` - IntersectionObserver for fade-in animations
-4. `js/forms.js` - Form validation, phone mask (+7 format), `submitForm()`
-5. `js/modals.js` - `openBlogModal()`, `closeBlogModal()`, `toggleFaq()`
-6. `js/main.js` - Service tabs initialization
+The main `index.html` is **generated** - do not edit directly. Edit files in `/src/sections/` instead:
+- `scripts/build.py` concatenates sections in order to create `index.html`
+- Section order defined in `SECTIONS` list in build.py
+- `server.py` runs `build.py` automatically on startup
 
-### Key Design Tokens (variables.css)
-```css
---accent-green: #00ff88         /* Primary accent */
---transition-base: 0.3s ease    /* Standard transition */
---transition-bounce: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)
---radius-xl: 24px               /* Card radius */
---border-subtle: rgba(255, 255, 255, 0.05)
---shadow-glow-md: 0 0 30px var(--accent-green-glow)
+### API Endpoints
+
+All endpoints return JSON with CORS headers:
+
+```
+GET/POST  /api/masters      - Barber profiles
+GET/POST  /api/services     - Services and pricing (3 tiers: green, pink, blue)
+GET/POST  /api/articles     - Blog articles
+GET/POST  /api/principles   - Quality principles
+GET/POST  /api/faq          - FAQ items
+GET/POST  /api/social       - Social media & contact info
+POST      /api/upload       - Upload image (base64)
+DELETE    /api/upload/{filename}
+GET/POST  /api/stats        - Visitor statistics
+POST      /api/stats/visit  - Record page/section view
 ```
 
-### Global JavaScript API (SaysApp)
-```javascript
-SaysApp.$('.selector')     // querySelector
-SaysApp.$$('.selector')    // querySelectorAll
-SaysApp.byId('id')         // getElementById
-SaysApp.lockScroll(bool)   // Lock/unlock body scroll
-SaysApp.toggleClass(el, 'class', force)
-SaysApp.onEscape(callback) // Handle Escape key
-SaysApp.ready(fn)          // DOMContentLoaded wrapper
-```
+### JavaScript Module Loading Order
 
-## Notes
+Scripts in `src/js/site/` load in sequence (each depends on previous):
+1. `utils.js` - DOM utilities ($, $$, byId, toggleClass, lockScroll, on, ready)
+2. `sanitizer.js` - XSS protection
+3. `navigation.js` - Mobile menu handling
+4. `animations.js` - Fade-in effects
+5. `modals.js` - Blog modal & FAQ accordion
+6. `main.js` - Service tabs initialization
+7. `data-loader.js` - Fetches API data, renders templates into DOM
+8. `analytics.js` - Visitor tracking with session IDs
 
-- Site is in Russian language
-- Podology section uses inverted light theme (medical colors in variables.css)
-- All JS modules use IIFE pattern and depend on SaysApp from utils.js
-- Phone input has mask: +7 (XXX) XXX-XX-XX
+### Admin Panel
+
+`admin.html` + `src/js/admin/` modules (bundled to `admin.bundle.js`):
+- Password-protected (server-side token auth)
+- CRUD operations for all content types
+- Image upload with UUID naming to `/uploads/`
+- Stats dashboard with 14-day chart
+
+### Data Flow
+
+1. Browser loads `index.html` (assembled from sections)
+2. `data-loader.js` fetches from `/api/*` endpoints
+3. Templates render data into DOM placeholders
+4. Changes in admin → POST to API → server writes to JSON files
+
+## Key Patterns
+
+- **IIFE modules**: Each JS file wrapped in `(function() { 'use strict'; ... })();`
+- **CSS variables**: Defined in `src/css/variables.css`
+- **Badge colors**: Masters have badge-green, badge-pink, or badge-blue class
+- **Services pricing**: 3 price columns per service matching badge colors
