@@ -61,7 +61,6 @@ var AdminPanel = (function() {
             AdminState.setMasters(data.masters.masters || []);
             AdminState.setServices(data.services || {});
             AdminState.setArticles(data.articles.articles || []);
-            AdminState.setPrinciples(data.principles.principles || []);
             AdminState.setFaq(data.faq.faq || []);
             AdminState.setSocial(data.social || {});
 
@@ -102,9 +101,6 @@ var AdminPanel = (function() {
                 break;
             case 'articles':
                 AdminArticlesRenderer.render();
-                break;
-            case 'principles':
-                AdminPrinciplesRenderer.render();
                 break;
             case 'faq':
                 AdminFaqRenderer.render();
@@ -178,12 +174,6 @@ var AdminPanel = (function() {
                 title: 'Статьи',
                 description: 'Блог и полезные материалы',
                 addText: 'Добавить статью'
-            },
-            principles: {
-                element: '#principlesSection',
-                title: 'Принципы работы',
-                description: 'Ценности и подход к работе',
-                addText: 'Добавить принцип'
             },
             faq: {
                 element: '#faqSection',
@@ -290,14 +280,6 @@ var AdminPanel = (function() {
                     AdminArticleForm.remove(id);
                     break;
 
-                // Principles
-                case 'edit-principle':
-                    editPrinciple(id);
-                    break;
-                case 'delete-principle':
-                    AdminPrincipleForm.remove(id);
-                    break;
-
                 // FAQ
                 case 'edit-faq':
                     editFaq(id);
@@ -353,13 +335,6 @@ var AdminPanel = (function() {
         var article = AdminState.findArticle(id);
         if (article) {
             AdminArticleForm.show(article);
-        }
-    }
-
-    function editPrinciple(id) {
-        var principle = AdminState.findPrinciple(id);
-        if (principle) {
-            AdminPrincipleForm.show(principle);
         }
     }
 
@@ -487,9 +462,6 @@ var AdminPanel = (function() {
                     case 'articles':
                         AdminArticleForm.show();
                         break;
-                    case 'principles':
-                        AdminPrincipleForm.show();
-                        break;
                     case 'faq':
                         AdminFaqForm.show();
                         break;
@@ -532,9 +504,6 @@ var AdminPanel = (function() {
                     case 'articles':
                         AdminArticleForm.save();
                         break;
-                    case 'principles':
-                        AdminPrincipleForm.save();
-                        break;
                     case 'faq':
                         AdminFaqForm.save();
                         break;
@@ -575,7 +544,6 @@ var AdminPanel = (function() {
         AdminMastersRenderer.init();
         AdminServicesRenderer.init();
         AdminArticlesRenderer.init();
-        AdminPrinciplesRenderer.init();
         AdminFaqRenderer.init();
         AdminSocialRenderer.init();
 
@@ -652,14 +620,6 @@ var AdminPanel = (function() {
         showArticleForm: function(id) {
             var article = id ? AdminState.findArticle(id) : null;
             AdminArticleForm.show(article);
-        },
-
-        // Principles
-        editPrinciple: editPrinciple,
-        deletePrinciple: function(id) { AdminPrincipleForm.remove(id); },
-        showPrincipleForm: function(id) {
-            var principle = id ? AdminState.findPrinciple(id) : null;
-            AdminPrincipleForm.show(principle);
         },
 
         // FAQ

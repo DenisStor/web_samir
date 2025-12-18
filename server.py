@@ -202,18 +202,6 @@ def validate_faq(data):
     return True, None
 
 
-def validate_principle(data):
-    """Валидация принципа."""
-    if not isinstance(data, dict):
-        return False, "Invalid data format"
-
-    title = data.get('title', '')
-    if not title or not isinstance(title, str) or len(title) > 200:
-        return False, "Invalid or missing title"
-
-    return True, None
-
-
 def build_html():
     """Собирает index.html из секций."""
     if BUILD_SCRIPT.exists():
@@ -273,8 +261,6 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
             self.handle_get_data('services.json')
         elif path == '/api/articles':
             self.handle_get_data('articles.json')
-        elif path == '/api/principles':
-            self.handle_get_data('principles.json')
         elif path == '/api/faq':
             self.handle_get_data('faq.json')
         elif path == '/api/social':
@@ -316,8 +302,6 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
             self.handle_save_data('services.json')
         elif path == '/api/articles':
             self.handle_save_data('articles.json')
-        elif path == '/api/principles':
-            self.handle_save_data('principles.json')
         elif path == '/api/faq':
             self.handle_save_data('faq.json')
         elif path == '/api/social':

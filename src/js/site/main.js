@@ -50,7 +50,47 @@
         });
     }
 
+    // =================================================================
+    // PODOLOGY TABS
+    // =================================================================
+
+    /**
+     * Инициализировать табы подологии
+     */
+    function initPodologyTabs() {
+        const tabButtons = $$('.podology-tab');
+
+        if (!tabButtons.length) return;
+
+        tabButtons.forEach(button => {
+            on(button, 'click', (e) => {
+                e.preventDefault();
+
+                const targetTab = button.getAttribute('data-podology-target');
+                if (!targetTab) return;
+
+                // Убрать active со всех табов
+                tabButtons.forEach(btn => toggleClass(btn, 'active', false));
+
+                // Добавить active на кликнутый таб
+                toggleClass(button, 'active', true);
+
+                // Скрыть все контенты табов
+                $$('.podology-tab-content').forEach(content => {
+                    toggleClass(content, 'active', false);
+                });
+
+                // Показать выбранный контент
+                const targetContent = $(`.podology-tab-content[data-podology="${targetTab}"]`);
+                if (targetContent) {
+                    toggleClass(targetContent, 'active', true);
+                }
+            });
+        });
+    }
+
     // Запуск при готовности DOM
     ready(initServiceTabs);
+    ready(initPodologyTabs);
 
 })();

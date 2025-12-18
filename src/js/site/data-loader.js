@@ -275,59 +275,6 @@
         }
     }
 
-    // Иконки для принципов
-    const principleIcons = {
-        book: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>`,
-        shield: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`,
-        clock: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
-        check: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`,
-        star: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`,
-        heart: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`,
-        award: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>`,
-        target: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>`
-    };
-
-    function createQualityItem(principle) {
-        const iconHtml = principle.image
-            ? `<img src="${principle.image}" alt="${principle.title}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`
-            : principleIcons[principle.icon] || principleIcons.check;
-
-        return `
-            <div class="quality-item fade-in visible">
-                <div class="quality-icon">
-                    ${iconHtml}
-                </div>
-                <h3>${principle.title}</h3>
-                <p>${principle.description}</p>
-            </div>
-        `;
-    }
-
-    async function loadPrinciples() {
-        try {
-            const response = await fetch(`${API_BASE}/principles`);
-            if (!response.ok) return;
-
-            const data = await response.json();
-
-            if (data.principles !== undefined) {
-                const qualityGrid = document.querySelector('.quality-grid');
-                if (qualityGrid) {
-                    const principles = data.principles || [];
-                    if (principles.length > 0) {
-                        qualityGrid.innerHTML = principles.map(createQualityItem).join('');
-                        console.log(`Loaded ${principles.length} principles from API`);
-                    } else {
-                        qualityGrid.innerHTML = '<p class="empty-message" style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,0.5); padding: 40px;">Принципы работы скоро появятся</p>';
-                        console.log('Principles: empty array from API');
-                    }
-                }
-            }
-        } catch (error) {
-            console.log('Using static principles data:', error.message);
-        }
-    }
-
     function createFaqItem(item) {
         return `
             <div class="faq-item fade-in visible">
@@ -576,7 +523,6 @@
             loadMasters(),
             loadServices(),
             loadArticles(),
-            loadPrinciples(),
             loadFaq(),
             loadSocial()
         ]);

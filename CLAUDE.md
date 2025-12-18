@@ -70,6 +70,18 @@ python3 scripts/build.py --watch
 
 # Build admin bundle only
 python3 scripts/build.py --admin-only
+
+# Linting and formatting (requires: npm install)
+npm run lint              # Check JS with ESLint
+npm run lint:fix          # Auto-fix ESLint issues
+npm run format            # Format JS/CSS with Prettier
+npm run format:check      # Check formatting
+
+# Testing
+npm test                  # Run all Python tests
+npm run test:server       # Run server tests only
+python3 -m pytest tests/test_server.py::test_function_name -v  # Run single test
+python3 -m pytest tests/ --cov=.  # Run with coverage
 ```
 
 ## Architecture

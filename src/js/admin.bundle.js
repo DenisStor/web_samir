@@ -18,7 +18,6 @@ var AdminState = {
     masters: [],
     services: { categories: [], podology: { services: [] } },
     articles: [],
-    principles: [],
     faq: [],
     social: { social: [], phone: '', email: '', address: '' },
 
@@ -32,7 +31,6 @@ var AdminState = {
         this.masters = [];
         this.services = { categories: [], podology: { services: [] } };
         this.articles = [];
-        this.principles = [];
         this.faq = [];
         this.social = { social: [], phone: '', email: '', address: '' };
         this.editingItem = null;
@@ -50,10 +48,6 @@ var AdminState = {
         this.articles = data || [];
     },
 
-    setPrinciples: function(data) {
-        this.principles = data || [];
-    },
-
     setFaq: function(data) {
         this.faq = data || [];
     },
@@ -69,10 +63,6 @@ var AdminState = {
 
     findArticle: function(id) {
         return this.articles.find(function(a) { return a.id === id; });
-    },
-
-    findPrinciple: function(id) {
-        return this.principles.find(function(p) { return p.id === id; });
     },
 
     findFaq: function(id) {
@@ -444,7 +434,6 @@ var AdminAPI = (function() {
             get('masters'),
             get('services'),
             get('articles'),
-            get('principles'),
             get('faq'),
             get('social'),
             get('stats')
@@ -454,10 +443,9 @@ var AdminAPI = (function() {
             masters: results[0],
             services: results[1],
             articles: results[2],
-            principles: results[3],
-            faq: results[4],
-            social: results[5],
-            stats: results[6]
+            faq: results[3],
+            social: results[4],
+            stats: results[5]
         };
     }
 
@@ -2217,93 +2205,6 @@ var AdminArticlesRenderer = (function() {
 window.AdminArticlesRenderer = AdminArticlesRenderer;
 
 
-// ============= renderers/principles.js =============
-
-/**
- * Admin Principles Renderer
- * Рендеринг списка принципов работы
- */
-
-var AdminPrinciplesRenderer = (function() {
-    'use strict';
-
-    var container = null;
-
-    /**
-     * Инициализация
-     */
-    function init() {
-        container = document.getElementById('principlesGrid');
-    }
-
-    /**
-     * Рендеринг списка принципов
-     */
-    function render() {
-        if (!container) {
-            container = document.getElementById('principlesGrid');
-            if (!container) return;
-        }
-
-        var principles = AdminState.principles || [];
-
-        if (principles.length === 0) {
-            container.innerHTML = '<p class="empty-message">Нет принципов. Нажмите "Добавить" чтобы создать.</p>';
-            return;
-        }
-
-        var html = principles.map(function(principle) {
-            var iconHtml = principle.image
-                ? '<img src="' + principle.image + '" alt="' + escapeHtml(principle.title) + '">'
-                : SharedIcons.getPrinciple(principle.icon || 'check');
-
-            return '<div class="principle-card" data-id="' + principle.id + '">' +
-                '<div class="principle-icon">' +
-                    iconHtml +
-                '</div>' +
-                '<div class="principle-content">' +
-                    '<h3 class="principle-title">' + escapeHtml(principle.title) + '</h3>' +
-                    '<p class="principle-description">' + escapeHtml(principle.description || '') + '</p>' +
-                '</div>' +
-                '<div class="principle-actions">' +
-                    '<button class="btn btn-secondary" data-action="edit-principle" data-id="' + principle.id + '">' +
-                        SharedIcons.get('edit') +
-                        'Редактировать' +
-                    '</button>' +
-                    '<button class="btn btn-icon danger" data-action="delete-principle" data-id="' + principle.id + '" title="Удалить">' +
-                        SharedIcons.get('delete') +
-                    '</button>' +
-                '</div>' +
-            '</div>';
-        }).join('');
-
-        container.innerHTML = html;
-    }
-
-    /**
-     * Escape HTML
-     */
-    function escapeHtml(text) {
-        if (!text) return '';
-        if (typeof window.escapeHtml === 'function') {
-            return window.escapeHtml(text);
-        }
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    // Публичный API
-    return {
-        init: init,
-        render: render
-    };
-})();
-
-// Экспорт
-window.AdminPrinciplesRenderer = AdminPrinciplesRenderer;
-
-
 // ============= renderers/faq.js =============
 
 /**
@@ -3356,180 +3257,6 @@ var AdminArticleForm = (function() {
 window.AdminArticleForm = AdminArticleForm;
 
 
-// ============= forms/principle-form.js =============
-
-/**
- * Admin Principle Form
- * Форма добавления/редактирования принципа работы
- */
-
-var AdminPrincipleForm = (function() {
-    'use strict';
-
-    /**
-     * Показать форму принципа
-     */
-    function show(principle) {
-        AdminState.editingItem = principle || null;
-
-        var title = principle ? 'Редактировать принцип' : 'Добавить принцип';
-
-        var iconOptions = SharedIcons.getPrincipleKeys().map(function(icon) {
-            var selected = principle && principle.icon === icon ? 'selected' : '';
-            return '<option value="' + icon + '" ' + selected + '>' + icon + '</option>';
-        }).join('');
-
-        var currentIcon = (principle && principle.icon) || 'check';
-
-        var html = '<form id="principleForm" class="admin-form">' +
-            '<div class="form-group">' +
-                '<label class="form-label">Изображение (необязательно)</label>' +
-                '<div class="image-upload ' + (principle && principle.image ? 'has-image' : '') + '" id="principleImageUpload">' +
-                    (principle && principle.image ? '<img src="' + principle.image + '" alt="Изображение">' : '') +
-                    '<input type="file" accept="image/*" data-upload-target="principleImage">' +
-                    SharedIcons.get('upload') +
-                    '<span>Нажмите для загрузки изображения</span>' +
-                    (principle && principle.image ? '<button type="button" class="remove-image" data-action="remove-image" data-target="principleImage">' + SharedIcons.get('close') + '</button>' : '') +
-                '</div>' +
-                '<input type="hidden" id="principleImage" value="' + (principle && principle.image ? principle.image : '') + '">' +
-                '<p class="form-hint">Если изображение не загружено, будет показана иконка</p>' +
-            '</div>' +
-            '<div class="form-group">' +
-                '<label class="form-label">Иконка (если нет изображения)</label>' +
-                '<select class="form-input" id="principleIcon">' +
-                    iconOptions +
-                '</select>' +
-                '<div class="icon-preview" id="iconPreview">' +
-                    SharedIcons.getPrinciple(currentIcon) +
-                '</div>' +
-            '</div>' +
-            '<div class="form-group">' +
-                '<label class="form-label">Заголовок *</label>' +
-                '<input type="text" class="form-input" id="principleTitle" value="' + escapeHtml(principle && principle.title || '') + '" placeholder="Название принципа" required>' +
-            '</div>' +
-            '<div class="form-group">' +
-                '<label class="form-label">Описание *</label>' +
-                '<textarea class="form-textarea" id="principleDescription" placeholder="Описание принципа работы...">' + escapeHtml(principle && principle.description || '') + '</textarea>' +
-            '</div>' +
-        '</form>';
-
-        AdminModals.setTitle('modal', title);
-        var modalBody = document.getElementById('modalBody');
-        if (modalBody) {
-            modalBody.innerHTML = html;
-        }
-        AdminModals.open('modal');
-
-        // Обновление превью иконки при выборе
-        var iconSelect = document.getElementById('principleIcon');
-        var iconPreview = document.getElementById('iconPreview');
-
-        if (iconSelect && iconPreview) {
-            iconSelect.addEventListener('change', function() {
-                iconPreview.innerHTML = SharedIcons.getPrinciple(iconSelect.value);
-            });
-        }
-    }
-
-    /**
-     * Сохранить принцип
-     */
-    async function save() {
-        var titleEl = document.getElementById('principleTitle');
-        var title = titleEl ? titleEl.value.trim() : '';
-
-        if (!title) {
-            showToast('Введите заголовок принципа', 'error');
-            return;
-        }
-
-        var descEl = document.getElementById('principleDescription');
-        var iconEl = document.getElementById('principleIcon');
-        var imageEl = document.getElementById('principleImage');
-
-        var description = descEl ? descEl.value.trim() : '';
-        var icon = iconEl ? iconEl.value : 'check';
-        var image = imageEl ? imageEl.value : null;
-
-        var principleData = {
-            id: AdminState.editingItem ? AdminState.editingItem.id : 'principle_' + Date.now(),
-            title: title,
-            description: description,
-            icon: icon,
-            image: image
-        };
-
-        var principles = AdminState.principles || [];
-
-        if (AdminState.editingItem) {
-            var index = principles.findIndex(function(p) {
-                return p.id === AdminState.editingItem.id;
-            });
-            if (index !== -1) {
-                principles[index] = principleData;
-            }
-        } else {
-            principles.push(principleData);
-        }
-
-        try {
-            await AdminAPI.save('principles', { principles: principles });
-            AdminState.setPrinciples(principles);
-            showToast('Принцип сохранён', 'success');
-            AdminModals.close('modal');
-            AdminPrinciplesRenderer.render();
-        } catch (error) {
-            showToast('Ошибка сохранения: ' + error.message, 'error');
-        }
-    }
-
-    /**
-     * Удалить принцип
-     */
-    async function remove(id) {
-        if (!confirm('Вы уверены, что хотите удалить этот принцип?')) {
-            return;
-        }
-
-        var principles = AdminState.principles.filter(function(p) {
-            return p.id !== id;
-        });
-
-        try {
-            await AdminAPI.save('principles', { principles: principles });
-            AdminState.setPrinciples(principles);
-            showToast('Принцип удалён', 'success');
-            AdminPrinciplesRenderer.render();
-        } catch (error) {
-            showToast('Ошибка удаления: ' + error.message, 'error');
-        }
-    }
-
-    /**
-     * Escape HTML
-     */
-    function escapeHtml(text) {
-        if (!text) return '';
-        if (typeof window.escapeHtml === 'function') {
-            return window.escapeHtml(text);
-        }
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    // Публичный API
-    return {
-        show: show,
-        save: save,
-        remove: remove
-    };
-})();
-
-// Экспорт
-window.AdminPrincipleForm = AdminPrincipleForm;
-
-
 // ============= forms/faq-form.js =============
 
 /**
@@ -3729,7 +3456,6 @@ var AdminPanel = (function() {
             AdminState.setMasters(data.masters.masters || []);
             AdminState.setServices(data.services || {});
             AdminState.setArticles(data.articles.articles || []);
-            AdminState.setPrinciples(data.principles.principles || []);
             AdminState.setFaq(data.faq.faq || []);
             AdminState.setSocial(data.social || {});
 
@@ -3770,9 +3496,6 @@ var AdminPanel = (function() {
                 break;
             case 'articles':
                 AdminArticlesRenderer.render();
-                break;
-            case 'principles':
-                AdminPrinciplesRenderer.render();
                 break;
             case 'faq':
                 AdminFaqRenderer.render();
@@ -3846,12 +3569,6 @@ var AdminPanel = (function() {
                 title: 'Статьи',
                 description: 'Блог и полезные материалы',
                 addText: 'Добавить статью'
-            },
-            principles: {
-                element: '#principlesSection',
-                title: 'Принципы работы',
-                description: 'Ценности и подход к работе',
-                addText: 'Добавить принцип'
             },
             faq: {
                 element: '#faqSection',
@@ -3958,14 +3675,6 @@ var AdminPanel = (function() {
                     AdminArticleForm.remove(id);
                     break;
 
-                // Principles
-                case 'edit-principle':
-                    editPrinciple(id);
-                    break;
-                case 'delete-principle':
-                    AdminPrincipleForm.remove(id);
-                    break;
-
                 // FAQ
                 case 'edit-faq':
                     editFaq(id);
@@ -4021,13 +3730,6 @@ var AdminPanel = (function() {
         var article = AdminState.findArticle(id);
         if (article) {
             AdminArticleForm.show(article);
-        }
-    }
-
-    function editPrinciple(id) {
-        var principle = AdminState.findPrinciple(id);
-        if (principle) {
-            AdminPrincipleForm.show(principle);
         }
     }
 
@@ -4155,9 +3857,6 @@ var AdminPanel = (function() {
                     case 'articles':
                         AdminArticleForm.show();
                         break;
-                    case 'principles':
-                        AdminPrincipleForm.show();
-                        break;
                     case 'faq':
                         AdminFaqForm.show();
                         break;
@@ -4200,9 +3899,6 @@ var AdminPanel = (function() {
                     case 'articles':
                         AdminArticleForm.save();
                         break;
-                    case 'principles':
-                        AdminPrincipleForm.save();
-                        break;
                     case 'faq':
                         AdminFaqForm.save();
                         break;
@@ -4243,7 +3939,6 @@ var AdminPanel = (function() {
         AdminMastersRenderer.init();
         AdminServicesRenderer.init();
         AdminArticlesRenderer.init();
-        AdminPrinciplesRenderer.init();
         AdminFaqRenderer.init();
         AdminSocialRenderer.init();
 
@@ -4320,14 +4015,6 @@ var AdminPanel = (function() {
         showArticleForm: function(id) {
             var article = id ? AdminState.findArticle(id) : null;
             AdminArticleForm.show(article);
-        },
-
-        // Principles
-        editPrinciple: editPrinciple,
-        deletePrinciple: function(id) { AdminPrincipleForm.remove(id); },
-        showPrincipleForm: function(id) {
-            var principle = id ? AdminState.findPrinciple(id) : null;
-            AdminPrincipleForm.show(principle);
         },
 
         // FAQ

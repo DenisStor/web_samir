@@ -25,7 +25,6 @@ SECTIONS = [
     'services.html',
     'podology.html',
     'masters.html',
-    'quality.html',
     'location.html',
     'social.html',
     'blog.html',
@@ -54,7 +53,6 @@ ADMIN_MODULES = [
     'renderers/masters.js',
     'renderers/services.js',
     'renderers/articles.js',
-    'renderers/principles.js',
     'renderers/faq.js',
     'renderers/social.js',
 
@@ -62,7 +60,6 @@ ADMIN_MODULES = [
     'forms/master-form.js',
     'forms/service-form.js',
     'forms/article-form.js',
-    'forms/principle-form.js',
     'forms/faq-form.js',
 
     # Main entry point (последний, зависит от всех)

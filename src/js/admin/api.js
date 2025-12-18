@@ -224,7 +224,6 @@ var AdminAPI = (function() {
             get('masters'),
             get('services'),
             get('articles'),
-            get('principles'),
             get('faq'),
             get('social'),
             get('stats')
@@ -234,10 +233,9 @@ var AdminAPI = (function() {
             masters: results[0],
             services: results[1],
             articles: results[2],
-            principles: results[3],
-            faq: results[4],
-            social: results[5],
-            stats: results[6]
+            faq: results[3],
+            social: results[4],
+            stats: results[5]
         };
     }
 

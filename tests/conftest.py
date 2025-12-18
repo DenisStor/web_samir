@@ -61,15 +61,3 @@ def sample_faq():
         'question': 'Как записаться?',
         'answer': 'Позвоните нам или оставьте заявку на сайте.'
     }
-
-
-@pytest.fixture
-def sample_principle():
-    """Sample valid principle data"""
-    return {
-        'id': 'principle_test',
-        'title': 'Качество',
-        'description': 'Мы гарантируем высокое качество услуг',
-        'icon': 'check',
-        'image': None
-    }

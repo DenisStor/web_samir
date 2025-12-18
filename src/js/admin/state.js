@@ -8,7 +8,6 @@ var AdminState = {
     masters: [],
     services: { categories: [], podology: { services: [] } },
     articles: [],
-    principles: [],
     faq: [],
     social: { social: [], phone: '', email: '', address: '' },
 
@@ -22,7 +21,6 @@ var AdminState = {
         this.masters = [];
         this.services = { categories: [], podology: { services: [] } };
         this.articles = [];
-        this.principles = [];
         this.faq = [];
         this.social = { social: [], phone: '', email: '', address: '' };
         this.editingItem = null;
@@ -40,10 +38,6 @@ var AdminState = {
         this.articles = data || [];
     },
 
-    setPrinciples: function(data) {
-        this.principles = data || [];
-    },
-
     setFaq: function(data) {
         this.faq = data || [];
     },
@@ -59,10 +53,6 @@ var AdminState = {
 
     findArticle: function(id) {
         return this.articles.find(function(a) { return a.id === id; });
-    },
-
-    findPrinciple: function(id) {
-        return this.principles.find(function(p) { return p.id === id; });
     },
 
     findFaq: function(id) {
