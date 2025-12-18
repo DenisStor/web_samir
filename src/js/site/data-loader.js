@@ -138,23 +138,7 @@
         `;
     }
 
-    // =================================================================
-    // UTILITIES
-    // =================================================================
-
-    function formatDate(dateStr) {
-        if (!dateStr) return '';
-        try {
-            const date = new Date(dateStr);
-            return date.toLocaleDateString('ru-RU', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
-            });
-        } catch {
-            return dateStr;
-        }
-    }
+    // formatDate определён в utils.js и доступен глобально
 
     // =================================================================
     // DATA LOADING

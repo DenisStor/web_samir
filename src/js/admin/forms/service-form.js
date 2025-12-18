@@ -37,7 +37,7 @@ var AdminServiceForm = (function() {
         var html = '<form id="serviceForm" class="admin-form">' +
             '<div class="form-group">' +
                 '<label class="form-label">Название услуги *</label>' +
-                '<input type="text" class="form-input" id="serviceName" value="' + escapeHtml(service && service.name || '') + '" placeholder="Введите название услуги" required>' +
+                '<input type="text" class="form-input" id="serviceName" value="' + window.escapeHtml(service && service.name || '') + '" placeholder="Введите название услуги" required>' +
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-label">Цены по уровням мастеров</label>' +
@@ -89,11 +89,11 @@ var AdminServiceForm = (function() {
         var html = '<form id="podologyForm" class="admin-form">' +
             '<div class="form-group">' +
                 '<label class="form-label">Название услуги *</label>' +
-                '<input type="text" class="form-input" id="podologyName" value="' + escapeHtml(service && service.name || '') + '" placeholder="Введите название услуги" required>' +
+                '<input type="text" class="form-input" id="podologyName" value="' + window.escapeHtml(service && service.name || '') + '" placeholder="Введите название услуги" required>' +
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-label">Цена</label>' +
-                '<input type="text" class="form-input" id="podologyPrice" value="' + escapeHtml(service && service.price || '') + '" placeholder="от 2000 ₽">' +
+                '<input type="text" class="form-input" id="podologyPrice" value="' + window.escapeHtml(service && service.price || '') + '" placeholder="от 2000 ₽">' +
             '</div>' +
         '</form>';
 
@@ -289,19 +289,6 @@ var AdminServiceForm = (function() {
         } catch (error) {
             showToast('Ошибка удаления: ' + error.message, 'error');
         }
-    }
-
-    /**
-     * Escape HTML
-     */
-    function escapeHtml(text) {
-        if (!text) return '';
-        if (typeof window.escapeHtml === 'function') {
-            return window.escapeHtml(text);
-        }
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
     }
 
     // Публичный API

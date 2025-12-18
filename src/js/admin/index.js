@@ -63,6 +63,9 @@ var AdminPanel = (function() {
             AdminState.setArticles(data.articles.articles || []);
             AdminState.setFaq(data.faq.faq || []);
             AdminState.setSocial(data.social || {});
+            AdminState.setShopCategories(data.shopCategories.categories || []);
+            AdminState.setProducts(data.products.products || []);
+            AdminState.setLegalDocuments(data.legal.documents || []);
 
             // Рендеринг
             renderCurrentSection();
@@ -107,6 +110,15 @@ var AdminPanel = (function() {
                 break;
             case 'social':
                 AdminSocialRenderer.render();
+                break;
+            case 'shop-categories':
+                AdminShopCategoriesRenderer.render();
+                break;
+            case 'shop-products':
+                AdminShopProductsRenderer.render();
+                break;
+            case 'legal':
+                AdminLegalRenderer.render();
                 break;
         }
     }
@@ -186,6 +198,24 @@ var AdminPanel = (function() {
                 title: 'Соцсети и контакты',
                 description: 'Настройка социальных сетей и контактной информации',
                 hideAddBtn: true
+            },
+            'shop-categories': {
+                element: '#shopCategoriesSection',
+                title: 'Категории товаров',
+                description: 'Управление категориями интернет-магазина',
+                addText: 'Добавить категорию'
+            },
+            'shop-products': {
+                element: '#shopProductsSection',
+                title: 'Товары',
+                description: 'Управление товарами интернет-магазина',
+                addText: 'Добавить товар'
+            },
+            legal: {
+                element: '#legalSection',
+                title: 'Юридические документы',
+                description: 'Политики, соглашения и правовая информация',
+                addText: 'Добавить документ'
             }
         };
 
@@ -307,6 +337,33 @@ var AdminPanel = (function() {
                 case 'remove-principle':
                     AdminMasterForm.removePrinciple(target);
                     break;
+
+                // Shop categories
+                case 'edit-shop-category':
+                    editShopCategory(id);
+                    break;
+                case 'delete-shop-category':
+                    AdminCategoryForm.remove(id);
+                    break;
+
+                // Shop products
+                case 'edit-product':
+                    editProduct(id);
+                    break;
+                case 'delete-product':
+                    AdminProductForm.remove(id);
+                    break;
+
+                // Legal documents
+                case 'edit-legal':
+                    editLegalDocument(id);
+                    break;
+                case 'delete-legal':
+                    AdminLegalForm.remove(id);
+                    break;
+                case 'toggle-legal':
+                    AdminLegalRenderer.toggleActive(id);
+                    break;
             }
         });
 
@@ -342,6 +399,27 @@ var AdminPanel = (function() {
         var faqItem = AdminState.findFaq(id);
         if (faqItem) {
             AdminFaqForm.show(faqItem);
+        }
+    }
+
+    function editShopCategory(id) {
+        var category = AdminState.findShopCategory(id);
+        if (category) {
+            AdminCategoryForm.show(category);
+        }
+    }
+
+    function editProduct(id) {
+        var product = AdminState.findProduct(id);
+        if (product) {
+            AdminProductForm.show(product);
+        }
+    }
+
+    function editLegalDocument(id) {
+        var document = AdminState.findLegalDocument(id);
+        if (document) {
+            AdminLegalForm.show(document);
         }
     }
 
@@ -465,6 +543,15 @@ var AdminPanel = (function() {
                     case 'faq':
                         AdminFaqForm.show();
                         break;
+                    case 'shop-categories':
+                        AdminCategoryForm.show();
+                        break;
+                    case 'shop-products':
+                        AdminProductForm.show();
+                        break;
+                    case 'legal':
+                        AdminLegalForm.show();
+                        break;
                 }
             });
         }
@@ -507,6 +594,15 @@ var AdminPanel = (function() {
                     case 'faq':
                         AdminFaqForm.save();
                         break;
+                    case 'shop-categories':
+                        AdminCategoryForm.save();
+                        break;
+                    case 'shop-products':
+                        AdminProductForm.save();
+                        break;
+                    case 'legal':
+                        AdminLegalForm.save();
+                        break;
                 }
             });
         }
@@ -546,6 +642,16 @@ var AdminPanel = (function() {
         AdminArticlesRenderer.init();
         AdminFaqRenderer.init();
         AdminSocialRenderer.init();
+        AdminShopCategoriesRenderer.init();
+        AdminShopProductsRenderer.init();
+        AdminLegalRenderer.init();
+
+        // Инициализация поиска
+        if (window.AdminSearch) {
+            AdminSearch.init('mastersSearch', 'mastersGrid');
+            AdminSearch.init('articlesSearch', 'articlesGrid');
+            AdminSearch.init('faqSearch', 'faqList');
+        }
 
         // Инициализация логаута
         AdminAuth.initLogoutButton();
@@ -645,6 +751,22 @@ var AdminPanel = (function() {
         // Master principles
         addPrinciple: function() { AdminMasterForm.addPrinciple(); },
         removePrinciple: function(btn) { AdminMasterForm.removePrinciple(btn); },
+
+        // Shop categories
+        editShopCategory: editShopCategory,
+        deleteShopCategory: function(id) { AdminCategoryForm.remove(id); },
+        showCategoryForm: function(id) {
+            var category = id ? AdminState.findShopCategory(id) : null;
+            AdminCategoryForm.show(category);
+        },
+
+        // Shop products
+        editProduct: editProduct,
+        deleteProduct: function(id) { AdminProductForm.remove(id); },
+        showProductForm: function(id) {
+            var product = id ? AdminState.findProduct(id) : null;
+            AdminProductForm.show(product);
+        },
 
         // WYSIWYG
         formatText: function(command) {

@@ -226,7 +226,10 @@ var AdminAPI = (function() {
             get('articles'),
             get('faq'),
             get('social'),
-            get('stats')
+            get('stats'),
+            get('shop/categories'),
+            get('shop/products'),
+            get('legal')
         ]);
 
         return {
@@ -235,7 +238,10 @@ var AdminAPI = (function() {
             articles: results[2],
             faq: results[3],
             social: results[4],
-            stats: results[5]
+            stats: results[5],
+            shopCategories: results[6],
+            products: results[7],
+            legal: results[8]
         };
     }
 

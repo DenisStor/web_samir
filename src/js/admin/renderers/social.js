@@ -60,12 +60,12 @@ var AdminSocialRenderer = (function() {
                     SharedIcons.getSocial(link.icon) +
                 '</div>' +
                 '<div class="social-link-info">' +
-                    '<div class="social-link-name">' + escapeHtml(link.name) + '</div>' +
+                    '<div class="social-link-name">' + window.escapeHtml(link.name) + '</div>' +
                     '<input type="text" ' +
                         'class="social-link-url-input" ' +
                         'data-social-id="' + link.id + '" ' +
-                        'value="' + escapeHtml(link.url || '') + '" ' +
-                        'placeholder="Введите URL для ' + escapeHtml(link.name) + '">' +
+                        'value="' + window.escapeHtml(link.url || '') + '" ' +
+                        'placeholder="Введите URL для ' + window.escapeHtml(link.name) + '">' +
                 '</div>' +
                 '<div class="social-link-toggle">' +
                     '<div class="toggle ' + toggleClass + '" data-social-id="' + link.id + '" data-action="toggle-social"></div>' +
@@ -132,19 +132,6 @@ var AdminSocialRenderer = (function() {
             console.error('Error saving social:', error);
             showToast('Ошибка сохранения', 'error');
         }
-    }
-
-    /**
-     * Escape HTML
-     */
-    function escapeHtml(text) {
-        if (!text) return '';
-        if (typeof window.escapeHtml === 'function') {
-            return window.escapeHtml(text);
-        }
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
     }
 
     // Публичный API

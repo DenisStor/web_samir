@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Магазин | Say's Barbers</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Security: DOMPurify for XSS protection -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js" integrity="sha512-H+rglffZ6f5gF7UJgvH4Naa+fGCgjrHKMgoFOGmcPTRwR6iAaWkO4bXrpB0aZzIqR0pxKkf8KXJRA2CFNN7TKA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- CSS Modules -->
+    <link rel="stylesheet" href="src/css/variables.css">
+    <link rel="stylesheet" href="src/css/utilities.css">
+    <link rel="stylesheet" href="src/css/base.css">
+    <link rel="stylesheet" href="src/css/navigation.css">
+    <link rel="stylesheet" href="src/css/components.css">
+    <link rel="stylesheet" href="src/css/shop.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="container nav-content">
+            <a href="/" class="logo">
+                Say's<span class="logo-accent">Barbers</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/#services">Услуги</a></li>
+                <li><a href="/#podology">Подологический кабинет</a></li>
+                <li><a href="/shop" class="active">Магазин</a></li>
+                <li><a href="/#masters">Мастера</a></li>
+                <li><a href="/#blog">Блог</a></li>
+                <li><a href="/#faq">FAQ</a></li>
+                <li><a href="/#location">Контакты</a></li>
+            </ul>
+            <a href="/#booking" class="nav-cta">Онлайн-запись</a>
+            <button class="burger" type="button" aria-expanded="false" aria-controls="mobileMenu" aria-label="Открыть меню" onclick="ShopApp.toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+        <a href="/#services" onclick="ShopApp.closeMenu()">Услуги</a>
+        <a href="/#podology" onclick="ShopApp.closeMenu()">Подологический кабинет</a>
+        <a href="/shop" onclick="ShopApp.closeMenu()">Магазин</a>
+        <a href="/#masters" onclick="ShopApp.closeMenu()">Мастера</a>
+        <a href="/#blog" onclick="ShopApp.closeMenu()">Блог</a>
+        <a href="/#faq" onclick="ShopApp.closeMenu()">FAQ</a>
+        <a href="/#location" onclick="ShopApp.closeMenu()">Контакты</a>
+        <a href="/#booking" onclick="ShopApp.closeMenu()">Онлайн-запись</a>
+    </div>
+
+    <!-- Shop Container -->
+    <main class="shop-main">
+        <!-- Catalog View (default) -->
+        <div class="shop-catalog" id="shopCatalog">
+            <div class="container">
+                <!-- Header -->
+                <div class="shop-header">
+                    <div class="shop-header-top">
+                        <h1 class="shop-title">Магазин</h1>
+                        <div class="shop-search">
+                            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                            </svg>
+                            <input type="text" id="shopSearch" placeholder="Поиск товаров...">
+                            <button class="search-clear" id="searchClear" type="button" aria-label="Очистить">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Toolbar: Categories + Sort -->
+                    <div class="shop-toolbar">
+                        <div class="shop-categories-bar">
+                            <button class="category-chip active" data-category="all">
+                                <svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                                    <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                                </svg>
+                                <span>Все</span>
+                                <span class="chip-count" id="allCount">0</span>
+                            </button>
+                            <div class="categories-chips" id="categoriesChips"></div>
+                        </div>
+                        <div class="shop-sort">
+                            <svg class="sort-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="4" y1="6" x2="16" y2="6"/><line x1="4" y1="12" x2="12" y2="12"/><line x1="4" y1="18" x2="8" y2="18"/>
+                                <polyline points="15 15 18 18 21 15"/><line x1="18" y1="18" x2="18" y2="9"/>
+                            </svg>
+                            <select id="sortSelect" aria-label="Сортировка">
+                                <option value="order">По умолчанию</option>
+                                <option value="price-asc">Цена ↑</option>
+                                <option value="price-desc">Цена ↓</option>
+                                <option value="name">По названию</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="shop-content">
+
+                    <!-- Products Grid -->
+                    <div class="products-area">
+                        <div class="products-grid" id="productsGrid">
+                            <!-- Products loaded dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Detail View (hidden by default) -->
+        <div class="product-page" id="productPage" style="display: none;">
+            <div class="container">
+                <button class="back-link" onclick="ShopApp.showCatalog()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m15 18-6-6 6-6"/>
+                    </svg>
+                    Назад в каталог
+                </button>
+
+                <div class="product-detail" id="productDetail">
+                    <!-- Product detail loaded dynamically -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-copy">
+                    © 2025 Say's Barbers. Все права защищены.
+                </div>
+                <div class="footer-links">
+                    <a href="#">Политика конфиденциальности</a>
+                    <a href="#">Пользовательское соглашение</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox" style="display: none;">
+        <button class="lightbox-close" onclick="ShopApp.closeLightbox()" aria-label="Закрыть">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </button>
+        <button class="lightbox-prev" onclick="ShopApp.prevImage()" aria-label="Предыдущее фото">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 18 9 12 15 6"/>
+            </svg>
+        </button>
+        <img class="lightbox-image" id="lightboxImage" src="" alt="">
+        <button class="lightbox-next" onclick="ShopApp.nextImage()" aria-label="Следующее фото">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Mobile Filter Sheet -->
+    <div class="filter-backdrop" onclick="ShopApp.closeFilterSheet()"></div>
+    <div class="filter-sheet">
+        <div class="filter-sheet-header">
+            <h3 class="filter-sheet-title">Категории</h3>
+            <button class="filter-sheet-close" onclick="ShopApp.closeFilterSheet()" aria-label="Закрыть">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+        <div class="filter-sheet-content" id="mobileCategories">
+            <!-- Categories will be rendered here -->
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="src/js/shop/shop-app.js"></script>
+</body>
+</html>

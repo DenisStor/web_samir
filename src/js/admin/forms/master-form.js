@@ -17,7 +17,7 @@ var AdminMasterForm = (function() {
 
         var principlesHtml = principles.map(function(p, i) {
             return '<div class="principle-item">' +
-                '<input type="text" class="form-input principle-input" value="' + escapeHtml(p) + '" placeholder="Принцип ' + (i + 1) + '">' +
+                '<input type="text" class="form-input principle-input" value="' + window.escapeHtml(p) + '" placeholder="Принцип ' + (i + 1) + '">' +
                 '<button type="button" class="btn btn-icon danger" data-action="remove-principle">' +
                     SharedIcons.get('close') +
                 '</button>' +
@@ -38,12 +38,12 @@ var AdminMasterForm = (function() {
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-label">Имя *</label>' +
-                '<input type="text" class="form-input" id="masterName" value="' + escapeHtml(master && master.name || '') + '" placeholder="Введите имя мастера" required>' +
+                '<input type="text" class="form-input" id="masterName" value="' + window.escapeHtml(master && master.name || '') + '" placeholder="Введите имя мастера" required>' +
             '</div>' +
             '<div class="form-row form-row-2">' +
                 '<div class="form-group">' +
                     '<label class="form-label">Инициал</label>' +
-                    '<input type="text" class="form-input" id="masterInitial" value="' + escapeHtml(master && master.initial || '') + '" placeholder="С" maxlength="1">' +
+                    '<input type="text" class="form-input" id="masterInitial" value="' + window.escapeHtml(master && master.initial || '') + '" placeholder="С" maxlength="1">' +
                 '</div>' +
                 '<div class="form-group">' +
                     '<label class="form-label">Уровень</label>' +
@@ -56,11 +56,11 @@ var AdminMasterForm = (function() {
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-label">Должность</label>' +
-                '<input type="text" class="form-input" id="masterRole" value="' + escapeHtml(master && master.role || '') + '" placeholder="Мастер">' +
+                '<input type="text" class="form-input" id="masterRole" value="' + window.escapeHtml(master && master.role || '') + '" placeholder="Мастер">' +
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-label">Специализация</label>' +
-                '<textarea class="form-textarea" id="masterSpecialization" placeholder="Описание специализации мастера...">' + escapeHtml(master && master.specialization || '') + '</textarea>' +
+                '<textarea class="form-textarea" id="masterSpecialization" placeholder="Описание специализации мастера...">' + window.escapeHtml(master && master.specialization || '') + '</textarea>' +
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-label">Принципы работы</label>' +
@@ -200,19 +200,6 @@ var AdminMasterForm = (function() {
         if (item) {
             item.remove();
         }
-    }
-
-    /**
-     * Escape HTML
-     */
-    function escapeHtml(text) {
-        if (!text) return '';
-        if (typeof window.escapeHtml === 'function') {
-            return window.escapeHtml(text);
-        }
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
     }
 
     // Публичный API

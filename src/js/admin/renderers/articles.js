@@ -1,18 +1,62 @@
 /**
  * Admin Articles Renderer
- * Рендеринг списка статей
+ * Рендеринг списка статей с поддержкой drag & drop
  */
 
 var AdminArticlesRenderer = (function() {
     'use strict';
 
     var container = null;
+    var dragDropInitialized = false;
 
     /**
      * Инициализация
      */
     function init() {
         container = document.getElementById('articlesGrid');
+        initDragDrop();
+    }
+
+    /**
+     * Инициализация drag & drop
+     */
+    function initDragDrop() {
+        if (dragDropInitialized || !window.AdminDragDrop) return;
+
+        AdminDragDrop.init('articlesGrid', '.article-card', function(newOrder) {
+            reorderArticles(newOrder);
+        });
+
+        dragDropInitialized = true;
+    }
+
+    /**
+     * Изменение порядка статей
+     */
+    function reorderArticles(newOrder) {
+        var articles = AdminState.articles || [];
+
+        var reordered = newOrder.map(function(id) {
+            return articles.find(function(a) { return a.id === id; });
+        }).filter(Boolean);
+
+        reordered.forEach(function(article, index) {
+            article.order = index;
+        });
+
+        AdminAPI.save('articles', { articles: reordered })
+            .then(function() {
+                AdminState.setArticles(reordered);
+                if (window.showToast) {
+                    showToast('Порядок сохранён', 'success');
+                }
+            })
+            .catch(function(error) {
+                if (window.showToast) {
+                    showToast('Ошибка сохранения порядка', 'error');
+                }
+                render();
+            });
     }
 
     /**
@@ -48,12 +92,14 @@ var AdminArticlesRenderer = (function() {
             return;
         }
 
-        var html = articles.map(function(article) {
+        var html = articles.map(function(article, index) {
             var imageHtml = article.image
                 ? '<img src="' + article.image + '" alt="' + escapeHtml(article.title) + '">'
                 : SharedIcons.get('image');
 
-            return '<div class="article-card" data-id="' + article.id + '">' +
+            var searchText = [article.title, article.tag, article.excerpt].join(' ');
+
+            return '<div class="article-card has-drag" data-id="' + article.id + '" data-index="' + index + '" data-search="' + escapeHtml(searchText) + '" draggable="true">' +
                 '<div class="article-image">' +
                     imageHtml +
                 '</div>' +
@@ -69,15 +115,20 @@ var AdminArticlesRenderer = (function() {
                             SharedIcons.get('edit') +
                             'Редактировать' +
                         '</button>' +
-                        '<button class="btn btn-icon danger" data-action="delete-article" data-id="' + article.id + '" title="Удалить">' +
+                        '<button class="btn btn-icon danger" data-action="delete-article" data-id="' + article.id + '" data-name="' + escapeHtml(article.title) + '" title="Удалить">' +
                             SharedIcons.get('delete') +
                         '</button>' +
                     '</div>' +
                 '</div>' +
+                '<div class="drag-handle" title="Перетащите для изменения порядка">' + SharedIcons.get('grip') + '</div>' +
             '</div>';
         }).join('');
 
         container.innerHTML = html;
+
+        if (window.AdminDragDrop) {
+            AdminDragDrop.refresh('articlesGrid');
+        }
     }
 
     /**
@@ -97,7 +148,8 @@ var AdminArticlesRenderer = (function() {
     return {
         init: init,
         render: render,
-        formatDate: formatDate
+        formatDate: formatDate,
+        reorderArticles: reorderArticles
     };
 })();
 

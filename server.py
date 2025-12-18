@@ -267,6 +267,27 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
             self.handle_get_data('social.json')
         elif path == '/api/stats':
             self.handle_get_stats()
+        elif path == '/api/legal':
+            self.handle_get_data('legal.json')
+        elif path.startswith('/api/legal/'):
+            slug = path.split('/')[-1]
+            self.handle_get_legal_document(slug)
+        # Shop API
+        elif path == '/api/shop/categories':
+            self.handle_get_data('shop-categories.json')
+        elif path == '/api/shop/products':
+            self.handle_get_products()
+        elif path.startswith('/api/shop/products/'):
+            product_id = path.split('/')[-1]
+            self.handle_get_product(product_id)
+        # Legal page routing
+        elif path == '/legal' or path.startswith('/legal/'):
+            self.path = '/legal.html'
+            return super().do_GET()
+        # Shop page routing
+        elif path == '/shop' or path.startswith('/shop/'):
+            self.path = '/shop.html'
+            return super().do_GET()
         elif path == '/':
             self.path = f'/{FILENAME}'
             return super().do_GET()
@@ -306,6 +327,12 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
             self.handle_save_data('faq.json')
         elif path == '/api/social':
             self.handle_save_data('social.json')
+        elif path == '/api/shop/categories':
+            self.handle_save_data('shop-categories.json')
+        elif path == '/api/shop/products':
+            self.handle_save_data('products.json')
+        elif path == '/api/legal':
+            self.handle_save_data('legal.json')
         elif path == '/api/upload':
             self.handle_upload()
         else:
@@ -403,6 +430,89 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_json_response(data)
             else:
                 self.send_json_response({})
+        except Exception as e:
+            self.send_error_response(500, str(e))
+
+    def handle_get_products(self):
+        """Получение товаров с фильтрацией по категории"""
+        try:
+            # Парсим query параметры
+            parsed = urlparse(self.path)
+            query = parse_qs(parsed.query)
+            category_slug = query.get('category', [None])[0]
+
+            filepath = DATA_DIR / 'products.json'
+            if filepath.exists():
+                with open(filepath, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                products = data.get('products', [])
+            else:
+                products = []
+
+            # Фильтрация по категории
+            if category_slug and category_slug != 'all':
+                cat_filepath = DATA_DIR / 'shop-categories.json'
+                if cat_filepath.exists():
+                    with open(cat_filepath, 'r', encoding='utf-8') as f:
+                        cat_data = json.load(f)
+                    category = next(
+                        (c for c in cat_data.get('categories', [])
+                         if c.get('slug') == category_slug),
+                        None
+                    )
+                    if category:
+                        products = [p for p in products
+                                   if p.get('categoryId') == category.get('id')]
+
+            # Фильтруем только активные для публичного API
+            products = [p for p in products if p.get('status') == 'active']
+
+            self.send_json_response({'products': products})
+        except Exception as e:
+            self.send_error_response(500, str(e))
+
+    def handle_get_product(self, product_id):
+        """Получение одного товара по ID"""
+        try:
+            filepath = DATA_DIR / 'products.json'
+            if filepath.exists():
+                with open(filepath, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+
+                product = next(
+                    (p for p in data.get('products', []) if p.get('id') == product_id),
+                    None
+                )
+
+                if product:
+                    self.send_json_response(product)
+                else:
+                    self.send_error_response(404, 'Product not found')
+            else:
+                self.send_error_response(404, 'Product not found')
+        except Exception as e:
+            self.send_error_response(500, str(e))
+
+    def handle_get_legal_document(self, slug):
+        """Получение одного юридического документа по slug"""
+        try:
+            filepath = DATA_DIR / 'legal.json'
+            if filepath.exists():
+                with open(filepath, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+
+                document = next(
+                    (d for d in data.get('documents', [])
+                     if d.get('slug') == slug and d.get('active', True)),
+                    None
+                )
+
+                if document:
+                    self.send_json_response(document)
+                else:
+                    self.send_error_response(404, 'Document not found')
+            else:
+                self.send_error_response(404, 'Document not found')
         except Exception as e:
             self.send_error_response(500, str(e))
 
@@ -547,8 +657,10 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
             self.send_error_response(500, str(e))
 
     def handle_record_visit(self):
-        """Запись посещения или просмотра секции"""
+        """Запись посещения или просмотра секции (с атомарной записью)"""
         filepath = DATA_DIR / 'stats.json'
+        lock = get_file_lock('stats.json')
+
         try:
             # Читаем данные запроса
             content_length = int(self.headers.get('Content-Length', 0))
@@ -558,57 +670,64 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
             else:
                 visit_data = {}
 
-            # Загружаем текущую статистику
-            if filepath.exists():
-                with open(filepath, 'r', encoding='utf-8') as f:
-                    stats = json.load(f)
-            else:
-                stats = self._init_stats()
+            with lock:  # Thread-safe блокировка
+                # Загружаем текущую статистику
+                if filepath.exists():
+                    with open(filepath, 'r', encoding='utf-8') as f:
+                        stats = json.load(f)
+                else:
+                    stats = self._init_stats()
 
-            today = datetime.now().strftime('%Y-%m-%d')
-            now = datetime.now().isoformat()
-            visit_type = visit_data.get('type', 'pageview')
+                today = datetime.now().strftime('%Y-%m-%d')
+                now = datetime.now().isoformat()
+                visit_type = visit_data.get('type', 'pageview')
 
-            if visit_type == 'pageview':
-                # Обновляем счётчики просмотров страниц
-                stats['total_views'] = stats.get('total_views', 0) + 1
-                stats['last_visit'] = now
+                if visit_type == 'pageview':
+                    # Обновляем счётчики просмотров страниц
+                    stats['total_views'] = stats.get('total_views', 0) + 1
+                    stats['last_visit'] = now
 
-                # Ежедневная статистика
-                if 'daily' not in stats:
-                    stats['daily'] = {}
-                stats['daily'][today] = stats['daily'].get(today, 0) + 1
+                    # Ежедневная статистика
+                    if 'daily' not in stats:
+                        stats['daily'] = {}
+                    stats['daily'][today] = stats['daily'].get(today, 0) + 1
 
-                # Уникальные посетители (по session ID)
-                session_id = visit_data.get('session_id')
-                if session_id:
-                    if 'sessions' not in stats:
-                        stats['sessions'] = {}
-                    if today not in stats['sessions']:
-                        stats['sessions'][today] = []
-                    if session_id not in stats['sessions'][today]:
-                        stats['sessions'][today].append(session_id)
-                        stats['unique_visitors'] = stats.get('unique_visitors', 0) + 1
+                    # Уникальные посетители (по session ID)
+                    session_id = visit_data.get('session_id')
+                    if session_id:
+                        if 'sessions' not in stats:
+                            stats['sessions'] = {}
+                        if today not in stats['sessions']:
+                            stats['sessions'][today] = []
+                        if session_id not in stats['sessions'][today]:
+                            stats['sessions'][today].append(session_id)
+                            stats['unique_visitors'] = stats.get('unique_visitors', 0) + 1
 
-            elif visit_type == 'section':
-                # Статистика по секциям
-                section = visit_data.get('section')
-                if section:
-                    if 'sections' not in stats:
-                        stats['sections'] = {}
-                    stats['sections'][section] = stats['sections'].get(section, 0) + 1
+                elif visit_type == 'section':
+                    # Статистика по секциям
+                    section = visit_data.get('section')
+                    if section:
+                        if 'sections' not in stats:
+                            stats['sections'] = {}
+                        stats['sections'][section] = stats['sections'].get(section, 0) + 1
 
-            # Очищаем старые данные (старше 90 дней)
-            cutoff = (datetime.now() - timedelta(days=90)).strftime('%Y-%m-%d')
-            stats['daily'] = {k: v for k, v in stats.get('daily', {}).items() if k >= cutoff}
-            stats['sessions'] = {k: v for k, v in stats.get('sessions', {}).items() if k >= cutoff}
+                # Очищаем старые данные (старше 90 дней)
+                cutoff = (datetime.now() - timedelta(days=90)).strftime('%Y-%m-%d')
+                stats['daily'] = {k: v for k, v in stats.get('daily', {}).items() if k >= cutoff}
+                stats['sessions'] = {k: v for k, v in stats.get('sessions', {}).items() if k >= cutoff}
 
-            # Сохраняем
-            with open(filepath, 'w', encoding='utf-8') as f:
-                json.dump(stats, f, ensure_ascii=False, indent=2)
+                # Атомарная запись через временный файл
+                temp_filepath = filepath.with_suffix('.tmp')
+                with open(temp_filepath, 'w', encoding='utf-8') as f:
+                    json.dump(stats, f, ensure_ascii=False, indent=2)
+                temp_filepath.replace(filepath)
 
             self.send_json_response({'success': True})
         except Exception as e:
+            # Удаляем временный файл при ошибке
+            temp_filepath = filepath.with_suffix('.tmp')
+            if temp_filepath.exists():
+                temp_filepath.unlink()
             self.send_error_response(500, str(e))
 
     def _init_stats(self):

@@ -29,12 +29,12 @@ var AdminArticleForm = (function() {
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-label">Заголовок *</label>' +
-                '<input type="text" class="form-input" id="articleTitle" value="' + escapeHtml(article && article.title || '') + '" placeholder="Введите заголовок статьи" required>' +
+                '<input type="text" class="form-input" id="articleTitle" value="' + window.escapeHtml(article && article.title || '') + '" placeholder="Введите заголовок статьи" required>' +
             '</div>' +
             '<div class="form-row form-row-2">' +
                 '<div class="form-group">' +
                     '<label class="form-label">Тег/Категория</label>' +
-                    '<input type="text" class="form-input" id="articleTag" value="' + escapeHtml(article && article.tag || '') + '" placeholder="Уход за волосами">' +
+                    '<input type="text" class="form-input" id="articleTag" value="' + window.escapeHtml(article && article.tag || '') + '" placeholder="Уход за волосами">' +
                 '</div>' +
                 '<div class="form-group">' +
                     '<label class="form-label">Дата публикации</label>' +
@@ -43,7 +43,7 @@ var AdminArticleForm = (function() {
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-label">Краткое описание</label>' +
-                '<textarea class="form-textarea" id="articleExcerpt" placeholder="Краткое описание для превью статьи...">' + escapeHtml(article && article.excerpt || '') + '</textarea>' +
+                '<textarea class="form-textarea" id="articleExcerpt" placeholder="Краткое описание для превью статьи...">' + window.escapeHtml(article && article.excerpt || '') + '</textarea>' +
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-label">Полный текст статьи</label>' +
@@ -221,19 +221,6 @@ var AdminArticleForm = (function() {
         } catch (error) {
             showToast('Ошибка удаления: ' + error.message, 'error');
         }
-    }
-
-    /**
-     * Escape HTML
-     */
-    function escapeHtml(text) {
-        if (!text) return '';
-        if (typeof window.escapeHtml === 'function') {
-            return window.escapeHtml(text);
-        }
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
     }
 
     // Публичный API

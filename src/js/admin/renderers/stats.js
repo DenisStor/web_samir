@@ -13,12 +13,11 @@ var AdminStatsRenderer = (function() {
      */
     function init() {
         elements = {
-            totalViews: document.getElementById('totalViews'),
-            todayViews: document.getElementById('todayViews'),
-            weekViews: document.getElementById('weekViews'),
-            monthViews: document.getElementById('monthViews'),
-            uniqueVisitors: document.getElementById('uniqueVisitors'),
-            topSections: document.getElementById('topSections'),
+            totalViews: document.getElementById('statTotalViews'),
+            todayViews: document.getElementById('statTodayViews'),
+            weekViews: document.getElementById('statWeekViews'),
+            uniqueVisitors: document.getElementById('statUniqueVisitors'),
+            topSections: document.getElementById('pagesStatsList'),
             chartCanvas: document.getElementById('statsChart')
         };
     }
@@ -38,9 +37,6 @@ var AdminStatsRenderer = (function() {
         }
         if (elements.weekViews) {
             elements.weekViews.textContent = formatNumber(stats.week_views || 0);
-        }
-        if (elements.monthViews) {
-            elements.monthViews.textContent = formatNumber(stats.month_views || 0);
         }
         if (elements.uniqueVisitors) {
             elements.uniqueVisitors.textContent = formatNumber(stats.unique_visitors || 0);
@@ -70,35 +66,33 @@ var AdminStatsRenderer = (function() {
             'faq': 'FAQ',
             'booking': 'Запись',
             'podology': 'Подология',
-            'location': 'Контакты'
+            'location': 'Контакты',
+            'social': 'Соцсети'
         };
 
-        // Сортировка по просмотрам
         var sortedSections = Object.entries(sections)
             .sort(function(a, b) { return b[1] - a[1]; })
-            .slice(0, 5);
+            .slice(0, 6);
 
         if (sortedSections.length === 0) {
-            elements.topSections.innerHTML = '<p class="empty-message">Нет данных о просмотрах секций</p>';
+            elements.topSections.innerHTML = '<p class="empty-message">Нет данных</p>';
             return;
         }
 
         var maxViews = sortedSections[0][1];
 
-        var html = sortedSections.map(function(item) {
+        var html = sortedSections.map(function(item, index) {
             var key = item[0];
             var views = item[1];
             var name = sectionNames[key] || key;
             var percent = maxViews > 0 ? Math.round((views / maxViews) * 100) : 0;
 
-            return '<div class="section-stat-item">' +
-                '<div class="section-stat-info">' +
-                    '<span class="section-name">' + escapeHtml(name) + '</span>' +
-                    '<span class="section-views">' + formatNumber(views) + '</span>' +
+            return '<div class="page-stat-row">' +
+                '<span class="page-stat-name">' + escapeHtml(name) + '</span>' +
+                '<div class="page-stat-bar-wrap">' +
+                    '<div class="page-stat-bar" style="width: ' + percent + '%"></div>' +
                 '</div>' +
-                '<div class="section-stat-bar">' +
-                    '<div class="section-stat-fill" style="width: ' + percent + '%"></div>' +
-                '</div>' +
+                '<span class="page-stat-count">' + views + '</span>' +
             '</div>';
         }).join('');
 
@@ -112,46 +106,115 @@ var AdminStatsRenderer = (function() {
         var canvas = elements.chartCanvas;
         if (!canvas || !canvas.getContext) return;
 
+        // Устанавливаем размеры canvas на основе родительского контейнера
+        var wrapper = canvas.parentElement;
+        if (wrapper) {
+            var rect = wrapper.getBoundingClientRect();
+            var dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            canvas.style.width = rect.width + 'px';
+            canvas.style.height = rect.height + 'px';
+        }
+
         var ctx = canvas.getContext('2d');
-        var width = canvas.width;
-        var height = canvas.height;
-        var padding = 40;
+        var dpr = window.devicePixelRatio || 1;
+        ctx.scale(dpr, dpr);
+
+        var width = canvas.width / dpr;
+        var height = canvas.height / dpr;
+        var padding = 50;
+        var paddingBottom = 30;
 
         // Очистка
-        ctx.clearRect(0, 0, width, height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        if (!chartData || chartData.length === 0) return;
+        if (!chartData || chartData.length === 0) {
+            // Показываем сообщение если нет данных
+            ctx.fillStyle = '#666';
+            ctx.font = '14px Manrope, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Нет данных для отображения', width / 2, height / 2);
+            return;
+        }
 
-        // Находим максимальное значение
-        var maxViews = Math.max.apply(null, chartData.map(function(d) { return d.views; }));
+        // Находим максимальное значение (с защитой от пустого массива)
+        var views = chartData.map(function(d) { return d.views || 0; });
+        var maxViews = views.length > 0 ? Math.max.apply(null, views) : 0;
         if (maxViews === 0) maxViews = 1;
 
-        var chartWidth = width - padding * 2;
-        var chartHeight = height - padding * 2;
+        var chartWidth = width - padding - 20;
+        var chartHeight = height - padding - paddingBottom;
         var barWidth = chartWidth / chartData.length;
+        var barGap = 4;
 
-        // Рисуем бары
-        ctx.fillStyle = '#00ff88';
+        // Рисуем линии сетки
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+        ctx.lineWidth = 1;
+        for (var i = 0; i <= 4; i++) {
+            var y = padding + (chartHeight / 4) * i;
+            ctx.beginPath();
+            ctx.moveTo(padding, y);
+            ctx.lineTo(width - 20, y);
+            ctx.stroke();
+        }
 
+        // Подписи оси Y
+        ctx.fillStyle = '#666';
+        ctx.font = '11px Manrope, sans-serif';
+        ctx.textAlign = 'right';
+        for (var i = 0; i <= 4; i++) {
+            var value = Math.round(maxViews * (4 - i) / 4);
+            var y = padding + (chartHeight / 4) * i;
+            ctx.fillText(formatNumber(value), padding - 10, y + 4);
+        }
+
+        // Рисуем бары с градиентом
         chartData.forEach(function(data, index) {
-            var barHeight = (data.views / maxViews) * chartHeight;
-            var x = padding + index * barWidth + barWidth * 0.1;
-            var y = height - padding - barHeight;
-            var w = barWidth * 0.8;
+            var barHeight = Math.max(2, (data.views / maxViews) * chartHeight);
+            var x = padding + index * barWidth + barGap;
+            var y = height - paddingBottom - barHeight;
+            var w = barWidth - barGap * 2;
 
-            ctx.fillRect(x, y, w, barHeight);
+            // Градиент для бара
+            var gradient = ctx.createLinearGradient(x, y, x, y + barHeight);
+            gradient.addColorStop(0, '#00ff88');
+            gradient.addColorStop(1, 'rgba(0, 255, 136, 0.4)');
+            ctx.fillStyle = gradient;
+
+            // Скругленные углы сверху
+            var radius = Math.min(4, w / 2);
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + w - radius, y);
+            ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+            ctx.lineTo(x + w, y + barHeight);
+            ctx.lineTo(x, y + barHeight);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.fill();
+
+            // Значение над баром
+            if (data.views > 0) {
+                ctx.fillStyle = '#fff';
+                ctx.font = '10px Manrope, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(data.views, x + w / 2, y - 6);
+            }
         });
 
         // Подписи дат
-        ctx.fillStyle = '#a0a0a0';
-        ctx.font = '10px Manrope';
+        ctx.fillStyle = '#888';
+        ctx.font = '10px Manrope, sans-serif';
         ctx.textAlign = 'center';
 
         chartData.forEach(function(data, index) {
-            if (index % 2 === 0) { // Каждая вторая дата
-                var x = padding + index * barWidth + barWidth / 2;
-                var date = new Date(data.date);
-                var label = date.getDate() + '.' + (date.getMonth() + 1);
+            var x = padding + index * barWidth + barWidth / 2;
+            var date = new Date(data.date);
+            var label = date.getDate() + '/' + (date.getMonth() + 1);
+
+            // Показываем каждую дату или через одну если много баров
+            if (chartData.length <= 7 || index % 2 === 0) {
                 ctx.fillText(label, x, height - 10);
             }
         });

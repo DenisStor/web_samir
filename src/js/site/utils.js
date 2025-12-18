@@ -52,14 +52,6 @@ SaysApp.lockScroll = function(lock) {
     document.body.style.overflow = lock ? 'hidden' : '';
 };
 
-/**
- * Проверить, заблокирован ли скролл
- * @returns {boolean}
- */
-SaysApp.isScrollLocked = function() {
-    return document.body.style.overflow === 'hidden';
-};
-
 // =================================================================
 // ARIA УТИЛИТЫ (Accessibility)
 // =================================================================
@@ -201,16 +193,6 @@ SaysApp.formatDateShort = function(dateStr) {
 };
 
 /**
- * Генерировать уникальный ID
- * @param {string} prefix - префикс для ID
- * @returns {string} - уникальный ID
- */
-SaysApp.generateId = function(prefix) {
-    prefix = prefix || 'id';
-    return prefix + '_' + Date.now() + Math.random().toString(36).substr(2, 9);
-};
-
-/**
  * Debounce функция
  * @param {Function} fn - функция для debounce
  * @param {number} delay - задержка в миллисекундах
@@ -255,6 +237,5 @@ window.SaysApp = SaysApp;
 // Также экспортируем отдельные функции для удобства
 window.formatDate = SaysApp.formatDate;
 window.formatDateShort = SaysApp.formatDateShort;
-window.generateId = SaysApp.generateId;
 window.debounce = SaysApp.debounce;
 window.throttle = SaysApp.throttle;

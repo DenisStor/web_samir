@@ -47,6 +47,9 @@ ADMIN_MODULES = [
     'modals.js',
     'image-upload.js',
     'wysiwyg.js',
+    'dragdrop.js',
+    'validation.js',
+    'search.js',
 
     # Renderers
     'renderers/stats.js',
@@ -55,12 +58,18 @@ ADMIN_MODULES = [
     'renderers/articles.js',
     'renderers/faq.js',
     'renderers/social.js',
+    'renderers/shop-categories.js',
+    'renderers/shop-products.js',
+    'renderers/legal.js',
 
     # Forms
     'forms/master-form.js',
     'forms/service-form.js',
     'forms/article-form.js',
     'forms/faq-form.js',
+    'forms/category-form.js',
+    'forms/product-form.js',
+    'forms/legal-form.js',
 
     # Main entry point (последний, зависит от всех)
     'index.js',

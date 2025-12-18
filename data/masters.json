@@ -9,7 +9,8 @@
       "specialization": "",
       "principles": [],
       "photo": "/uploads/f08de508993c4483848067b928be6e16.jpg",
-      "active": true
+      "active": true,
+      "order": 0
     },
     {
       "id": "master_1764865876624",
@@ -22,7 +23,8 @@
         "ооо"
       ],
       "photo": "/uploads/2e7e94def7ba4e078411bc69d7faae8b.jpg",
-      "active": true
+      "active": true,
+      "order": 1
     }
   ]
 }

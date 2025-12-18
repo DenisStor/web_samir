@@ -20,6 +20,11 @@ var AdminState = {
     articles: [],
     faq: [],
     social: { social: [], phone: '', email: '', address: '' },
+    // Shop данные
+    shopCategories: [],
+    products: [],
+    // Legal данные
+    legalDocuments: [],
 
     // UI состояние
     currentSection: 'stats',
@@ -33,11 +38,24 @@ var AdminState = {
         this.articles = [];
         this.faq = [];
         this.social = { social: [], phone: '', email: '', address: '' };
+        this.shopCategories = [];
+        this.products = [];
+        this.legalDocuments = [];
         this.editingItem = null;
     },
 
+    // Вспомогательная функция сортировки по order
+    _sortByOrder: function(items) {
+        if (!items || !Array.isArray(items)) return items;
+        return items.slice().sort(function(a, b) {
+            var orderA = typeof a.order === 'number' ? a.order : Infinity;
+            var orderB = typeof b.order === 'number' ? b.order : Infinity;
+            return orderA - orderB;
+        });
+    },
+
     setMasters: function(data) {
-        this.masters = data || [];
+        this.masters = this._sortByOrder(data || []);
     },
 
     setServices: function(data) {
@@ -45,11 +63,11 @@ var AdminState = {
     },
 
     setArticles: function(data) {
-        this.articles = data || [];
+        this.articles = this._sortByOrder(data || []);
     },
 
     setFaq: function(data) {
-        this.faq = data || [];
+        this.faq = this._sortByOrder(data || []);
     },
 
     setSocial: function(data) {
@@ -72,6 +90,32 @@ var AdminState = {
     findSocialLink: function(id) {
         var links = this.social.social || [];
         return links.find(function(s) { return s.id === id; });
+    },
+
+    // Shop методы
+    setShopCategories: function(data) {
+        this.shopCategories = this._sortByOrder(data || []);
+    },
+
+    setProducts: function(data) {
+        this.products = this._sortByOrder(data || []);
+    },
+
+    findShopCategory: function(id) {
+        return this.shopCategories.find(function(c) { return c.id === id; });
+    },
+
+    findProduct: function(id) {
+        return this.products.find(function(p) { return p.id === id; });
+    },
+
+    // Legal методы
+    setLegalDocuments: function(data) {
+        this.legalDocuments = data || [];
+    },
+
+    findLegalDocument: function(id) {
+        return this.legalDocuments.find(function(d) { return d.id === id; });
     }
 };
 
@@ -121,7 +165,7 @@ var AdminToast = (function() {
 
         var icon = getIcon(type);
         toast.innerHTML = '<span class="toast-icon">' + icon + '</span>' +
-                          '<span class="toast-message">' + escapeHtml(message) + '</span>';
+                          '<span class="toast-message">' + window.escapeHtml(message) + '</span>';
 
         container.appendChild(toast);
 
@@ -154,18 +198,6 @@ var AdminToast = (function() {
             info: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>'
         };
         return icons[type] || icons.info;
-    }
-
-    /**
-     * Escape HTML для безопасности
-     */
-    function escapeHtml(text) {
-        if (typeof window.escapeHtml === 'function') {
-            return window.escapeHtml(text);
-        }
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
     }
 
     // Shorthand методы
@@ -436,7 +468,10 @@ var AdminAPI = (function() {
             get('articles'),
             get('faq'),
             get('social'),
-            get('stats')
+            get('stats'),
+            get('shop/categories'),
+            get('shop/products'),
+            get('legal')
         ]);
 
         return {
@@ -445,7 +480,10 @@ var AdminAPI = (function() {
             articles: results[2],
             faq: results[3],
             social: results[4],
-            stats: results[5]
+            stats: results[5],
+            shopCategories: results[6],
+            products: results[7],
+            legal: results[8]
         };
     }
 
@@ -747,41 +785,51 @@ var AdminModals = (function() {
      * Открыть модальное окно
      */
     function open(modalId) {
-        var modal = document.getElementById(modalId);
-        if (!modal) {
-            console.error('Modal not found:', modalId);
+        // Для modal и deleteModal - активируем overlay
+        var overlayId = modalId === 'modal' ? 'modalOverlay' :
+                        modalId === 'deleteModal' ? 'deleteModalOverlay' : modalId;
+        var overlay = document.getElementById(overlayId);
+        if (!overlay) {
+            console.error('Modal overlay not found:', overlayId);
             return;
         }
 
-        modal.classList.add('active');
+        overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
-        currentModal = modal;
+        currentModal = overlay;
 
         // Обработчик закрытия по Escape
         document.addEventListener('keydown', handleEscape);
 
         // Обработчик закрытия по клику на оверлей
-        modal.addEventListener('click', handleOverlayClick);
+        overlay.addEventListener('click', handleOverlayClick);
     }
 
     /**
      * Закрыть модальное окно
      */
     function close(modalId) {
-        var modal = modalId ? document.getElementById(modalId) : currentModal;
-        if (!modal) return;
+        var overlay;
+        if (modalId) {
+            var overlayId = modalId === 'modal' ? 'modalOverlay' :
+                            modalId === 'deleteModal' ? 'deleteModalOverlay' : modalId;
+            overlay = document.getElementById(overlayId);
+        } else {
+            overlay = currentModal;
+        }
+        if (!overlay) return;
 
-        modal.classList.remove('active');
+        overlay.classList.remove('active');
         document.body.style.overflow = '';
 
         // Удаляем обработчики
         document.removeEventListener('keydown', handleEscape);
-        modal.removeEventListener('click', handleOverlayClick);
+        overlay.removeEventListener('click', handleOverlayClick);
 
         currentModal = null;
 
         // Сброс формы если есть
-        var form = modal.querySelector('form');
+        var form = overlay.querySelector('form');
         if (form) {
             form.reset();
         }
@@ -828,6 +876,93 @@ var AdminModals = (function() {
     }
 
     /**
+     * Установить состояние загрузки на кнопке
+     */
+    function setButtonLoading(btn, loading, loadingText) {
+        if (!btn) return;
+
+        if (loading) {
+            // Сохраняем оригинальный текст
+            if (!btn.dataset.originalText) {
+                btn.dataset.originalText = btn.innerHTML;
+            }
+            btn.classList.add('btn-loading');
+            btn.disabled = true;
+
+            // Добавляем спиннер и текст
+            var spinner = '<span class="btn-spinner"></span>';
+            var text = loadingText || 'Загрузка...';
+            btn.innerHTML = spinner + '<span class="btn-loading-text">' + text + '</span>';
+        } else {
+            btn.classList.remove('btn-loading');
+            btn.disabled = false;
+
+            // Восстанавливаем оригинальный текст
+            if (btn.dataset.originalText) {
+                btn.innerHTML = btn.dataset.originalText;
+                delete btn.dataset.originalText;
+            }
+        }
+    }
+
+    /**
+     * Показать диалог подтверждения удаления
+     */
+    function confirmDelete(itemName, onConfirm) {
+        var overlay = document.getElementById('deleteModalOverlay');
+        var modal = document.getElementById('deleteModal');
+
+        if (!overlay || !modal) {
+            // Fallback на стандартный confirm
+            if (confirm('Удалить "' + itemName + '"?')) {
+                onConfirm();
+            }
+            return;
+        }
+
+        // Устанавливаем название элемента
+        var nameEl = modal.querySelector('.delete-item-name');
+        if (nameEl) {
+            nameEl.textContent = itemName || 'этот элемент';
+        }
+
+        // Устанавливаем обработчик подтверждения
+        var confirmBtn = modal.querySelector('.btn-danger, [data-action="confirm-delete"]');
+        var cancelBtn = modal.querySelector('.btn-secondary, [data-action="cancel-delete"]');
+
+        function cleanup() {
+            if (confirmBtn) {
+                confirmBtn.removeEventListener('click', handleConfirm);
+            }
+            if (cancelBtn) {
+                cancelBtn.removeEventListener('click', handleCancel);
+            }
+            close('deleteModal');
+        }
+
+        function handleConfirm() {
+            cleanup();
+            if (typeof onConfirm === 'function') {
+                onConfirm();
+            }
+        }
+
+        function handleCancel() {
+            cleanup();
+        }
+
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', handleConfirm);
+        }
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', handleCancel);
+        }
+
+        // Открываем модалку
+        open('deleteModal');
+    }
+
+    /**
      * Инициализация кнопок закрытия
      */
     function init() {
@@ -859,7 +994,9 @@ var AdminModals = (function() {
         open: open,
         close: close,
         closeCurrent: closeCurrent,
-        setTitle: setTitle
+        setTitle: setTitle,
+        setButtonLoading: setButtonLoading,
+        confirmDelete: confirmDelete
     };
 })();
 
@@ -1666,6 +1803,660 @@ var AdminWYSIWYG = (function() {
 window.AdminWYSIWYG = AdminWYSIWYG;
 
 
+// ============= dragdrop.js =============
+
+/**
+ * Admin Drag & Drop Module
+ * Универсальный модуль для сортировки элементов перетаскиванием
+ */
+var AdminDragDrop = (function() {
+    'use strict';
+
+    var draggedItem = null;
+    var draggedIndex = -1;
+    var containers = {};
+
+    /**
+     * Инициализация drag & drop для контейнера
+     * @param {string} containerId - ID контейнера
+     * @param {string} itemSelector - CSS селектор элементов
+     * @param {function} onReorder - Callback при изменении порядка (newOrder: string[])
+     */
+    function init(containerId, itemSelector, onReorder) {
+        var container = document.getElementById(containerId);
+        if (!container) return;
+
+        // Сохраняем конфигурацию
+        containers[containerId] = {
+            selector: itemSelector,
+            onReorder: onReorder
+        };
+
+        // Добавляем обработчики событий через делегирование
+        container.addEventListener('dragstart', handleDragStart);
+        container.addEventListener('dragend', handleDragEnd);
+        container.addEventListener('dragover', handleDragOver);
+        container.addEventListener('dragleave', handleDragLeave);
+        container.addEventListener('drop', handleDrop);
+    }
+
+    /**
+     * Обновить draggable атрибуты после рендера
+     */
+    function refresh(containerId) {
+        var config = containers[containerId];
+        if (!config) return;
+
+        var container = document.getElementById(containerId);
+        if (!container) return;
+
+        var items = container.querySelectorAll(config.selector);
+        items.forEach(function(item, index) {
+            item.setAttribute('draggable', 'true');
+            item.dataset.index = index;
+        });
+    }
+
+    /**
+     * Добавить drag handle к элементу
+     */
+    function addDragHandle(element) {
+        if (element.querySelector('.drag-handle')) return;
+
+        var handle = document.createElement('div');
+        handle.className = 'drag-handle';
+        handle.innerHTML = window.SharedIcons ? window.SharedIcons.get('grip') :
+            '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg>';
+        handle.title = 'Перетащите для изменения порядка';
+
+        // Вставляем в начало элемента
+        element.insertBefore(handle, element.firstChild);
+    }
+
+    function handleDragStart(e) {
+        var item = e.target.closest('[draggable="true"]');
+        if (!item) return;
+
+        draggedItem = item;
+        draggedIndex = parseInt(item.dataset.index, 10);
+
+        // Добавляем класс с небольшой задержкой для анимации
+        setTimeout(function() {
+            if (draggedItem) {
+                draggedItem.classList.add('dragging');
+            }
+        }, 0);
+
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', draggedIndex.toString());
+    }
+
+    function handleDragEnd(e) {
+        if (draggedItem) {
+            draggedItem.classList.remove('dragging');
+        }
+
+        // Убираем все drag-over классы
+        document.querySelectorAll('.drag-over').forEach(function(el) {
+            el.classList.remove('drag-over');
+        });
+
+        draggedItem = null;
+        draggedIndex = -1;
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+
+        var item = e.target.closest('[draggable="true"]');
+        if (!item || item === draggedItem) return;
+
+        // Убираем класс со всех элементов в этом контейнере
+        var container = item.parentElement;
+        container.querySelectorAll('.drag-over').forEach(function(el) {
+            el.classList.remove('drag-over');
+        });
+
+        item.classList.add('drag-over');
+    }
+
+    function handleDragLeave(e) {
+        var item = e.target.closest('[draggable="true"]');
+        if (item && !item.contains(e.relatedTarget)) {
+            item.classList.remove('drag-over');
+        }
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+
+        var targetItem = e.target.closest('[draggable="true"]');
+        if (!targetItem || targetItem === draggedItem || !draggedItem) return;
+
+        var container = targetItem.parentElement;
+        var containerId = container.id;
+        var config = containers[containerId];
+
+        if (!config) return;
+
+        var targetIndex = parseInt(targetItem.dataset.index, 10);
+
+        // Перемещаем элемент в DOM
+        if (draggedIndex < targetIndex) {
+            container.insertBefore(draggedItem, targetItem.nextSibling);
+        } else {
+            container.insertBefore(draggedItem, targetItem);
+        }
+
+        // Обновляем индексы
+        var items = container.querySelectorAll(config.selector);
+        items.forEach(function(item, index) {
+            item.dataset.index = index;
+        });
+
+        // Собираем новый порядок ID
+        var newOrder = [];
+        items.forEach(function(item) {
+            var id = item.dataset.id;
+            if (id) {
+                newOrder.push(id);
+            }
+        });
+
+        // Убираем класс drag-over
+        targetItem.classList.remove('drag-over');
+
+        // Вызываем callback
+        if (config.onReorder && newOrder.length > 0) {
+            config.onReorder(newOrder);
+        }
+    }
+
+    /**
+     * Удалить обработчики для контейнера
+     */
+    function destroy(containerId) {
+        var container = document.getElementById(containerId);
+        if (container) {
+            container.removeEventListener('dragstart', handleDragStart);
+            container.removeEventListener('dragend', handleDragEnd);
+            container.removeEventListener('dragover', handleDragOver);
+            container.removeEventListener('dragleave', handleDragLeave);
+            container.removeEventListener('drop', handleDrop);
+        }
+        delete containers[containerId];
+    }
+
+    // Публичный API
+    return {
+        init: init,
+        refresh: refresh,
+        addDragHandle: addDragHandle,
+        destroy: destroy
+    };
+})();
+
+// Экспорт
+window.AdminDragDrop = AdminDragDrop;
+
+
+// ============= validation.js =============
+
+/**
+ * Admin Form Validation Module
+ * Валидация форм перед отправкой
+ */
+var AdminValidation = (function() {
+    'use strict';
+
+    /**
+     * Правила валидации
+     */
+    var rules = {
+        required: function(value) {
+            return value !== null && value !== undefined && String(value).trim() !== '';
+        },
+        minLength: function(value, min) {
+            return String(value).trim().length >= min;
+        },
+        maxLength: function(value, max) {
+            return String(value).trim().length <= max;
+        },
+        email: function(value) {
+            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return !value || emailRegex.test(value);
+        },
+        url: function(value) {
+            if (!value) return true;
+            try {
+                new URL(value);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        },
+        number: function(value) {
+            return !value || !isNaN(parseFloat(value));
+        },
+        positiveNumber: function(value) {
+            return !value || (parseFloat(value) >= 0);
+        }
+    };
+
+    /**
+     * Сообщения об ошибках
+     */
+    var messages = {
+        required: 'Это поле обязательно для заполнения',
+        minLength: 'Минимальная длина: {0} символов',
+        maxLength: 'Максимальная длина: {0} символов',
+        email: 'Введите корректный email',
+        url: 'Введите корректный URL',
+        number: 'Введите число',
+        positiveNumber: 'Число должно быть положительным'
+    };
+
+    /**
+     * Валидация поля
+     * @param {string} fieldId - ID поля
+     * @param {Array} fieldRules - Массив правил [{rule: 'required'}, {rule: 'minLength', value: 3}]
+     * @returns {Object} {valid: boolean, error: string|null}
+     */
+    function validateField(fieldId, fieldRules) {
+        var field = document.getElementById(fieldId);
+        if (!field) return { valid: true, error: null };
+
+        var value = field.value;
+
+        for (var i = 0; i < fieldRules.length; i++) {
+            var ruleConfig = fieldRules[i];
+            var ruleName = ruleConfig.rule;
+            var ruleValue = ruleConfig.value;
+            var customMessage = ruleConfig.message;
+
+            if (rules[ruleName]) {
+                var isValid = rules[ruleName](value, ruleValue);
+                if (!isValid) {
+                    var errorMessage = customMessage || messages[ruleName];
+                    if (errorMessage && ruleValue !== undefined) {
+                        errorMessage = errorMessage.replace('{0}', ruleValue);
+                    }
+                    return { valid: false, error: errorMessage };
+                }
+            }
+        }
+
+        return { valid: true, error: null };
+    }
+
+    /**
+     * Валидация формы
+     * @param {Object} fieldsConfig - Конфигурация полей {fieldId: [{rule: 'required'}]}
+     * @returns {Object} {valid: boolean, errors: {fieldId: string}}
+     */
+    function validateForm(fieldsConfig) {
+        var errors = {};
+        var isValid = true;
+
+        Object.keys(fieldsConfig).forEach(function(fieldId) {
+            var result = validateField(fieldId, fieldsConfig[fieldId]);
+            if (!result.valid) {
+                errors[fieldId] = result.error;
+                isValid = false;
+            }
+        });
+
+        return { valid: isValid, errors: errors };
+    }
+
+    /**
+     * Показать ошибку для поля
+     */
+    function showFieldError(fieldId, message) {
+        var field = document.getElementById(fieldId);
+        if (!field) return;
+
+        // Добавляем класс ошибки
+        field.classList.add('form-input-error');
+
+        // Удаляем старое сообщение об ошибке
+        var existingError = field.parentElement.querySelector('.form-error-message');
+        if (existingError) {
+            existingError.remove();
+        }
+
+        // Добавляем новое сообщение
+        if (message) {
+            var errorEl = document.createElement('div');
+            errorEl.className = 'form-error-message';
+            errorEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' + window.escapeHtml(message);
+            field.parentElement.appendChild(errorEl);
+        }
+    }
+
+    /**
+     * Убрать ошибку с поля
+     */
+    function clearFieldError(fieldId) {
+        var field = document.getElementById(fieldId);
+        if (!field) return;
+
+        field.classList.remove('form-input-error');
+
+        var existingError = field.parentElement.querySelector('.form-error-message');
+        if (existingError) {
+            existingError.remove();
+        }
+    }
+
+    /**
+     * Показать все ошибки формы
+     */
+    function showFormErrors(errors) {
+        Object.keys(errors).forEach(function(fieldId) {
+            showFieldError(fieldId, errors[fieldId]);
+        });
+
+        // Фокус на первое поле с ошибкой
+        var firstErrorField = Object.keys(errors)[0];
+        if (firstErrorField) {
+            var field = document.getElementById(firstErrorField);
+            if (field) {
+                field.focus();
+                field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    }
+
+    /**
+     * Очистить все ошибки формы
+     */
+    function clearFormErrors(fieldsConfig) {
+        Object.keys(fieldsConfig).forEach(function(fieldId) {
+            clearFieldError(fieldId);
+        });
+    }
+
+    /**
+     * Валидация и показ ошибок
+     * @returns {boolean} - Форма валидна?
+     */
+    function validate(fieldsConfig) {
+        // Сначала очищаем старые ошибки
+        clearFormErrors(fieldsConfig);
+
+        // Валидируем
+        var result = validateForm(fieldsConfig);
+
+        // Показываем ошибки если есть
+        if (!result.valid) {
+            showFormErrors(result.errors);
+
+            // Показываем toast с первой ошибкой
+            var firstError = Object.values(result.errors)[0];
+            if (firstError && window.showToast) {
+                window.showToast(firstError, 'error');
+            }
+        }
+
+        return result.valid;
+    }
+
+    /**
+     * Добавить live валидацию к полю
+     */
+    function addLiveValidation(fieldId, fieldRules) {
+        var field = document.getElementById(fieldId);
+        if (!field) return;
+
+        field.addEventListener('blur', function() {
+            var result = validateField(fieldId, fieldRules);
+            if (!result.valid) {
+                showFieldError(fieldId, result.error);
+            } else {
+                clearFieldError(fieldId);
+            }
+        });
+
+        field.addEventListener('input', function() {
+            // Убираем ошибку при вводе
+            clearFieldError(fieldId);
+        });
+    }
+
+    // Публичный API
+    return {
+        validate: validate,
+        validateForm: validateForm,
+        validateField: validateField,
+        showFieldError: showFieldError,
+        clearFieldError: clearFieldError,
+        showFormErrors: showFormErrors,
+        clearFormErrors: clearFormErrors,
+        addLiveValidation: addLiveValidation,
+        rules: rules,
+        messages: messages
+    };
+})();
+
+// Экспорт
+window.AdminValidation = AdminValidation;
+
+
+// ============= search.js =============
+
+/**
+ * Admin Search Module
+ * Поиск и фильтрация элементов в списках
+ */
+var AdminSearch = (function() {
+    'use strict';
+
+    var searchConfigs = {};
+    var debounceTimers = {};
+
+    /**
+     * Инициализация поиска
+     * @param {string} inputId - ID поля ввода
+     * @param {string} containerId - ID контейнера с элементами
+     * @param {Object} options - Настройки
+     * @param {string} options.itemSelector - CSS селектор элементов
+     * @param {string} options.searchAttribute - Атрибут для поиска (по умолчанию data-search)
+     * @param {function} options.onFilter - Callback при фильтрации
+     * @param {number} options.debounce - Задержка в мс (по умолчанию 200)
+     */
+    function init(inputId, containerId, options) {
+        var input = document.getElementById(inputId);
+        if (!input) return;
+
+        options = options || {};
+
+        var config = {
+            containerId: containerId,
+            itemSelector: options.itemSelector || '[data-id]',
+            searchAttribute: options.searchAttribute || 'data-search',
+            onFilter: options.onFilter,
+            debounce: options.debounce || 200
+        };
+
+        searchConfigs[inputId] = config;
+
+        // Обработчик ввода
+        input.addEventListener('input', function() {
+            handleInput(inputId, input.value);
+        });
+
+        // Кнопка очистки
+        var searchBox = input.closest('.search-box');
+        if (searchBox) {
+            var clearBtn = searchBox.querySelector('.search-clear');
+            if (clearBtn) {
+                clearBtn.addEventListener('click', function() {
+                    input.value = '';
+                    handleInput(inputId, '');
+                    input.focus();
+                });
+            }
+
+            // Обновляем состояние кнопки очистки
+            updateClearButton(searchBox, input.value);
+        }
+    }
+
+    /**
+     * Обработка ввода с debounce
+     */
+    function handleInput(inputId, value) {
+        var config = searchConfigs[inputId];
+        if (!config) return;
+
+        // Обновляем кнопку очистки
+        var input = document.getElementById(inputId);
+        var searchBox = input ? input.closest('.search-box') : null;
+        if (searchBox) {
+            updateClearButton(searchBox, value);
+        }
+
+        // Debounce
+        if (debounceTimers[inputId]) {
+            clearTimeout(debounceTimers[inputId]);
+        }
+
+        debounceTimers[inputId] = setTimeout(function() {
+            filterItems(config, value);
+        }, config.debounce);
+    }
+
+    /**
+     * Обновить состояние кнопки очистки
+     */
+    function updateClearButton(searchBox, value) {
+        if (value && value.trim()) {
+            searchBox.classList.add('has-value');
+        } else {
+            searchBox.classList.remove('has-value');
+        }
+    }
+
+    /**
+     * Фильтрация элементов
+     */
+    function filterItems(config, query) {
+        var container = document.getElementById(config.containerId);
+        if (!container) return;
+
+        query = query.toLowerCase().trim();
+        var items = container.querySelectorAll(config.itemSelector);
+        var visibleCount = 0;
+        var totalCount = items.length;
+
+        items.forEach(function(item) {
+            // Пропускаем сообщения о пустом списке
+            if (item.classList.contains('empty-message') || item.classList.contains('empty-state')) {
+                return;
+            }
+
+            var searchText = '';
+
+            // Получаем текст для поиска
+            if (item.hasAttribute(config.searchAttribute)) {
+                searchText = item.getAttribute(config.searchAttribute);
+            } else {
+                searchText = item.textContent;
+            }
+
+            searchText = searchText.toLowerCase();
+
+            var matches = !query || searchText.includes(query);
+
+            if (matches) {
+                item.style.display = '';
+                item.classList.remove('search-hidden');
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+                item.classList.add('search-hidden');
+            }
+        });
+
+        // Показываем сообщение если ничего не найдено
+        updateEmptyMessage(container, visibleCount, query);
+
+        // Вызываем callback
+        if (config.onFilter) {
+            config.onFilter({
+                query: query,
+                visible: visibleCount,
+                total: totalCount
+            });
+        }
+    }
+
+    /**
+     * Показать/скрыть сообщение о пустом результате
+     */
+    function updateEmptyMessage(container, visibleCount, query) {
+        var emptyMessage = container.querySelector('.search-empty-message');
+
+        if (visibleCount === 0 && query) {
+            if (!emptyMessage) {
+                emptyMessage = document.createElement('div');
+                emptyMessage.className = 'empty-message search-empty-message';
+                container.appendChild(emptyMessage);
+            }
+            emptyMessage.textContent = 'По запросу "' + query + '" ничего не найдено';
+            emptyMessage.style.display = '';
+        } else if (emptyMessage) {
+            emptyMessage.style.display = 'none';
+        }
+    }
+
+    /**
+     * Очистить поиск
+     */
+    function clear(inputId) {
+        var input = document.getElementById(inputId);
+        if (input) {
+            input.value = '';
+            handleInput(inputId, '');
+        }
+    }
+
+    /**
+     * Обновить поиск (после изменения данных)
+     */
+    function refresh(inputId) {
+        var input = document.getElementById(inputId);
+        if (input && searchConfigs[inputId]) {
+            filterItems(searchConfigs[inputId], input.value);
+        }
+    }
+
+    /**
+     * Уничтожить поиск
+     */
+    function destroy(inputId) {
+        if (debounceTimers[inputId]) {
+            clearTimeout(debounceTimers[inputId]);
+        }
+        delete searchConfigs[inputId];
+        delete debounceTimers[inputId];
+    }
+
+    // Публичный API
+    return {
+        init: init,
+        clear: clear,
+        refresh: refresh,
+        destroy: destroy
+    };
+})();
+
+// Экспорт
+window.AdminSearch = AdminSearch;
+
+
 // ============= renderers/stats.js =============
 
 /**
@@ -1683,12 +2474,11 @@ var AdminStatsRenderer = (function() {
      */
     function init() {
         elements = {
-            totalViews: document.getElementById('totalViews'),
-            todayViews: document.getElementById('todayViews'),
-            weekViews: document.getElementById('weekViews'),
-            monthViews: document.getElementById('monthViews'),
-            uniqueVisitors: document.getElementById('uniqueVisitors'),
-            topSections: document.getElementById('topSections'),
+            totalViews: document.getElementById('statTotalViews'),
+            todayViews: document.getElementById('statTodayViews'),
+            weekViews: document.getElementById('statWeekViews'),
+            uniqueVisitors: document.getElementById('statUniqueVisitors'),
+            topSections: document.getElementById('pagesStatsList'),
             chartCanvas: document.getElementById('statsChart')
         };
     }
@@ -1708,9 +2498,6 @@ var AdminStatsRenderer = (function() {
         }
         if (elements.weekViews) {
             elements.weekViews.textContent = formatNumber(stats.week_views || 0);
-        }
-        if (elements.monthViews) {
-            elements.monthViews.textContent = formatNumber(stats.month_views || 0);
         }
         if (elements.uniqueVisitors) {
             elements.uniqueVisitors.textContent = formatNumber(stats.unique_visitors || 0);
@@ -1740,35 +2527,33 @@ var AdminStatsRenderer = (function() {
             'faq': 'FAQ',
             'booking': 'Запись',
             'podology': 'Подология',
-            'location': 'Контакты'
+            'location': 'Контакты',
+            'social': 'Соцсети'
         };
 
-        // Сортировка по просмотрам
         var sortedSections = Object.entries(sections)
             .sort(function(a, b) { return b[1] - a[1]; })
-            .slice(0, 5);
+            .slice(0, 6);
 
         if (sortedSections.length === 0) {
-            elements.topSections.innerHTML = '<p class="empty-message">Нет данных о просмотрах секций</p>';
+            elements.topSections.innerHTML = '<p class="empty-message">Нет данных</p>';
             return;
         }
 
         var maxViews = sortedSections[0][1];
 
-        var html = sortedSections.map(function(item) {
+        var html = sortedSections.map(function(item, index) {
             var key = item[0];
             var views = item[1];
             var name = sectionNames[key] || key;
             var percent = maxViews > 0 ? Math.round((views / maxViews) * 100) : 0;
 
-            return '<div class="section-stat-item">' +
-                '<div class="section-stat-info">' +
-                    '<span class="section-name">' + escapeHtml(name) + '</span>' +
-                    '<span class="section-views">' + formatNumber(views) + '</span>' +
+            return '<div class="page-stat-row">' +
+                '<span class="page-stat-name">' + escapeHtml(name) + '</span>' +
+                '<div class="page-stat-bar-wrap">' +
+                    '<div class="page-stat-bar" style="width: ' + percent + '%"></div>' +
                 '</div>' +
-                '<div class="section-stat-bar">' +
-                    '<div class="section-stat-fill" style="width: ' + percent + '%"></div>' +
-                '</div>' +
+                '<span class="page-stat-count">' + views + '</span>' +
             '</div>';
         }).join('');
 
@@ -1782,46 +2567,115 @@ var AdminStatsRenderer = (function() {
         var canvas = elements.chartCanvas;
         if (!canvas || !canvas.getContext) return;
 
+        // Устанавливаем размеры canvas на основе родительского контейнера
+        var wrapper = canvas.parentElement;
+        if (wrapper) {
+            var rect = wrapper.getBoundingClientRect();
+            var dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            canvas.style.width = rect.width + 'px';
+            canvas.style.height = rect.height + 'px';
+        }
+
         var ctx = canvas.getContext('2d');
-        var width = canvas.width;
-        var height = canvas.height;
-        var padding = 40;
+        var dpr = window.devicePixelRatio || 1;
+        ctx.scale(dpr, dpr);
+
+        var width = canvas.width / dpr;
+        var height = canvas.height / dpr;
+        var padding = 50;
+        var paddingBottom = 30;
 
         // Очистка
-        ctx.clearRect(0, 0, width, height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        if (!chartData || chartData.length === 0) return;
+        if (!chartData || chartData.length === 0) {
+            // Показываем сообщение если нет данных
+            ctx.fillStyle = '#666';
+            ctx.font = '14px Manrope, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Нет данных для отображения', width / 2, height / 2);
+            return;
+        }
 
-        // Находим максимальное значение
-        var maxViews = Math.max.apply(null, chartData.map(function(d) { return d.views; }));
+        // Находим максимальное значение (с защитой от пустого массива)
+        var views = chartData.map(function(d) { return d.views || 0; });
+        var maxViews = views.length > 0 ? Math.max.apply(null, views) : 0;
         if (maxViews === 0) maxViews = 1;
 
-        var chartWidth = width - padding * 2;
-        var chartHeight = height - padding * 2;
+        var chartWidth = width - padding - 20;
+        var chartHeight = height - padding - paddingBottom;
         var barWidth = chartWidth / chartData.length;
+        var barGap = 4;
 
-        // Рисуем бары
-        ctx.fillStyle = '#00ff88';
+        // Рисуем линии сетки
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+        ctx.lineWidth = 1;
+        for (var i = 0; i <= 4; i++) {
+            var y = padding + (chartHeight / 4) * i;
+            ctx.beginPath();
+            ctx.moveTo(padding, y);
+            ctx.lineTo(width - 20, y);
+            ctx.stroke();
+        }
 
+        // Подписи оси Y
+        ctx.fillStyle = '#666';
+        ctx.font = '11px Manrope, sans-serif';
+        ctx.textAlign = 'right';
+        for (var i = 0; i <= 4; i++) {
+            var value = Math.round(maxViews * (4 - i) / 4);
+            var y = padding + (chartHeight / 4) * i;
+            ctx.fillText(formatNumber(value), padding - 10, y + 4);
+        }
+
+        // Рисуем бары с градиентом
         chartData.forEach(function(data, index) {
-            var barHeight = (data.views / maxViews) * chartHeight;
-            var x = padding + index * barWidth + barWidth * 0.1;
-            var y = height - padding - barHeight;
-            var w = barWidth * 0.8;
+            var barHeight = Math.max(2, (data.views / maxViews) * chartHeight);
+            var x = padding + index * barWidth + barGap;
+            var y = height - paddingBottom - barHeight;
+            var w = barWidth - barGap * 2;
 
-            ctx.fillRect(x, y, w, barHeight);
+            // Градиент для бара
+            var gradient = ctx.createLinearGradient(x, y, x, y + barHeight);
+            gradient.addColorStop(0, '#00ff88');
+            gradient.addColorStop(1, 'rgba(0, 255, 136, 0.4)');
+            ctx.fillStyle = gradient;
+
+            // Скругленные углы сверху
+            var radius = Math.min(4, w / 2);
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + w - radius, y);
+            ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+            ctx.lineTo(x + w, y + barHeight);
+            ctx.lineTo(x, y + barHeight);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.fill();
+
+            // Значение над баром
+            if (data.views > 0) {
+                ctx.fillStyle = '#fff';
+                ctx.font = '10px Manrope, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(data.views, x + w / 2, y - 6);
+            }
         });
 
         // Подписи дат
-        ctx.fillStyle = '#a0a0a0';
-        ctx.font = '10px Manrope';
+        ctx.fillStyle = '#888';
+        ctx.font = '10px Manrope, sans-serif';
         ctx.textAlign = 'center';
 
         chartData.forEach(function(data, index) {
-            if (index % 2 === 0) { // Каждая вторая дата
-                var x = padding + index * barWidth + barWidth / 2;
-                var date = new Date(data.date);
-                var label = date.getDate() + '.' + (date.getMonth() + 1);
+            var x = padding + index * barWidth + barWidth / 2;
+            var date = new Date(data.date);
+            var label = date.getDate() + '/' + (date.getMonth() + 1);
+
+            // Показываем каждую дату или через одну если много баров
+            if (chartData.length <= 7 || index % 2 === 0) {
                 ctx.fillText(label, x, height - 10);
             }
         });
@@ -1867,19 +2721,66 @@ window.AdminStatsRenderer = AdminStatsRenderer;
 
 /**
  * Admin Masters Renderer
- * Рендеринг списка мастеров
+ * Рендеринг списка мастеров с поддержкой drag & drop
  */
 
 var AdminMastersRenderer = (function() {
     'use strict';
 
     var container = null;
+    var dragDropInitialized = false;
 
     /**
      * Инициализация
      */
     function init() {
         container = document.getElementById('mastersGrid');
+        initDragDrop();
+    }
+
+    /**
+     * Инициализация drag & drop
+     */
+    function initDragDrop() {
+        if (dragDropInitialized || !window.AdminDragDrop) return;
+
+        AdminDragDrop.init('mastersGrid', '.master-card', function(newOrder) {
+            reorderMasters(newOrder);
+        });
+
+        dragDropInitialized = true;
+    }
+
+    /**
+     * Изменение порядка мастеров
+     */
+    function reorderMasters(newOrder) {
+        var masters = AdminState.masters || [];
+
+        // Создаём новый порядок
+        var reordered = newOrder.map(function(id) {
+            return masters.find(function(m) { return m.id === id; });
+        }).filter(Boolean);
+
+        // Добавляем поле order
+        reordered.forEach(function(master, index) {
+            master.order = index;
+        });
+
+        // Сохраняем
+        AdminAPI.save('masters', { masters: reordered })
+            .then(function() {
+                AdminState.setMasters(reordered);
+                if (window.showToast) {
+                    showToast('Порядок сохранён', 'success');
+                }
+            })
+            .catch(function(error) {
+                if (window.showToast) {
+                    showToast('Ошибка сохранения порядка', 'error');
+                }
+                render(); // Откат
+            });
     }
 
     /**
@@ -1910,56 +2811,52 @@ var AdminMastersRenderer = (function() {
             return;
         }
 
-        var html = masters.map(function(master) {
+        var html = masters.map(function(master, index) {
             var photoHtml = master.photo
-                ? '<img src="' + master.photo + '" alt="' + escapeHtml(master.name) + '">'
+                ? '<img src="' + master.photo + '" alt="' + window.escapeHtml(master.name) + '">'
                 : (master.initial || master.name.charAt(0));
 
-            return '<div class="master-card" data-id="' + master.id + '">' +
+            var searchText = [master.name, master.role, master.specialization].join(' ');
+
+            return '<div class="master-card has-drag" data-id="' + master.id + '" data-index="' + index + '" data-search="' + window.escapeHtml(searchText) + '" draggable="true">' +
                 '<div class="master-card-header">' +
                     '<div class="master-avatar ' + (master.photo ? 'has-photo' : '') + '">' +
                         photoHtml +
                     '</div>' +
                     '<div class="master-info">' +
-                        '<h3 class="master-name">' + escapeHtml(master.name) + '</h3>' +
-                        '<div class="master-role">' + escapeHtml(master.role || 'Мастер') + '</div>' +
+                        '<h3 class="master-name">' + window.escapeHtml(master.name) + '</h3>' +
+                        '<div class="master-role">' + window.escapeHtml(master.role || 'Мастер') + '</div>' +
                         '<span class="master-badge badge-' + (master.badge || 'green') + '">' + getBadgeLabel(master.badge) + '</span>' +
                     '</div>' +
                 '</div>' +
-                '<p class="master-specialization">' + escapeHtml(master.specialization || '') + '</p>' +
+                '<p class="master-specialization">' + window.escapeHtml(master.specialization || '') + '</p>' +
                 '<div class="master-card-actions">' +
                     '<button class="btn btn-secondary" data-action="edit-master" data-id="' + master.id + '">' +
                         SharedIcons.get('edit') +
                         'Редактировать' +
                     '</button>' +
-                    '<button class="btn btn-icon danger" data-action="delete-master" data-id="' + master.id + '" title="Удалить">' +
+                    '<button class="btn btn-icon danger" data-action="delete-master" data-id="' + master.id + '" data-name="' + window.escapeHtml(master.name) + '" title="Удалить">' +
                         SharedIcons.get('delete') +
                     '</button>' +
                 '</div>' +
+                '<div class="drag-handle" title="Перетащите для изменения порядка">' + SharedIcons.get('grip') + '</div>' +
             '</div>';
         }).join('');
 
         container.innerHTML = html;
-    }
 
-    /**
-     * Escape HTML
-     */
-    function escapeHtml(text) {
-        if (!text) return '';
-        if (typeof window.escapeHtml === 'function') {
-            return window.escapeHtml(text);
+        // Обновляем drag & drop после рендера
+        if (window.AdminDragDrop) {
+            AdminDragDrop.refresh('mastersGrid');
         }
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
     }
 
     // Публичный API
     return {
         init: init,
         render: render,
-        getBadgeLabel: getBadgeLabel
+        getBadgeLabel: getBadgeLabel,
+        reorderMasters: reorderMasters
     };
 })();
 
@@ -1971,7 +2868,7 @@ window.AdminMastersRenderer = AdminMastersRenderer;
 
 /**
  * Admin Services Renderer
- * Рендеринг списка услуг
+ * Рендеринг списка услуг с поддержкой drag & drop
  */
 
 var AdminServicesRenderer = (function() {
@@ -1979,6 +2876,7 @@ var AdminServicesRenderer = (function() {
 
     var servicesList = null;
     var podologyList = null;
+    var dragDropInitialized = {};
 
     /**
      * Инициализация
@@ -1986,6 +2884,94 @@ var AdminServicesRenderer = (function() {
     function init() {
         servicesList = document.getElementById('servicesList');
         podologyList = document.getElementById('podologyList');
+        initDragDrop();
+    }
+
+    /**
+     * Инициализация drag & drop для услуг
+     */
+    function initDragDrop() {
+        if (!window.AdminDragDrop) return;
+
+        if (!dragDropInitialized.services) {
+            AdminDragDrop.init('servicesList', '.service-item', function(newOrder) {
+                reorderServices(newOrder);
+            });
+            dragDropInitialized.services = true;
+        }
+
+        if (!dragDropInitialized.podology) {
+            AdminDragDrop.init('podologyList', '.service-item', function(newOrder) {
+                reorderPodology(newOrder);
+            });
+            dragDropInitialized.podology = true;
+        }
+    }
+
+    /**
+     * Изменение порядка услуг в категории
+     */
+    function reorderServices(newOrder) {
+        var currentCategory = AdminState.currentCategory || 'main';
+        var services = AdminState.services || {};
+
+        if (!services.categories) return;
+
+        var categoryIndex = services.categories.findIndex(function(c) {
+            return c.id === currentCategory;
+        });
+
+        if (categoryIndex === -1) return;
+
+        var category = services.categories[categoryIndex];
+        var reordered = newOrder.map(function(id) {
+            return category.services.find(function(s) { return String(s.id) === String(id); });
+        }).filter(Boolean);
+
+        services.categories[categoryIndex].services = reordered;
+
+        AdminAPI.save('services', services)
+            .then(function() {
+                AdminState.setServices(services);
+                if (window.showToast) {
+                    showToast('Порядок сохранён', 'success');
+                }
+            })
+            .catch(function(error) {
+                if (window.showToast) {
+                    showToast('Ошибка сохранения порядка', 'error');
+                }
+                render();
+            });
+    }
+
+    /**
+     * Изменение порядка услуг подологии
+     */
+    function reorderPodology(newOrder) {
+        var services = AdminState.services || {};
+
+        if (!services.podology || !services.podology.services) return;
+
+        var reordered = newOrder.map(function(id) {
+            return services.podology.services.find(function(s) { return String(s.id) === String(id); });
+        }).filter(Boolean);
+
+        services.podology.services = reordered;
+
+        AdminAPI.save('services', services)
+            .then(function() {
+                AdminState.setServices(services);
+                if (window.showToast) {
+                    showToast('Порядок сохранён', 'success');
+                }
+            })
+            .catch(function(error) {
+                if (window.showToast) {
+                    showToast('Ошибка сохранения порядка', 'error');
+                }
+                renderPodology();
+            });
     }
 
     /**
@@ -2013,7 +2999,8 @@ var AdminServicesRenderer = (function() {
         }
 
         var html = category.services.map(function(service, index) {
-            return '<div class="service-item" data-id="' + service.id + '">' +
+            return '<div class="service-item" data-id="' + service.id + '" data-index="' + index + '" data-search="' + escapeHtml(service.name) + '" draggable="true">' +
+                '<div class="drag-handle" title="Перетащите для изменения порядка">' + SharedIcons.get('grip') + '</div>' +
                 '<span class="service-name">' + escapeHtml(service.name) + '</span>' +
                 '<div class="service-prices">' +
                     '<span class="price-tag price-green">' + (service.priceGreen || 0) + ' ₽</span>' +
@@ -2024,7 +3011,7 @@ var AdminServicesRenderer = (function() {
                     '<button class="btn btn-icon" data-action="edit-service" data-category="' + currentCategory + '" data-index="' + index + '" title="Редактировать">' +
                         SharedIcons.get('edit') +
                     '</button>' +
-                    '<button class="btn btn-icon danger" data-action="delete-service" data-category="' + currentCategory + '" data-index="' + index + '" title="Удалить">' +
+                    '<button class="btn btn-icon danger" data-action="delete-service" data-category="' + currentCategory + '" data-index="' + index + '" data-name="' + escapeHtml(service.name) + '" title="Удалить">' +
                         SharedIcons.get('delete') +
                     '</button>' +
                 '</div>' +
@@ -2032,6 +3019,10 @@ var AdminServicesRenderer = (function() {
         }).join('');
 
         servicesList.innerHTML = html;
+
+        if (window.AdminDragDrop) {
+            AdminDragDrop.refresh('servicesList');
+        }
     }
 
     /**
@@ -2052,7 +3043,8 @@ var AdminServicesRenderer = (function() {
         }
 
         var html = podologyServices.map(function(service, index) {
-            return '<div class="service-item" data-id="' + service.id + '">' +
+            return '<div class="service-item" data-id="' + service.id + '" data-index="' + index + '" data-search="' + escapeHtml(service.name) + '" draggable="true">' +
+                '<div class="drag-handle" title="Перетащите для изменения порядка">' + SharedIcons.get('grip') + '</div>' +
                 '<span class="service-name">' + escapeHtml(service.name) + '</span>' +
                 '<div class="service-prices">' +
                     '<span class="price-tag price-single">' + escapeHtml(service.price) + '</span>' +
@@ -2061,7 +3053,7 @@ var AdminServicesRenderer = (function() {
                     '<button class="btn btn-icon" data-action="edit-podology" data-index="' + index + '" title="Редактировать">' +
                         SharedIcons.get('edit') +
                     '</button>' +
-                    '<button class="btn btn-icon danger" data-action="delete-podology" data-index="' + index + '" title="Удалить">' +
+                    '<button class="btn btn-icon danger" data-action="delete-podology" data-index="' + index + '" data-name="' + escapeHtml(service.name) + '" title="Удалить">' +
                         SharedIcons.get('delete') +
                     '</button>' +
                 '</div>' +
@@ -2069,6 +3061,10 @@ var AdminServicesRenderer = (function() {
         }).join('');
 
         podologyList.innerHTML = html;
+
+        if (window.AdminDragDrop) {
+            AdminDragDrop.refresh('podologyList');
+        }
     }
 
     /**
@@ -2088,7 +3084,9 @@ var AdminServicesRenderer = (function() {
     return {
         init: init,
         render: render,
-        renderPodology: renderPodology
+        renderPodology: renderPodology,
+        reorderServices: reorderServices,
+        reorderPodology: reorderPodology
     };
 })();
 
@@ -2100,19 +3098,63 @@ window.AdminServicesRenderer = AdminServicesRenderer;
 
 /**
  * Admin Articles Renderer
- * Рендеринг списка статей
+ * Рендеринг списка статей с поддержкой drag & drop
  */
 
 var AdminArticlesRenderer = (function() {
     'use strict';
 
     var container = null;
+    var dragDropInitialized = false;
 
     /**
      * Инициализация
      */
     function init() {
         container = document.getElementById('articlesGrid');
+        initDragDrop();
+    }
+
+    /**
+     * Инициализация drag & drop
+     */
+    function initDragDrop() {
+        if (dragDropInitialized || !window.AdminDragDrop) return;
+
+        AdminDragDrop.init('articlesGrid', '.article-card', function(newOrder) {
+            reorderArticles(newOrder);
+        });
+
+        dragDropInitialized = true;
+    }
+
+    /**
+     * Изменение порядка статей
+     */
+    function reorderArticles(newOrder) {
+        var articles = AdminState.articles || [];
+
+        var reordered = newOrder.map(function(id) {
+            return articles.find(function(a) { return a.id === id; });
+        }).filter(Boolean);
+
+        reordered.forEach(function(article, index) {
+            article.order = index;
+        });
+
+        AdminAPI.save('articles', { articles: reordered })
+            .then(function() {
+                AdminState.setArticles(reordered);
+                if (window.showToast) {
+                    showToast('Порядок сохранён', 'success');
+                }
+            })
+            .catch(function(error) {
+                if (window.showToast) {
+                    showToast('Ошибка сохранения порядка', 'error');
+                }
+                render();
+            });
     }
 
     /**
@@ -2148,12 +3190,14 @@ var AdminArticlesRenderer = (function() {
             return;
         }
 
-        var html = articles.map(function(article) {
+        var html = articles.map(function(article, index) {
             var imageHtml = article.image
                 ? '<img src="' + article.image + '" alt="' + escapeHtml(article.title) + '">'
                 : SharedIcons.get('image');
 
-            return '<div class="article-card" data-id="' + article.id + '">' +
+            var searchText = [article.title, article.tag, article.excerpt].join(' ');
+
+            return '<div class="article-card has-drag" data-id="' + article.id + '" data-index="' + index + '" data-search="' + escapeHtml(searchText) + '" draggable="true">' +
                 '<div class="article-image">' +
                     imageHtml +
                 '</div>' +
@@ -2169,15 +3213,20 @@ var AdminArticlesRenderer = (function() {
                             SharedIcons.get('edit') +
                             'Редактировать' +
                         '</button>' +
-                        '<button class="btn btn-icon danger" data-action="delete-article" data-id="' + article.id + '" title="Удалить">' +
+                        '<button class="btn btn-icon danger" data-action="delete-article" data-id="' + article.id + '" data-name="' + escapeHtml(article.title) + '" title="Удалить">' +
                             SharedIcons.get('delete') +
                         '</button>' +
                     '</div>' +
                 '</div>' +
+                '<div class="drag-handle" title="Перетащите для изменения порядка">' + SharedIcons.get('grip') + '</div>' +
             '</div>';
         }).join('');
 
         container.innerHTML = html;
+
+        if (window.AdminDragDrop) {
+            AdminDragDrop.refresh('articlesGrid');
+        }
     }
 
     /**
@@ -2197,7 +3246,8 @@ var AdminArticlesRenderer = (function() {
     return {
         init: init,
         render: render,
-        formatDate: formatDate
+        formatDate: formatDate,
+        reorderArticles: reorderArticles
     };
 })();
 
@@ -2209,19 +3259,63 @@ window.AdminArticlesRenderer = AdminArticlesRenderer;
 
 /**
  * Admin FAQ Renderer
- * Рендеринг списка FAQ
+ * Рендеринг списка FAQ с поддержкой drag & drop
  */
 
 var AdminFaqRenderer = (function() {
     'use strict';
 
     var container = null;
+    var dragDropInitialized = false;
 
     /**
      * Инициализация
      */
     function init() {
         container = document.getElementById('faqList');
+        initDragDrop();
+    }
+
+    /**
+     * Инициализация drag & drop
+     */
+    function initDragDrop() {
+        if (dragDropInitialized || !window.AdminDragDrop) return;
+
+        AdminDragDrop.init('faqList', '.faq-admin-item', function(newOrder) {
+            reorderFaq(newOrder);
+        });
+
+        dragDropInitialized = true;
+    }
+
+    /**
+     * Изменение порядка FAQ
+     */
+    function reorderFaq(newOrder) {
+        var faq = AdminState.faq || [];
+
+        var reordered = newOrder.map(function(id) {
+            return faq.find(function(f) { return f.id === id; });
+        }).filter(Boolean);
+
+        reordered.forEach(function(item, index) {
+            item.order = index;
+        });
+
+        AdminAPI.save('faq', { faq: reordered })
+            .then(function() {
+                AdminState.setFaq(reordered);
+                if (window.showToast) {
+                    showToast('Порядок сохранён', 'success');
+                }
+            })
+            .catch(function(error) {
+                if (window.showToast) {
+                    showToast('Ошибка сохранения порядка', 'error');
+                }
+                render();
+            });
     }
 
     /**
@@ -2240,8 +3334,11 @@ var AdminFaqRenderer = (function() {
             return;
         }
 
-        var html = faq.map(function(item) {
-            return '<div class="faq-admin-item" data-id="' + item.id + '">' +
+        var html = faq.map(function(item, index) {
+            var searchText = [item.question, item.answer].join(' ');
+
+            return '<div class="faq-admin-item has-drag" data-id="' + item.id + '" data-index="' + index + '" data-search="' + escapeHtml(searchText) + '" draggable="true">' +
+                '<div class="drag-handle" title="Перетащите для изменения порядка">' + SharedIcons.get('grip') + '</div>' +
                 '<div class="faq-admin-content">' +
                     '<h3 class="faq-admin-question">' + escapeHtml(item.question) + '</h3>' +
                     '<p class="faq-admin-answer">' + escapeHtml(item.answer) + '</p>' +
@@ -2251,7 +3348,7 @@ var AdminFaqRenderer = (function() {
                         SharedIcons.get('edit') +
                         'Редактировать' +
                     '</button>' +
-                    '<button class="btn btn-icon danger" data-action="delete-faq" data-id="' + item.id + '" title="Удалить">' +
+                    '<button class="btn btn-icon danger" data-action="delete-faq" data-id="' + item.id + '" data-name="' + escapeHtml(item.question) + '" title="Удалить">' +
                         SharedIcons.get('delete') +
                     '</button>' +
                 '</div>' +
@@ -2259,6 +3356,10 @@ var AdminFaqRenderer = (function() {
         }).join('');
 
         container.innerHTML = html;
+
+        if (window.AdminDragDrop) {
+            AdminDragDrop.refresh('faqList');
+        }
     }
 
     /**
@@ -2277,7 +3378,8 @@ var AdminFaqRenderer = (function() {
     // Публичный API
     return {
         init: init,
-        render: render
+        render: render,
+        reorderFaq: reorderFaq
     };
 })();
 
@@ -2349,12 +3451,12 @@ var AdminSocialRenderer = (function() {
                     SharedIcons.getSocial(link.icon) +
                 '</div>' +
                 '<div class="social-link-info">' +
-                    '<div class="social-link-name">' + escapeHtml(link.name) + '</div>' +
+                    '<div class="social-link-name">' + window.escapeHtml(link.name) + '</div>' +
                     '<input type="text" ' +
                         'class="social-link-url-input" ' +
                         'data-social-id="' + link.id + '" ' +
-                        'value="' + escapeHtml(link.url || '') + '" ' +
-                        'placeholder="Введите URL для ' + escapeHtml(link.name) + '">' +
+                        'value="' + window.escapeHtml(link.url || '') + '" ' +
+                        'placeholder="Введите URL для ' + window.escapeHtml(link.name) + '">' +
                 '</div>' +
                 '<div class="social-link-toggle">' +
                     '<div class="toggle ' + toggleClass + '" data-social-id="' + link.id + '" data-action="toggle-social"></div>' +
@@ -2423,19 +3525,6 @@ var AdminSocialRenderer = (function() {
         }
     }
 
-    /**
-     * Escape HTML
-     */
-    function escapeHtml(text) {
-        if (!text) return '';
-        if (typeof window.escapeHtml === 'function') {
-            return window.escapeHtml(text);
-        }
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
     // Публичный API
     return {
         init: init,
@@ -2447,6 +3536,387 @@ var AdminSocialRenderer = (function() {
 
 // Экспорт
 window.AdminSocialRenderer = AdminSocialRenderer;
+
+
+// ============= renderers/shop-categories.js =============
+
+/**
+ * Shop Categories Renderer
+ * Отображение списка категорий товаров
+ */
+
+var AdminShopCategoriesRenderer = (function() {
+    'use strict';
+
+    var container = null;
+
+    function init() {
+        container = document.getElementById('shopCategoriesGrid');
+    }
+
+    function render() {
+        if (!container) {
+            container = document.getElementById('shopCategoriesGrid');
+            if (!container) return;
+        }
+
+        var categories = AdminState.shopCategories || [];
+
+        if (categories.length === 0) {
+            container.innerHTML = '<div class="empty-state">' +
+                '<p>Категории ещё не добавлены</p>' +
+                '<p class="empty-hint">Нажмите "Добавить" для создания первой категории</p>' +
+            '</div>';
+            return;
+        }
+
+        var html = categories
+            .sort(function(a, b) { return (a.order || 0) - (b.order || 0); })
+            .map(function(cat) {
+                var productsCount = (AdminState.products || []).filter(function(p) {
+                    return p.categoryId === cat.id;
+                }).length;
+
+                var iconHtml = SharedIcons.get(cat.icon || 'folder');
+
+                return '<div class="shop-category-card" data-id="' + escapeHtml(cat.id) + '">' +
+                    '<div class="category-card-icon">' + iconHtml + '</div>' +
+                    '<div class="category-card-info">' +
+                        '<h3 class="category-card-name">' + escapeHtml(cat.name) + '</h3>' +
+                        '<p class="category-card-description">' + escapeHtml(cat.description || '') + '</p>' +
+                        '<span class="category-card-count">' + productsCount + ' товаров</span>' +
+                    '</div>' +
+                    '<div class="category-card-actions">' +
+                        '<button class="btn btn-icon" data-action="edit-shop-category" data-id="' + escapeHtml(cat.id) + '" title="Редактировать">' +
+                            SharedIcons.get('edit') +
+                        '</button>' +
+                        '<button class="btn btn-icon danger" data-action="delete-shop-category" data-id="' + escapeHtml(cat.id) + '" title="Удалить">' +
+                            SharedIcons.get('delete') +
+                        '</button>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+
+        container.innerHTML = html;
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        var div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    return {
+        init: init,
+        render: render
+    };
+})();
+
+window.AdminShopCategoriesRenderer = AdminShopCategoriesRenderer;
+
+
+// ============= renderers/shop-products.js =============
+
+/**
+ * Shop Products Renderer
+ * Отображение таблицы товаров с пагинацией
+ */
+
+var AdminShopProductsRenderer = (function() {
+    'use strict';
+
+    var container = null;
+    var currentPage = 1;
+    var itemsPerPage = 10;
+    var filterCategory = 'all';
+
+    function init() {
+        container = document.getElementById('productsTableBody');
+
+        // Filter change handler
+        var filterSelect = document.getElementById('productsFilterCategory');
+        if (filterSelect) {
+            filterSelect.addEventListener('change', function(e) {
+                setFilter(e.target.value);
+            });
+        }
+    }
+
+    function render() {
+        if (!container) {
+            container = document.getElementById('productsTableBody');
+            if (!container) return;
+        }
+
+        // Update filter select options
+        updateFilterOptions();
+
+        var products = AdminState.products || [];
+
+        // Filter by category
+        if (filterCategory !== 'all') {
+            products = products.filter(function(p) {
+                return p.categoryId === filterCategory;
+            });
+        }
+
+        // Sort by order
+        products.sort(function(a, b) { return (a.order || 0) - (b.order || 0); });
+
+        // Pagination
+        var total = products.length;
+        var totalPages = Math.ceil(total / itemsPerPage);
+        var start = (currentPage - 1) * itemsPerPage;
+        var end = start + itemsPerPage;
+        var pageProducts = products.slice(start, end);
+
+        if (pageProducts.length === 0) {
+            container.innerHTML = '<tr><td colspan="5" class="empty-cell">' +
+                '<div class="empty-state">' +
+                    '<p>Товары ещё не добавлены</p>' +
+                    '<p class="empty-hint">Нажмите "Добавить" для создания первого товара</p>' +
+                '</div>' +
+            '</td></tr>';
+            renderPagination(0, 0);
+            return;
+        }
+
+        var html = pageProducts.map(function(product) {
+            var category = AdminState.findShopCategory(product.categoryId);
+            var mainImage = null;
+            if (product.images && product.images.length > 0) {
+                mainImage = product.images.find(function(img) { return img.isMain; }) || product.images[0];
+            }
+
+            var statusClass = {
+                active: 'success',
+                draft: 'warning',
+                archived: 'secondary'
+            }[product.status] || 'secondary';
+
+            var statusText = {
+                active: 'Активен',
+                draft: 'Черновик',
+                archived: 'В архиве'
+            }[product.status] || product.status;
+
+            return '<tr>' +
+                '<td>' +
+                    '<div class="product-cell">' +
+                        (mainImage
+                            ? '<img src="' + escapeHtml(mainImage.url) + '" class="product-thumb" alt="">'
+                            : '<div class="product-thumb-placeholder">' + SharedIcons.get('box') + '</div>') +
+                        '<span class="product-cell-name">' + escapeHtml(product.name) + '</span>' +
+                    '</div>' +
+                '</td>' +
+                '<td>' + (category ? escapeHtml(category.name) : '-') + '</td>' +
+                '<td class="price-cell">' + formatPrice(product.price) + '</td>' +
+                '<td><span class="status-badge ' + statusClass + '">' + statusText + '</span></td>' +
+                '<td class="actions-cell">' +
+                    '<button class="btn btn-icon" data-action="edit-product" data-id="' + escapeHtml(product.id) + '" title="Редактировать">' +
+                        SharedIcons.get('edit') +
+                    '</button>' +
+                    '<button class="btn btn-icon danger" data-action="delete-product" data-id="' + escapeHtml(product.id) + '" title="Удалить">' +
+                        SharedIcons.get('delete') +
+                    '</button>' +
+                '</td>' +
+            '</tr>';
+        }).join('');
+
+        container.innerHTML = html;
+        renderPagination(totalPages, total);
+    }
+
+    function updateFilterOptions() {
+        var filterSelect = document.getElementById('productsFilterCategory');
+        if (!filterSelect) return;
+
+        var categories = AdminState.shopCategories || [];
+        var html = '<option value="all">Все категории</option>';
+
+        categories.forEach(function(cat) {
+            var selected = filterCategory === cat.id ? ' selected' : '';
+            html += '<option value="' + escapeHtml(cat.id) + '"' + selected + '>' +
+                escapeHtml(cat.name) +
+            '</option>';
+        });
+
+        filterSelect.innerHTML = html;
+    }
+
+    function renderPagination(totalPages, total) {
+        var paginationEl = document.getElementById('productsPagination');
+        if (!paginationEl) return;
+
+        if (totalPages <= 1) {
+            paginationEl.innerHTML = '';
+            return;
+        }
+
+        var html = '<div class="pagination">' +
+            '<span class="pagination-info">Показано ' + Math.min(itemsPerPage, total) + ' из ' + total + '</span>' +
+            '<div class="pagination-buttons">';
+
+        for (var i = 1; i <= totalPages; i++) {
+            var activeClass = i === currentPage ? ' active' : '';
+            html += '<button class="pagination-btn' + activeClass + '" onclick="AdminShopProductsRenderer.goToPage(' + i + ')">' + i + '</button>';
+        }
+
+        html += '</div></div>';
+        paginationEl.innerHTML = html;
+    }
+
+    function setFilter(categoryId) {
+        filterCategory = categoryId;
+        currentPage = 1;
+        render();
+    }
+
+    function goToPage(page) {
+        currentPage = page;
+        render();
+    }
+
+    function formatPrice(price) {
+        return new Intl.NumberFormat('ru-RU').format(price) + ' ₽';
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        var div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    return {
+        init: init,
+        render: render,
+        setFilter: setFilter,
+        goToPage: goToPage
+    };
+})();
+
+window.AdminShopProductsRenderer = AdminShopProductsRenderer;
+
+
+// ============= renderers/legal.js =============
+
+/**
+ * Admin Legal Renderer
+ * Рендеринг юридических документов (политики, соглашения)
+ */
+
+var AdminLegalRenderer = (function() {
+    'use strict';
+
+    var elements = {};
+
+    /**
+     * Инициализация
+     */
+    function init() {
+        elements = {
+            legalDocumentsList: document.getElementById('legalDocumentsList')
+        };
+    }
+
+    /**
+     * Рендеринг списка документов
+     */
+    function render() {
+        if (!elements.legalDocumentsList) {
+            elements.legalDocumentsList = document.getElementById('legalDocumentsList');
+            if (!elements.legalDocumentsList) return;
+        }
+
+        var documents = AdminState.legalDocuments || [];
+
+        if (documents.length === 0) {
+            elements.legalDocumentsList.innerHTML = '<p class="empty-message">Нет юридических документов</p>';
+            return;
+        }
+
+        var html = documents.map(function(doc) {
+            var statusClass = doc.active ? 'active' : 'inactive';
+            var statusText = doc.active ? 'Активен' : 'Скрыт';
+            var updatedAt = doc.updatedAt ? new Date(doc.updatedAt).toLocaleDateString('ru-RU') : '';
+
+            return '<div class="legal-document-card ' + statusClass + '" data-id="' + doc.id + '">' +
+                '<div class="legal-document-header">' +
+                    '<div class="legal-document-info">' +
+                        '<h3 class="legal-document-title">' + window.escapeHtml(doc.title) + '</h3>' +
+                        '<div class="legal-document-meta">' +
+                            '<span class="legal-document-slug">/legal/' + window.escapeHtml(doc.slug) + '</span>' +
+                            (updatedAt ? '<span class="legal-document-date">Обновлён: ' + updatedAt + '</span>' : '') +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="legal-document-status">' +
+                        '<span class="status-badge ' + statusClass + '">' + statusText + '</span>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="legal-document-preview">' +
+                    getPreviewText(doc.content) +
+                '</div>' +
+                '<div class="legal-document-actions">' +
+                    '<button class="btn btn-secondary btn-sm" data-action="edit-legal" data-id="' + doc.id + '">' +
+                        SharedIcons.get('edit') +
+                        '<span>Редактировать</span>' +
+                    '</button>' +
+                    '<button class="btn btn-outline btn-sm" data-action="toggle-legal" data-id="' + doc.id + '">' +
+                        (doc.active ? SharedIcons.get('eyeOff') : SharedIcons.get('eye')) +
+                        '<span>' + (doc.active ? 'Скрыть' : 'Показать') + '</span>' +
+                    '</button>' +
+                '</div>' +
+            '</div>';
+        }).join('');
+
+        elements.legalDocumentsList.innerHTML = html;
+    }
+
+    /**
+     * Получение превью текста (без HTML тегов)
+     */
+    function getPreviewText(html) {
+        if (!html) return '';
+        var div = document.createElement('div');
+        div.innerHTML = html;
+        var text = div.textContent || div.innerText || '';
+        return text.length > 200 ? text.substring(0, 200) + '...' : text;
+    }
+
+    /**
+     * Переключение активности документа
+     */
+    async function toggleActive(id) {
+        var documents = AdminState.legalDocuments || [];
+        var doc = documents.find(function(d) { return d.id === id; });
+
+        if (doc) {
+            doc.active = !doc.active;
+            doc.updatedAt = new Date().toISOString();
+
+            try {
+                await AdminAPI.save('legal', { documents: documents });
+                render();
+                showToast('Статус документа изменён', 'success');
+            } catch (error) {
+                console.error('Error toggling legal document:', error);
+                showToast('Ошибка сохранения', 'error');
+            }
+        }
+    }
+
+    // Публичный API
+    return {
+        init: init,
+        render: render,
+        toggleActive: toggleActive
+    };
+})();
+
+// Экспорт
+window.AdminLegalRenderer = AdminLegalRenderer;
 
 
 // ============= forms/master-form.js =============
@@ -2470,7 +3940,7 @@ var AdminMasterForm = (function() {
 
         var principlesHtml = principles.map(function(p, i) {
             return '<div class="principle-item">' +
-                '<input type="text" class="form-input principle-input" value="' + escapeHtml(p) + '" placeholder="Принцип ' + (i + 1) + '">' +
+                '<input type="text" class="form-input principle-input" value="' + window.escapeHtml(p) + '" placeholder="Принцип ' + (i + 1) + '">' +
                 '<button type="button" class="btn btn-icon danger" data-action="remove-principle">' +
                     SharedIcons.get('close') +
                 '</button>' +
@@ -2491,12 +3961,12 @@ var AdminMasterForm = (function() {
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-label">Имя *</label>' +
-                '<input type="text" class="form-input" id="masterName" value="' + escapeHtml(master && master.name || '') + '" placeholder="Введите имя мастера" required>' +
+                '<input type="text" class="form-input" id="masterName" value="' + window.escapeHtml(master && master.name || '') + '" placeholder="Введите имя мастера" required>' +
             '</div>' +
             '<div class="form-row form-row-2">' +
                 '<div class="form-group">' +
                     '<label class="form-label">Инициал</label>' +
-                    '<input type="text" class="form-input" id="masterInitial" value="' + escapeHtml(master && master.initial || '') + '" placeholder="С" maxlength="1">' +
+                    '<input type="text" class="form-input" id="masterInitial" value="' + window.escapeHtml(master && master.initial || '') + '" placeholder="С" maxlength="1">' +
                 '</div>' +
                 '<div class="form-group">' +
                     '<label class="form-label">Уровень</label>' +
@@ -2509,11 +3979,11 @@ var AdminMasterForm = (function() {
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-label">Должность</label>' +
-                '<input type="text" class="form-input" id="masterRole" value="' + escapeHtml(master && master.role || '') + '" placeholder="Мастер">' +
+                '<input type="text" class="form-input" id="masterRole" value="' + window.escapeHtml(master && master.role || '') + '" placeholder="Мастер">' +
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-label">Специализация</label>' +
-                '<textarea class="form-textarea" id="masterSpecialization" placeholder="Описание специализации мастера...">' + escapeHtml(master && master.specialization || '') + '</textarea>' +
+                '<textarea class="form-textarea" id="masterSpecialization" placeholder="Описание специализации мастера...">' + window.escapeHtml(master && master.specialization || '') + '</textarea>' +
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-label">Принципы работы</label>' +
@@ -2655,19 +4125,6 @@ var AdminMasterForm = (function() {
         }
     }
 
-    /**
-     * Escape HTML
-     */
-    function escapeHtml(text) {
-        if (!text) return '';
-        if (typeof window.escapeHtml === 'function') {
-            return window.escapeHtml(text);
-        }
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
     // Публичный API
     return {
         show: show,
@@ -2723,7 +4180,7 @@ var AdminServiceForm = (function() {
         var html = '<form id="serviceForm" class="admin-form">' +
             '<div class="form-group">' +
                 '<label class="form-label">Название услуги *</label>' +
-                '<input type="text" class="form-input" id="serviceName" value="' + escapeHtml(service && service.name || '') + '" placeholder="Введите название услуги" required>' +
+                '<input type="text" class="form-input" id="serviceName" value="' + window.escapeHtml(service && service.name || '') + '" placeholder="Введите название услуги" required>' +
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-label">Цены по уровням мастеров</label>' +
@@ -2775,11 +4232,11 @@ var AdminServiceForm = (function() {
         var html = '<form id="podologyForm" class="admin-form">' +
             '<div class="form-group">' +
                 '<label class="form-label">Название услуги *</label>' +
-                '<input type="text" class="form-input" id="podologyName" value="' + escapeHtml(service && service.name || '') + '" placeholder="Введите название услуги" required>' +
+                '<input type="text" class="form-input" id="podologyName" value="' + window.escapeHtml(service && service.name || '') + '" placeholder="Введите название услуги" required>' +
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-label">Цена</label>' +
-                '<input type="text" class="form-input" id="podologyPrice" value="' + escapeHtml(service && service.price || '') + '" placeholder="от 2000 ₽">' +
+                '<input type="text" class="form-input" id="podologyPrice" value="' + window.escapeHtml(service && service.price || '') + '" placeholder="от 2000 ₽">' +
             '</div>' +
         '</form>';
 
@@ -2977,19 +4434,6 @@ var AdminServiceForm = (function() {
         }
     }
 
-    /**
-     * Escape HTML
-     */
-    function escapeHtml(text) {
-        if (!text) return '';
-        if (typeof window.escapeHtml === 'function') {
-            return window.escapeHtml(text);
-        }
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
     // Публичный API
     return {
         show: show,
@@ -3038,12 +4482,12 @@ var AdminArticleForm = (function() {
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-label">Заголовок *</label>' +
-                '<input type="text" class="form-input" id="articleTitle" value="' + escapeHtml(article && article.title || '') + '" placeholder="Введите заголовок статьи" required>' +
+                '<input type="text" class="form-input" id="articleTitle" value="' + window.escapeHtml(article && article.title || '') + '" placeholder="Введите заголовок статьи" required>' +
             '</div>' +
             '<div class="form-row form-row-2">' +
                 '<div class="form-group">' +
                     '<label class="form-label">Тег/Категория</label>' +
-                    '<input type="text" class="form-input" id="articleTag" value="' + escapeHtml(article && article.tag || '') + '" placeholder="Уход за волосами">' +
+                    '<input type="text" class="form-input" id="articleTag" value="' + window.escapeHtml(article && article.tag || '') + '" placeholder="Уход за волосами">' +
                 '</div>' +
                 '<div class="form-group">' +
                     '<label class="form-label">Дата публикации</label>' +
@@ -3052,7 +4496,7 @@ var AdminArticleForm = (function() {
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-label">Краткое описание</label>' +
-                '<textarea class="form-textarea" id="articleExcerpt" placeholder="Краткое описание для превью статьи...">' + escapeHtml(article && article.excerpt || '') + '</textarea>' +
+                '<textarea class="form-textarea" id="articleExcerpt" placeholder="Краткое описание для превью статьи...">' + window.escapeHtml(article && article.excerpt || '') + '</textarea>' +
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-label">Полный текст статьи</label>' +
@@ -3232,19 +4676,6 @@ var AdminArticleForm = (function() {
         }
     }
 
-    /**
-     * Escape HTML
-     */
-    function escapeHtml(text) {
-        if (!text) return '';
-        if (typeof window.escapeHtml === 'function') {
-            return window.escapeHtml(text);
-        }
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
     // Публичный API
     return {
         show: show,
@@ -3278,11 +4709,11 @@ var AdminFaqForm = (function() {
         var html = '<form id="faqForm" class="admin-form">' +
             '<div class="form-group">' +
                 '<label class="form-label">Вопрос *</label>' +
-                '<input type="text" class="form-input" id="faqQuestion" value="' + escapeHtml(faqItem && faqItem.question || '') + '" placeholder="Введите вопрос" required>' +
+                '<input type="text" class="form-input" id="faqQuestion" value="' + window.escapeHtml(faqItem && faqItem.question || '') + '" placeholder="Введите вопрос" required>' +
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-label">Ответ *</label>' +
-                '<textarea class="form-textarea" id="faqAnswer" placeholder="Введите ответ на вопрос..." rows="5">' + escapeHtml(faqItem && faqItem.answer || '') + '</textarea>' +
+                '<textarea class="form-textarea" id="faqAnswer" placeholder="Введите ответ на вопрос..." rows="5">' + window.escapeHtml(faqItem && faqItem.answer || '') + '</textarea>' +
             '</div>' +
         '</form>';
 
@@ -3366,17 +4797,711 @@ var AdminFaqForm = (function() {
         }
     }
 
-    /**
-     * Escape HTML
-     */
-    function escapeHtml(text) {
-        if (!text) return '';
-        if (typeof window.escapeHtml === 'function') {
-            return window.escapeHtml(text);
+    // Публичный API
+    return {
+        show: show,
+        save: save,
+        remove: remove
+    };
+})();
+
+// Экспорт
+window.AdminFaqForm = AdminFaqForm;
+
+
+// ============= forms/category-form.js =============
+
+/**
+ * Shop Category Form
+ * Форма добавления/редактирования категории товаров
+ */
+
+var AdminCategoryForm = (function() {
+    'use strict';
+
+    function show(category) {
+        AdminState.editingItem = category || null;
+        var title = category ? 'Редактировать категорию' : 'Добавить категорию';
+
+        var icons = ['folder', 'box', 'scissors', 'droplet', 'star', 'heart', 'tag', 'gift'];
+
+        var html = '<form id="categoryForm" class="admin-form">' +
+            '<div class="form-group">' +
+                '<label class="form-label">Название *</label>' +
+                '<input type="text" class="form-input" id="categoryName" ' +
+                    'value="' + window.escapeHtml(category && category.name || '') + '" ' +
+                    'placeholder="Средства для волос" required>' +
+            '</div>' +
+            '<div class="form-group">' +
+                '<label class="form-label">URL (slug)</label>' +
+                '<input type="text" class="form-input" id="categorySlug" ' +
+                    'value="' + window.escapeHtml(category && category.slug || '') + '" ' +
+                    'placeholder="hair-care">' +
+                '<p class="form-hint">Оставьте пустым для автоматической генерации</p>' +
+            '</div>' +
+            '<div class="form-group">' +
+                '<label class="form-label">Описание</label>' +
+                '<textarea class="form-textarea" id="categoryDescription" rows="3" ' +
+                    'placeholder="Краткое описание категории...">' +
+                    window.escapeHtml(category && category.description || '') +
+                '</textarea>' +
+            '</div>' +
+            '<div class="form-group">' +
+                '<label class="form-label">Иконка</label>' +
+                '<div class="icon-selector" id="iconSelector">' +
+                    icons.map(function(icon) {
+                        var activeClass = (category && category.icon === icon) || (!category && icon === 'folder') ? ' active' : '';
+                        return '<button type="button" class="icon-option' + activeClass + '" data-icon="' + icon + '">' +
+                            SharedIcons.get(icon) +
+                        '</button>';
+                    }).join('') +
+                '</div>' +
+                '<input type="hidden" id="categoryIcon" value="' + window.escapeHtml(category && category.icon || 'folder') + '">' +
+            '</div>' +
+        '</form>';
+
+        AdminModals.setTitle('modal', title);
+        document.getElementById('modalBody').innerHTML = html;
+        AdminModals.open('modal');
+
+        initForm(category);
+    }
+
+    function initForm(category) {
+        // Auto-generate slug from name
+        var nameInput = document.getElementById('categoryName');
+        var slugInput = document.getElementById('categorySlug');
+
+        if (nameInput && slugInput) {
+            nameInput.addEventListener('input', function() {
+                if (!category) {
+                    slugInput.value = generateSlug(nameInput.value);
+                }
+            });
         }
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+
+        // Icon selector
+        var iconSelector = document.getElementById('iconSelector');
+        var iconInput = document.getElementById('categoryIcon');
+
+        if (iconSelector) {
+            iconSelector.addEventListener('click', function(e) {
+                var option = e.target.closest('.icon-option');
+                if (option) {
+                    iconSelector.querySelectorAll('.icon-option').forEach(function(o) {
+                        o.classList.remove('active');
+                    });
+                    option.classList.add('active');
+                    iconInput.value = option.dataset.icon;
+                }
+            });
+        }
+    }
+
+    async function save() {
+        var name = document.getElementById('categoryName').value.trim();
+        if (!name) {
+            showToast('Введите название категории', 'error');
+            return;
+        }
+
+        var slug = document.getElementById('categorySlug').value.trim() || generateSlug(name);
+        var description = document.getElementById('categoryDescription').value.trim();
+        var icon = document.getElementById('categoryIcon').value || 'folder';
+
+        var categoryData = {
+            id: AdminState.editingItem ? AdminState.editingItem.id : 'category_' + Date.now(),
+            name: name,
+            slug: slug,
+            description: description,
+            icon: icon,
+            order: AdminState.editingItem ? AdminState.editingItem.order : AdminState.shopCategories.length + 1,
+            active: true
+        };
+
+        var categories = AdminState.shopCategories.slice();
+
+        if (AdminState.editingItem) {
+            var index = categories.findIndex(function(c) {
+                return c.id === AdminState.editingItem.id;
+            });
+            if (index !== -1) categories[index] = categoryData;
+        } else {
+            categories.push(categoryData);
+        }
+
+        try {
+            await AdminAPI.save('shop/categories', { categories: categories });
+            AdminState.setShopCategories(categories);
+            showToast('Категория сохранена', 'success');
+            AdminModals.close('modal');
+            AdminShopCategoriesRenderer.render();
+        } catch (error) {
+            showToast('Ошибка: ' + error.message, 'error');
+        }
+    }
+
+    async function remove(id) {
+        // Check if category has products
+        var productsInCategory = AdminState.products.filter(function(p) {
+            return p.categoryId === id;
+        });
+
+        if (productsInCategory.length > 0) {
+            showToast('Нельзя удалить категорию с товарами (' + productsInCategory.length + ' шт.)', 'error');
+            return;
+        }
+
+        var category = AdminState.findShopCategory(id);
+        if (!category) return;
+
+        var message = 'Удалить категорию "' + window.escapeHtml(category.name) + '"?';
+        document.getElementById('deleteMessage').textContent = message;
+
+        AdminModals.open('deleteModal');
+
+        // Set up confirmation handler
+        var confirmBtn = document.getElementById('deleteConfirm');
+        var newConfirmBtn = confirmBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+        newConfirmBtn.addEventListener('click', async function() {
+            var categories = AdminState.shopCategories.filter(function(c) {
+                return c.id !== id;
+            });
+
+            try {
+                await AdminAPI.save('shop/categories', { categories: categories });
+                AdminState.setShopCategories(categories);
+                showToast('Категория удалена', 'success');
+                AdminModals.close('deleteModal');
+                AdminShopCategoriesRenderer.render();
+            } catch (error) {
+                showToast('Ошибка: ' + error.message, 'error');
+            }
+        });
+    }
+
+    function generateSlug(text) {
+        var translit = {
+            'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo',
+            'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
+            'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
+            'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch', 'ъ': '',
+            'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya'
+        };
+
+        return text.toLowerCase()
+            .split('')
+            .map(function(char) { return translit[char] || char; })
+            .join('')
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-|-$/g, '');
+    }
+
+    return {
+        show: show,
+        save: save,
+        remove: remove
+    };
+})();
+
+window.AdminCategoryForm = AdminCategoryForm;
+
+
+// ============= forms/product-form.js =============
+
+/**
+ * Product Form
+ * Форма добавления/редактирования товара
+ */
+
+var AdminProductForm = (function() {
+    'use strict';
+
+    var uploadedImages = [];
+
+    function show(product) {
+        AdminState.editingItem = product || null;
+        uploadedImages = product && product.images ? product.images.slice() : [];
+
+        var title = product ? 'Редактировать товар' : 'Добавить товар';
+
+        var categoriesOptions = AdminState.shopCategories.map(function(cat) {
+            var selected = product && product.categoryId === cat.id ? ' selected' : '';
+            return '<option value="' + window.escapeHtml(cat.id) + '"' + selected + '>' +
+                window.escapeHtml(cat.name) + '</option>';
+        }).join('');
+
+        var html = '<form id="productForm" class="admin-form">' +
+            '<div class="form-group">' +
+                '<label class="form-label">Изображения</label>' +
+                '<div class="images-upload-area" id="imagesUploadArea">' +
+                    '<div class="images-grid" id="imagesGrid"></div>' +
+                    '<label class="image-upload-btn">' +
+                        '<input type="file" accept="image/*" multiple id="productImagesInput">' +
+                        SharedIcons.get('plus') +
+                        '<span>Добавить</span>' +
+                    '</label>' +
+                '</div>' +
+                '<p class="form-hint">Первое изображение будет главным. Перетащите для изменения порядка.</p>' +
+            '</div>' +
+            '<div class="form-group">' +
+                '<label class="form-label">Название *</label>' +
+                '<input type="text" class="form-input" id="productName" ' +
+                    'value="' + window.escapeHtml(product && product.name || '') + '" ' +
+                    'placeholder="Помада для укладки" required>' +
+            '</div>' +
+            '<div class="form-row form-row-2">' +
+                '<div class="form-group">' +
+                    '<label class="form-label">Категория *</label>' +
+                    '<select class="form-select" id="productCategory" required>' +
+                        '<option value="">Выберите категорию</option>' +
+                        categoriesOptions +
+                    '</select>' +
+                '</div>' +
+                '<div class="form-group">' +
+                    '<label class="form-label">Цена (₽) *</label>' +
+                    '<input type="number" class="form-input" id="productPrice" ' +
+                        'value="' + (product && product.price || '') + '" ' +
+                        'placeholder="1500" min="0" required>' +
+                '</div>' +
+            '</div>' +
+            '<div class="form-group">' +
+                '<label class="form-label">Описание</label>' +
+                '<textarea class="form-textarea" id="productDescription" rows="5" ' +
+                    'placeholder="Подробное описание товара...">' +
+                    window.escapeHtml(product && product.description || '') +
+                '</textarea>' +
+            '</div>' +
+            '<div class="form-group">' +
+                '<label class="form-label">Статус</label>' +
+                '<select class="form-select" id="productStatus">' +
+                    '<option value="active"' + (product && product.status === 'active' ? ' selected' : '') + '>Активен</option>' +
+                    '<option value="draft"' + (product && product.status === 'draft' ? ' selected' : '') + '>Черновик</option>' +
+                    '<option value="archived"' + (product && product.status === 'archived' ? ' selected' : '') + '>В архиве</option>' +
+                '</select>' +
+            '</div>' +
+        '</form>';
+
+        AdminModals.setTitle('modal', title);
+        document.getElementById('modalBody').innerHTML = html;
+        AdminModals.open('modal');
+
+        renderImagesGrid();
+        initImageUpload();
+    }
+
+    function renderImagesGrid() {
+        var grid = document.getElementById('imagesGrid');
+        if (!grid) return;
+
+        if (uploadedImages.length === 0) {
+            grid.innerHTML = '';
+            return;
+        }
+
+        var html = uploadedImages.map(function(img, i) {
+            return '<div class="image-preview" data-index="' + i + '" draggable="true">' +
+                '<img src="' + window.escapeHtml(img.url) + '" alt="">' +
+                (i === 0 ? '<span class="main-badge">Главное</span>' : '') +
+                '<button type="button" class="remove-image-btn" data-index="' + i + '">' +
+                    SharedIcons.get('close') +
+                '</button>' +
+            '</div>';
+        }).join('');
+
+        grid.innerHTML = html;
+        initDragAndDrop();
+    }
+
+    function initImageUpload() {
+        var input = document.getElementById('productImagesInput');
+        var grid = document.getElementById('imagesGrid');
+        if (!input || !grid) return;
+
+        input.addEventListener('change', async function(e) {
+            var files = Array.from(e.target.files);
+
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                try {
+                    showToast('Загрузка изображения...', 'info');
+                    var result = await AdminImageUpload.uploadFile(file);
+                    if (result && result.url) {
+                        uploadedImages.push({
+                            url: result.url,
+                            isMain: uploadedImages.length === 0,
+                            order: uploadedImages.length + 1
+                        });
+                        renderImagesGrid();
+                    }
+                } catch (error) {
+                    showToast('Ошибка загрузки: ' + error.message, 'error');
+                }
+            }
+
+            input.value = '';
+        });
+
+        // Remove image handler
+        grid.addEventListener('click', function(e) {
+            var removeBtn = e.target.closest('.remove-image-btn');
+            if (removeBtn) {
+                var index = parseInt(removeBtn.dataset.index);
+                uploadedImages.splice(index, 1);
+                // Update isMain
+                if (uploadedImages.length > 0) {
+                    uploadedImages.forEach(function(img, i) {
+                        img.isMain = i === 0;
+                        img.order = i + 1;
+                    });
+                }
+                renderImagesGrid();
+            }
+        });
+    }
+
+    function initDragAndDrop() {
+        var grid = document.getElementById('imagesGrid');
+        if (!grid) return;
+
+        var draggedItem = null;
+        var draggedIndex = null;
+
+        grid.querySelectorAll('.image-preview').forEach(function(preview) {
+            preview.addEventListener('dragstart', function(e) {
+                draggedItem = this;
+                draggedIndex = parseInt(this.dataset.index);
+                this.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            });
+
+            preview.addEventListener('dragend', function() {
+                this.classList.remove('dragging');
+                draggedItem = null;
+                draggedIndex = null;
+            });
+
+            preview.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+            });
+
+            preview.addEventListener('drop', function(e) {
+                e.preventDefault();
+                if (!draggedItem || draggedItem === this) return;
+
+                var targetIndex = parseInt(this.dataset.index);
+
+                // Reorder array
+                var item = uploadedImages.splice(draggedIndex, 1)[0];
+                uploadedImages.splice(targetIndex, 0, item);
+
+                // Update isMain and order
+                uploadedImages.forEach(function(img, i) {
+                    img.isMain = i === 0;
+                    img.order = i + 1;
+                });
+
+                renderImagesGrid();
+            });
+        });
+    }
+
+    async function save() {
+        var name = document.getElementById('productName').value.trim();
+        var categoryId = document.getElementById('productCategory').value;
+        var price = parseInt(document.getElementById('productPrice').value);
+        var description = document.getElementById('productDescription').value.trim();
+        var status = document.getElementById('productStatus').value;
+
+        if (!name) {
+            showToast('Введите название товара', 'error');
+            return;
+        }
+        if (!categoryId) {
+            showToast('Выберите категорию', 'error');
+            return;
+        }
+        if (isNaN(price) || price < 0) {
+            showToast('Введите корректную цену', 'error');
+            return;
+        }
+
+        var now = new Date().toISOString();
+
+        var productData = {
+            id: AdminState.editingItem ? AdminState.editingItem.id : 'product_' + Date.now(),
+            name: name,
+            slug: generateSlug(name),
+            description: description,
+            price: price,
+            categoryId: categoryId,
+            images: uploadedImages,
+            status: status,
+            order: AdminState.editingItem ? AdminState.editingItem.order : AdminState.products.length + 1,
+            createdAt: AdminState.editingItem ? AdminState.editingItem.createdAt : now,
+            updatedAt: now
+        };
+
+        var products = AdminState.products.slice();
+
+        if (AdminState.editingItem) {
+            var index = products.findIndex(function(p) {
+                return p.id === AdminState.editingItem.id;
+            });
+            if (index !== -1) products[index] = productData;
+        } else {
+            products.push(productData);
+        }
+
+        try {
+            await AdminAPI.save('shop/products', { products: products });
+            AdminState.setProducts(products);
+            showToast('Товар сохранён', 'success');
+            AdminModals.close('modal');
+            AdminShopProductsRenderer.render();
+        } catch (error) {
+            showToast('Ошибка: ' + error.message, 'error');
+        }
+    }
+
+    async function remove(id) {
+        var product = AdminState.findProduct(id);
+        if (!product) return;
+
+        var message = 'Удалить товар "' + window.escapeHtml(product.name) + '"?';
+        document.getElementById('deleteMessage').textContent = message;
+
+        AdminModals.open('deleteModal');
+
+        // Set up confirmation handler
+        var confirmBtn = document.getElementById('deleteConfirm');
+        var newConfirmBtn = confirmBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+        newConfirmBtn.addEventListener('click', async function() {
+            var products = AdminState.products.filter(function(p) {
+                return p.id !== id;
+            });
+
+            try {
+                await AdminAPI.save('shop/products', { products: products });
+                AdminState.setProducts(products);
+                showToast('Товар удалён', 'success');
+                AdminModals.close('deleteModal');
+                AdminShopProductsRenderer.render();
+            } catch (error) {
+                showToast('Ошибка: ' + error.message, 'error');
+            }
+        });
+    }
+
+    function generateSlug(text) {
+        var translit = {
+            'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo',
+            'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
+            'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
+            'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch', 'ъ': '',
+            'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya'
+        };
+
+        return text.toLowerCase()
+            .split('')
+            .map(function(char) { return translit[char] || char; })
+            .join('')
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-|-$/g, '');
+    }
+
+    return {
+        show: show,
+        save: save,
+        remove: remove
+    };
+})();
+
+window.AdminProductForm = AdminProductForm;
+
+
+// ============= forms/legal-form.js =============
+
+/**
+ * Admin Legal Form
+ * Форма редактирования юридических документов
+ */
+
+var AdminLegalForm = (function() {
+    'use strict';
+
+    var currentDocumentId = null;
+
+    /**
+     * Показать форму редактирования
+     */
+    function show(document) {
+        currentDocumentId = document ? document.id : null;
+
+        var title = document ? 'Редактирование документа' : 'Новый документ';
+
+        var formHtml = '<form id="legalForm" class="modal-form">' +
+            '<div class="form-group">' +
+                '<label class="form-label">Название документа *</label>' +
+                '<input type="text" class="form-input" id="legalTitle" value="' + window.escapeHtml(document ? document.title : '') + '" required placeholder="Политика конфиденциальности">' +
+            '</div>' +
+            '<div class="form-group">' +
+                '<label class="form-label">URL-идентификатор (slug) *</label>' +
+                '<input type="text" class="form-input" id="legalSlug" value="' + window.escapeHtml(document ? document.slug : '') + '" required placeholder="privacy" pattern="[a-z0-9-]+">' +
+                '<small class="form-hint">Только латинские буквы, цифры и дефис. Будет доступен по адресу /legal/slug</small>' +
+            '</div>' +
+            '<div class="form-group">' +
+                '<label class="form-label">Содержимое документа *</label>' +
+                '<div class="wysiwyg-toolbar">' +
+                    '<button type="button" class="wysiwyg-btn" onclick="AdminWYSIWYG.formatText(\'bold\')" title="Жирный">' +
+                        '<strong>B</strong>' +
+                    '</button>' +
+                    '<button type="button" class="wysiwyg-btn" onclick="AdminWYSIWYG.formatText(\'italic\')" title="Курсив">' +
+                        '<em>I</em>' +
+                    '</button>' +
+                    '<button type="button" class="wysiwyg-btn" onclick="AdminWYSIWYG.formatText(\'insertUnorderedList\')" title="Маркированный список">' +
+                        SharedIcons.get('list') +
+                    '</button>' +
+                    '<button type="button" class="wysiwyg-btn" onclick="AdminWYSIWYG.formatText(\'insertOrderedList\')" title="Нумерованный список">' +
+                        SharedIcons.get('listOrdered') +
+                    '</button>' +
+                    '<span class="wysiwyg-separator"></span>' +
+                    '<button type="button" class="wysiwyg-btn" onclick="AdminWYSIWYG.insertHeading(2)" title="Заголовок H2">' +
+                        'H2' +
+                    '</button>' +
+                    '<button type="button" class="wysiwyg-btn" onclick="AdminWYSIWYG.insertHeading(3)" title="Заголовок H3">' +
+                        'H3' +
+                    '</button>' +
+                '</div>' +
+                '<div class="wysiwyg-editor" id="legalContent" contenteditable="true">' +
+                    (document ? document.content : '') +
+                '</div>' +
+            '</div>' +
+            '<div class="form-group">' +
+                '<label class="form-checkbox">' +
+                    '<input type="checkbox" id="legalActive" ' + (document && document.active !== false ? 'checked' : '') + '>' +
+                    '<span>Документ активен (отображается на сайте)</span>' +
+                '</label>' +
+            '</div>' +
+        '</form>';
+
+        AdminModals.open('modal', title, formHtml);
+    }
+
+    /**
+     * Сохранить документ
+     */
+    async function save() {
+        var title = document.getElementById('legalTitle').value.trim();
+        var slug = document.getElementById('legalSlug').value.trim().toLowerCase();
+        var content = document.getElementById('legalContent').innerHTML;
+        var active = document.getElementById('legalActive').checked;
+
+        // Валидация
+        if (!title) {
+            showToast('Введите название документа', 'error');
+            return;
+        }
+
+        if (!slug) {
+            showToast('Введите URL-идентификатор', 'error');
+            return;
+        }
+
+        if (!/^[a-z0-9-]+$/.test(slug)) {
+            showToast('Slug может содержать только латинские буквы, цифры и дефис', 'error');
+            return;
+        }
+
+        if (!content || content === '<br>') {
+            showToast('Введите содержимое документа', 'error');
+            return;
+        }
+
+        var documents = AdminState.legalDocuments || [];
+
+        // Проверка уникальности slug
+        var existingDoc = documents.find(function(d) {
+            return d.slug === slug && d.id !== currentDocumentId;
+        });
+
+        if (existingDoc) {
+            showToast('Документ с таким slug уже существует', 'error');
+            return;
+        }
+
+        if (currentDocumentId) {
+            // Редактирование существующего
+            var index = documents.findIndex(function(d) { return d.id === currentDocumentId; });
+            if (index !== -1) {
+                documents[index].title = title;
+                documents[index].slug = slug;
+                documents[index].content = content;
+                documents[index].active = active;
+                documents[index].updatedAt = new Date().toISOString();
+            }
+        } else {
+            // Создание нового
+            var newDocument = {
+                id: generateId(),
+                slug: slug,
+                title: title,
+                content: content,
+                active: active,
+                updatedAt: new Date().toISOString()
+            };
+            documents.push(newDocument);
+        }
+
+        try {
+            await AdminAPI.save('legal', { documents: documents });
+            AdminState.setLegalDocuments(documents);
+            AdminModals.close('modal');
+            AdminLegalRenderer.render();
+            showToast('Документ сохранён', 'success');
+        } catch (error) {
+            console.error('Error saving legal document:', error);
+            showToast('Ошибка сохранения', 'error');
+        }
+    }
+
+    /**
+     * Удалить документ
+     */
+    function remove(id) {
+        var document = AdminState.findLegalDocument(id);
+        if (!document) return;
+
+        AdminModals.openDeleteConfirm(
+            document.title,
+            async function() {
+                var documents = AdminState.legalDocuments.filter(function(d) {
+                    return d.id !== id;
+                });
+
+                try {
+                    await AdminAPI.save('legal', { documents: documents });
+                    AdminState.setLegalDocuments(documents);
+                    AdminLegalRenderer.render();
+                    showToast('Документ удалён', 'success');
+                } catch (error) {
+                    console.error('Error deleting legal document:', error);
+                    showToast('Ошибка удаления', 'error');
+                }
+            }
+        );
+    }
+
+    /**
+     * Генерация ID
+     */
+    function generateId() {
+        return 'legal_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     }
 
     // Публичный API
@@ -3388,7 +5513,7 @@ var AdminFaqForm = (function() {
 })();
 
 // Экспорт
-window.AdminFaqForm = AdminFaqForm;
+window.AdminLegalForm = AdminLegalForm;
 
 
 // ============= index.js =============
@@ -3458,6 +5583,9 @@ var AdminPanel = (function() {
             AdminState.setArticles(data.articles.articles || []);
             AdminState.setFaq(data.faq.faq || []);
             AdminState.setSocial(data.social || {});
+            AdminState.setShopCategories(data.shopCategories.categories || []);
+            AdminState.setProducts(data.products.products || []);
+            AdminState.setLegalDocuments(data.legal.documents || []);
 
             // Рендеринг
             renderCurrentSection();
@@ -3502,6 +5630,15 @@ var AdminPanel = (function() {
                 break;
             case 'social':
                 AdminSocialRenderer.render();
+                break;
+            case 'shop-categories':
+                AdminShopCategoriesRenderer.render();
+                break;
+            case 'shop-products':
+                AdminShopProductsRenderer.render();
+                break;
+            case 'legal':
+                AdminLegalRenderer.render();
                 break;
         }
     }
@@ -3581,6 +5718,24 @@ var AdminPanel = (function() {
                 title: 'Соцсети и контакты',
                 description: 'Настройка социальных сетей и контактной информации',
                 hideAddBtn: true
+            },
+            'shop-categories': {
+                element: '#shopCategoriesSection',
+                title: 'Категории товаров',
+                description: 'Управление категориями интернет-магазина',
+                addText: 'Добавить категорию'
+            },
+            'shop-products': {
+                element: '#shopProductsSection',
+                title: 'Товары',
+                description: 'Управление товарами интернет-магазина',
+                addText: 'Добавить товар'
+            },
+            legal: {
+                element: '#legalSection',
+                title: 'Юридические документы',
+                description: 'Политики, соглашения и правовая информация',
+                addText: 'Добавить документ'
             }
         };
 
@@ -3702,6 +5857,33 @@ var AdminPanel = (function() {
                 case 'remove-principle':
                     AdminMasterForm.removePrinciple(target);
                     break;
+
+                // Shop categories
+                case 'edit-shop-category':
+                    editShopCategory(id);
+                    break;
+                case 'delete-shop-category':
+                    AdminCategoryForm.remove(id);
+                    break;
+
+                // Shop products
+                case 'edit-product':
+                    editProduct(id);
+                    break;
+                case 'delete-product':
+                    AdminProductForm.remove(id);
+                    break;
+
+                // Legal documents
+                case 'edit-legal':
+                    editLegalDocument(id);
+                    break;
+                case 'delete-legal':
+                    AdminLegalForm.remove(id);
+                    break;
+                case 'toggle-legal':
+                    AdminLegalRenderer.toggleActive(id);
+                    break;
             }
         });
 
@@ -3737,6 +5919,27 @@ var AdminPanel = (function() {
         var faqItem = AdminState.findFaq(id);
         if (faqItem) {
             AdminFaqForm.show(faqItem);
+        }
+    }
+
+    function editShopCategory(id) {
+        var category = AdminState.findShopCategory(id);
+        if (category) {
+            AdminCategoryForm.show(category);
+        }
+    }
+
+    function editProduct(id) {
+        var product = AdminState.findProduct(id);
+        if (product) {
+            AdminProductForm.show(product);
+        }
+    }
+
+    function editLegalDocument(id) {
+        var document = AdminState.findLegalDocument(id);
+        if (document) {
+            AdminLegalForm.show(document);
         }
     }
 
@@ -3860,6 +6063,15 @@ var AdminPanel = (function() {
                     case 'faq':
                         AdminFaqForm.show();
                         break;
+                    case 'shop-categories':
+                        AdminCategoryForm.show();
+                        break;
+                    case 'shop-products':
+                        AdminProductForm.show();
+                        break;
+                    case 'legal':
+                        AdminLegalForm.show();
+                        break;
                 }
             });
         }
@@ -3902,6 +6114,15 @@ var AdminPanel = (function() {
                     case 'faq':
                         AdminFaqForm.save();
                         break;
+                    case 'shop-categories':
+                        AdminCategoryForm.save();
+                        break;
+                    case 'shop-products':
+                        AdminProductForm.save();
+                        break;
+                    case 'legal':
+                        AdminLegalForm.save();
+                        break;
                 }
             });
         }
@@ -3941,6 +6162,16 @@ var AdminPanel = (function() {
         AdminArticlesRenderer.init();
         AdminFaqRenderer.init();
         AdminSocialRenderer.init();
+        AdminShopCategoriesRenderer.init();
+        AdminShopProductsRenderer.init();
+        AdminLegalRenderer.init();
+
+        // Инициализация поиска
+        if (window.AdminSearch) {
+            AdminSearch.init('mastersSearch', 'mastersGrid');
+            AdminSearch.init('articlesSearch', 'articlesGrid');
+            AdminSearch.init('faqSearch', 'faqList');
+        }
 
         // Инициализация логаута
         AdminAuth.initLogoutButton();
@@ -4040,6 +6271,22 @@ var AdminPanel = (function() {
         // Master principles
         addPrinciple: function() { AdminMasterForm.addPrinciple(); },
         removePrinciple: function(btn) { AdminMasterForm.removePrinciple(btn); },
+
+        // Shop categories
+        editShopCategory: editShopCategory,
+        deleteShopCategory: function(id) { AdminCategoryForm.remove(id); },
+        showCategoryForm: function(id) {
+            var category = id ? AdminState.findShopCategory(id) : null;
+            AdminCategoryForm.show(category);
+        },
+
+        // Shop products
+        editProduct: editProduct,
+        deleteProduct: function(id) { AdminProductForm.remove(id); },
+        showProductForm: function(id) {
+            var product = id ? AdminState.findProduct(id) : null;
+            AdminProductForm.show(product);
+        },
 
         // WYSIWYG
         formatText: function(command) {
