@@ -1,0 +1,162 @@
+/* =====================================================================
+   SOCIAL.CSS - Стили настроек социальных сетей
+   ===================================================================== */
+
+.social-settings {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    max-width: 800px;
+}
+
+.settings-card {
+    background: var(--content-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+}
+
+.settings-card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-white);
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.social-links-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.social-link-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: var(--content-bg-light);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-base);
+}
+
+.social-link-item:hover {
+    background: var(--accent-green-subtle);
+}
+
+.social-link-item.inactive {
+    opacity: 0.5;
+}
+
+.social-link-icon {
+    width: 44px;
+    height: 44px;
+    background: var(--bg-dark);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.social-link-icon svg {
+    width: 24px;
+    height: 24px;
+    color: var(--accent-green);
+}
+
+.social-link-icon.vk svg { color: #0077ff; }
+.social-link-icon.telegram svg { color: #2AABEE; }
+.social-link-icon.whatsapp svg { color: #25D366; }
+.social-link-icon.youtube svg { color: #FF0000; }
+.social-link-icon.instagram svg { color: #E4405F; }
+.social-link-icon.tiktok svg { color: #ffffff; }
+
+.social-link-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.social-link-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-white);
+    margin-bottom: 4px;
+}
+
+.social-link-url-input {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    color: var(--text-white);
+    font-family: inherit;
+    font-size: 0.85rem;
+    transition: all var(--transition-base);
+}
+
+.social-link-url-input:focus {
+    outline: none;
+    border-color: var(--accent-green);
+    box-shadow: 0 0 0 2px var(--accent-green-subtle);
+}
+
+.social-link-url-input::placeholder {
+    color: var(--text-gray);
+}
+
+.social-link-toggle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.social-link-toggle .toggle {
+    width: 44px;
+    height: 24px;
+}
+
+.social-link-toggle .toggle::after {
+    width: 18px;
+    height: 18px;
+}
+
+.social-link-toggle .toggle.active::after {
+    left: 22px;
+}
+
+.social-link-toggle span {
+    font-size: 0.7rem;
+    color: var(--text-gray);
+    text-transform: uppercase;
+}
+
+.save-social-btn {
+    align-self: flex-start;
+    padding: 14px 28px;
+}
+
+.save-social-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+@media (max-width: 768px) {
+    .social-link-item {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .social-link-info {
+        flex: 1 1 100%;
+        order: 2;
+    }
+
+    .social-link-toggle {
+        flex-direction: row;
+        margin-left: auto;
+    }
+}

@@ -1,0 +1,24 @@
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-card">
+            <div class="login-logo">Say's<span class="logo-accent">Admin</span></div>
+            <h2 class="login-title">Вход в админ-панель</h2>
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label for="password">Пароль</label>
+                    <div class="password-input-wrapper">
+                        <input type="password" id="password" name="password" placeholder="Введите пароль" required autocomplete="current-password">
+                        <button type="button" class="password-toggle" id="togglePassword">
+                            <svg class="eye-icon"><use href="#icon-eye"/></svg>
+                            <svg class="eye-off-icon" style="display:none"><use href="#icon-eye-off"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <p class="login-error" id="loginError"></p>
+                <button type="submit" class="btn btn-primary login-btn">
+                    <svg><use href="#icon-login"/></svg>
+                    Войти
+                </button>
+            </form>
+        </div>
+    </div>

@@ -1,0 +1,78 @@
+/* =====================================================================
+   FAQ.CSS - Стили FAQ в админке
+   ===================================================================== */
+
+.faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.faq-admin-item {
+    background: var(--content-bg);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-subtle);
+    padding: 24px;
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    transition: all var(--transition-base);
+}
+
+.faq-admin-item:hover {
+    border-color: var(--accent-green);
+    box-shadow: 0 4px 20px rgba(0, 255, 136, 0.1);
+}
+
+.faq-admin-content {
+    flex: 1;
+}
+
+.faq-admin-question {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-white);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.faq-admin-question::before {
+    content: 'Q';
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: var(--accent-green);
+    color: var(--bg-dark);
+    border-radius: 50%;
+    font-size: 0.85rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.faq-admin-answer {
+    color: var(--text-gray);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    padding-left: 40px;
+}
+
+.faq-admin-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* FAQ item with drag handle */
+.faq-admin-item .drag-handle {
+    align-self: center;
+}
+
+/* FAQ и категории shop используют inline drag handle */
+.faq-admin-item.has-drag,
+.shop-category-card.has-drag {
+    /* Оставляем оригинальную структуру, drag-handle уже в flex */
+}

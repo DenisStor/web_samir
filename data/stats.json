@@ -1,6 +1,6 @@
 {
-  "total_views": 193,
-  "unique_visitors": 45,
+  "total_views": 197,
+  "unique_visitors": 46,
   "daily": {
     "2025-12-03": 13,
     "2025-12-04": 20,
@@ -8,7 +8,7 @@
     "2025-12-16": 6,
     "2025-12-18": 61,
     "2025-12-20": 60,
-    "2025-12-21": 26
+    "2025-12-21": 30
   },
   "pages": {
     "/index.html": 1
@@ -71,20 +71,21 @@
     "2025-12-21": [
       "sess_9tz7uzwv3_1766268419452",
       "sess_fyaj0n8bd_1766257152306",
-      "sess_9i0zpuitj_1766269103784"
+      "sess_9i0zpuitj_1766269103784",
+      "sess_62wjp2u7g_1766274351129"
     ]
   },
   "created": "2024-01-01T00:00:00",
-  "last_visit": "2025-12-21T00:59:59.024242",
+  "last_visit": "2025-12-21T01:47:24.896277",
   "sections": {
-    "services": 100,
-    "podology": 128,
-    "masters": 106,
+    "services": 103,
+    "podology": 131,
+    "masters": 109,
     "quality": 26,
-    "location": 84,
-    "social": 88,
-    "blog": 90,
-    "faq": 70,
-    "booking": 66
+    "location": 87,
+    "social": 91,
+    "blog": 93,
+    "faq": 73,
+    "booking": 68
   }
 }

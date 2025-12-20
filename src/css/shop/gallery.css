@@ -1,0 +1,190 @@
+/* =====================================================================
+   GALLERY.CSS - Галерея товара и лайтбокс
+   ===================================================================== */
+
+/* Gallery */
+.product-gallery {
+    position: sticky;
+    top: 100px;
+}
+
+@media (max-width: 1024px) {
+    .product-gallery {
+        position: static;
+    }
+}
+
+.gallery-main {
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    margin-bottom: 16px;
+    background: var(--content-bg);
+    border: 1px solid var(--border-subtle);
+    cursor: zoom-in;
+    position: relative;
+}
+
+.gallery-main img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.gallery-thumbs {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+}
+
+.gallery-thumb {
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 2px solid var(--border-subtle);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    flex-shrink: 0;
+    padding: 0;
+    background: none;
+}
+
+.gallery-thumb:hover,
+.gallery-thumb.active {
+    border-color: var(--accent-green);
+}
+
+.gallery-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Single Image */
+.product-single-image {
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    background: var(--content-bg);
+    border: 1px solid var(--border-subtle);
+}
+
+.product-single-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Gallery Zoom Hint */
+.gallery-zoom-hint {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.gallery-zoom-hint svg {
+    width: 20px;
+    height: 20px;
+    color: white;
+}
+
+.gallery-main:hover .gallery-zoom-hint {
+    opacity: 1;
+}
+
+/* =================================================================
+   LIGHTBOX
+   ================================================================= */
+
+.lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lightbox-image {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: var(--radius-md);
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease;
+}
+
+.lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.lightbox-close svg {
+    width: 24px;
+    height: 24px;
+}
+
+.lightbox-prev,
+.lightbox-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 56px;
+    height: 56px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease;
+}
+
+.lightbox-prev:hover,
+.lightbox-next:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.lightbox-prev {
+    left: 20px;
+}
+
+.lightbox-next {
+    right: 20px;
+}
+
+.lightbox-prev svg,
+.lightbox-next svg {
+    width: 28px;
+    height: 28px;
+}

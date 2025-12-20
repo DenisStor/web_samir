@@ -1,0 +1,245 @@
+/* =====================================================================
+   CARDS.CSS - Стили карточек мастеров и статей
+   ===================================================================== */
+
+/* Master Card */
+.master-card {
+    background: var(--content-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-xl);
+    padding: 24px;
+    transition: all var(--transition-base);
+}
+
+.master-card:hover {
+    border-color: var(--border-accent);
+    box-shadow: var(--shadow-card);
+}
+
+.master-card-header {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.master-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-lg);
+    background: var(--accent-green-subtle);
+    border: 2px solid var(--accent-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-green);
+    overflow: hidden;
+}
+
+.master-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.master-info {
+    flex: 1;
+}
+
+.master-name {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.master-role {
+    color: var(--text-gray);
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+}
+
+.master-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badge-green {
+    background: var(--badge-green-bg);
+    color: var(--badge-green);
+}
+
+.badge-pink {
+    background: var(--badge-pink-bg);
+    color: var(--badge-pink);
+}
+
+.badge-blue {
+    background: var(--badge-blue-bg);
+    color: var(--badge-blue);
+}
+
+.master-specialization {
+    color: var(--text-gray-light);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+.master-card-actions {
+    display: flex;
+    gap: 8px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-subtle);
+}
+
+.master-card-actions .btn {
+    flex: 1;
+    justify-content: center;
+}
+
+/* Avatar with photo */
+.master-avatar.has-photo {
+    padding: 0;
+    overflow: hidden;
+}
+
+.master-avatar.has-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* =================================================================
+   ARTICLE CARD
+   ================================================================= */
+
+.article-card {
+    background: var(--content-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    transition: all var(--transition-base);
+    display: flex;
+    flex-direction: column;
+}
+
+.article-card:hover {
+    border-color: var(--border-accent);
+    box-shadow: var(--shadow-card);
+}
+
+.article-image {
+    height: 160px;
+    background: var(--content-bg-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.article-image svg {
+    width: 48px;
+    height: 48px;
+    color: var(--accent-green);
+    opacity: 0.5;
+}
+
+.article-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.article-content {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.article-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.article-tag {
+    padding: 4px 10px;
+    background: var(--accent-green-subtle);
+    color: var(--accent-green);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.article-date {
+    color: var(--text-gray);
+    font-size: 0.8rem;
+}
+
+.article-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.8em;
+}
+
+.article-excerpt {
+    color: var(--text-gray-light);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin-bottom: 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.55em;
+    flex: 1;
+}
+
+.article-actions {
+    display: flex;
+    gap: 8px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-subtle);
+    margin-top: auto;
+}
+
+.article-actions .btn {
+    flex: 1;
+    justify-content: center;
+}
+
+/* Card layouts with drag handle */
+.master-card.has-drag,
+.article-card.has-drag {
+    position: relative;
+}
+
+.master-card.has-drag .drag-handle,
+.article-card.has-drag .drag-handle {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 5;
+    opacity: 0;
+}
+
+.master-card.has-drag:hover .drag-handle,
+.article-card.has-drag:hover .drag-handle {
+    opacity: 1;
+}

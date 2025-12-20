@@ -1,0 +1,176 @@
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-title">
+                <h1 id="pageTitle">Мастера</h1>
+                <p id="pageDescription">Управление командой барберов</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary" id="addNewBtn">
+                    <svg><use href="#icon-plus"/></svg>
+                    <span>Добавить</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Content Sections -->
+        <div class="content">
+            <!-- Stats Section -->
+            <section class="section active" id="statsSection">
+                <div class="stats-dashboard">
+                    <div class="stats-cards">
+                        <div class="stat-card">
+                            <div class="stat-icon"><svg><use href="#icon-eye"/></svg></div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="statTotalViews">0</span>
+                                <span class="stat-label">Всего просмотров</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><svg><use href="#icon-users"/></svg></div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="statUniqueVisitors">0</span>
+                                <span class="stat-label">Уникальных посетителей</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon today"><svg><use href="#icon-clock"/></svg></div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="statTodayViews">0</span>
+                                <span class="stat-label">Сегодня</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon week"><svg><use href="#icon-calendar"/></svg></div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="statWeekViews">0</span>
+                                <span class="stat-label">За неделю</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stats-chart-container">
+                        <h3 class="chart-title">Просмотры за последние 14 дней</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="statsChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="stats-pages">
+                        <h3 class="chart-title">Популярные секции</h3>
+                        <div class="pages-list" id="pagesStatsList"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Masters Section -->
+            <section class="section" id="mastersSection">
+                <div class="section-toolbar">
+                    <div class="search-box">
+                        <svg class="search-icon"><use href="#icon-search"/></svg>
+                        <input type="text" class="search-input" id="mastersSearch" placeholder="Поиск мастеров...">
+                    </div>
+                </div>
+                <div class="cards-grid" id="mastersGrid"></div>
+            </section>
+
+            <!-- Services Section -->
+            <section class="section" id="servicesSection">
+                <div class="tabs">
+                    <button class="tab active" data-category="main">Основные</button>
+                    <button class="tab" data-category="complex">Комплексные</button>
+                    <button class="tab" data-category="additional">Дополнительные</button>
+                </div>
+                <div class="services-list" id="servicesList"></div>
+            </section>
+
+            <!-- Podology Section -->
+            <section class="section" id="podologySection">
+                <div class="services-list" id="podologyList"></div>
+            </section>
+
+            <!-- Articles Section -->
+            <section class="section" id="articlesSection">
+                <div class="section-toolbar">
+                    <div class="search-box">
+                        <svg class="search-icon"><use href="#icon-search"/></svg>
+                        <input type="text" class="search-input" id="articlesSearch" placeholder="Поиск статей...">
+                    </div>
+                </div>
+                <div class="cards-grid articles-grid" id="articlesGrid"></div>
+            </section>
+
+            <!-- FAQ Section -->
+            <section class="section" id="faqSection">
+                <div class="section-toolbar">
+                    <div class="search-box">
+                        <svg class="search-icon"><use href="#icon-search"/></svg>
+                        <input type="text" class="search-input" id="faqSearch" placeholder="Поиск вопросов...">
+                    </div>
+                </div>
+                <div class="faq-list" id="faqList"></div>
+            </section>
+
+            <!-- Social Section -->
+            <section class="section" id="socialSection">
+                <div class="social-settings">
+                    <div class="settings-card">
+                        <h3 class="settings-card-title">Контактная информация</h3>
+                        <div class="form-group">
+                            <label class="form-label">Телефон</label>
+                            <input type="text" class="form-input" id="contactPhone" placeholder="+7 (XXX) XXX-XX-XX">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-input" id="contactEmail" placeholder="info@example.ru">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Адрес</label>
+                            <input type="text" class="form-input" id="contactAddress" placeholder="г. Город, ул. Улица, д. 1">
+                        </div>
+                    </div>
+                    <div class="settings-card">
+                        <h3 class="settings-card-title">Социальные сети</h3>
+                        <div class="social-links-list" id="socialLinksList"></div>
+                    </div>
+                    <button class="btn btn-primary save-social-btn" id="saveSocialBtn">
+                        <svg><use href="#icon-save"/></svg>
+                        Сохранить изменения
+                    </button>
+                </div>
+            </section>
+
+            <!-- Shop Categories Section -->
+            <section class="section" id="shopCategoriesSection">
+                <div class="shop-categories-grid" id="shopCategoriesGrid"></div>
+            </section>
+
+            <!-- Shop Products Section -->
+            <section class="section" id="shopProductsSection">
+                <div class="products-filter">
+                    <select class="form-select" id="productsFilterCategory">
+                        <option value="all">Все категории</option>
+                    </select>
+                </div>
+                <div class="products-table-wrapper">
+                    <table class="products-table">
+                        <thead>
+                            <tr>
+                                <th>Товар</th>
+                                <th>Категория</th>
+                                <th>Цена</th>
+                                <th>Статус</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTableBody"></tbody>
+                    </table>
+                </div>
+                <div id="productsPagination"></div>
+            </section>
+
+            <!-- Legal Documents Section -->
+            <section class="section" id="legalSection">
+                <div class="legal-documents-list" id="legalDocumentsList"></div>
+            </section>
+        </div>
+    </main>

@@ -1,0 +1,81 @@
+    <!-- Shop Container -->
+    <main class="shop-main">
+        <!-- Catalog View (default) -->
+        <div class="shop-catalog" id="shopCatalog">
+            <div class="container">
+                <!-- Header -->
+                <div class="shop-header">
+                    <div class="shop-header-top">
+                        <div class="shop-title-wrapper">
+                            <h1 class="shop-title">Магазин</h1>
+                            <p class="shop-subtitle">Профессиональная косметика для волос и бороды</p>
+                        </div>
+                        <div class="shop-search">
+                            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                            </svg>
+                            <input type="text" id="shopSearch" placeholder="Поиск товаров...">
+                            <button class="search-clear" id="searchClear" type="button" aria-label="Очистить">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Toolbar: Categories + Sort -->
+                    <div class="shop-toolbar">
+                        <div class="shop-categories-bar">
+                            <button class="category-chip active" data-category="all">
+                                <svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                                    <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                                </svg>
+                                <span>Все</span>
+                                <span class="chip-count" id="allCount">0</span>
+                            </button>
+                            <div class="categories-chips" id="categoriesChips"></div>
+                        </div>
+                        <div class="shop-sort">
+                            <svg class="sort-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="4" y1="6" x2="16" y2="6"/><line x1="4" y1="12" x2="12" y2="12"/><line x1="4" y1="18" x2="8" y2="18"/>
+                                <polyline points="15 15 18 18 21 15"/><line x1="18" y1="18" x2="18" y2="9"/>
+                            </svg>
+                            <select id="sortSelect" aria-label="Сортировка">
+                                <option value="order">По умолчанию</option>
+                                <option value="price-asc">Цена ↑</option>
+                                <option value="price-desc">Цена ↓</option>
+                                <option value="name">По названию</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="shop-content">
+
+                    <!-- Products Grid -->
+                    <div class="products-area">
+                        <div class="products-grid" id="productsGrid">
+                            <!-- Products loaded dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Detail View (hidden by default) -->
+        <div class="product-page" id="productPage" style="display: none;">
+            <div class="container">
+                <button class="back-link" onclick="ShopApp.showCatalog()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m15 18-6-6 6-6"/>
+                    </svg>
+                    Назад в каталог
+                </button>
+
+                <div class="product-detail" id="productDetail">
+                    <!-- Product detail loaded dynamically -->
+                </div>
+            </div>
+        </div>
+    </main>

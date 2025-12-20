@@ -14,18 +14,18 @@
           "priceBlue": 1500
         },
         {
-          "id": 2,
-          "name": "Детская стрижка (до 12 лет)",
-          "priceGreen": 700,
-          "pricePink": 900,
-          "priceBlue": 1100
-        },
-        {
           "id": 3,
           "name": "Стрижка машинкой",
           "priceGreen": 600,
           "pricePink": 800,
           "priceBlue": 1000
+        },
+        {
+          "id": 2,
+          "name": "Детская стрижка (до 12 лет)",
+          "priceGreen": 700,
+          "pricePink": 900,
+          "priceBlue": 1100
         },
         {
           "id": 4,

@@ -1,0 +1,241 @@
+/* =====================================================================
+   SERVICES.CSS - Стили секции услуг
+   ===================================================================== */
+
+.services {
+    background: var(--bg-darker);
+}
+
+/* Service Tabs */
+.service-tabs {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 48px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.service-tab {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    background: var(--content-bg);
+    border: 2px solid var(--border-subtle);
+    border-radius: var(--radius-full);
+    color: var(--text-gray);
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-smooth);
+    position: relative;
+    overflow: hidden;
+}
+
+.service-tab::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, var(--accent-green-subtle), transparent);
+    transition: left 0.5s ease;
+}
+
+.service-tab:hover::before {
+    left: 100%;
+}
+
+.service-tab svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    transition: all var(--transition-base);
+}
+
+.service-tab:hover {
+    border-color: var(--border-accent-hover);
+    color: var(--text-white);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px var(--accent-green-hover);
+}
+
+.service-tab:hover svg {
+    color: var(--accent-green);
+    transform: scale(1.1);
+}
+
+.service-tab.active {
+    background: var(--accent-green);
+    border-color: var(--accent-green);
+    color: var(--bg-dark);
+    box-shadow: var(--shadow-glow-lg), 0 8px 24px var(--accent-green-glow);
+}
+
+.service-tab.active svg {
+    color: var(--bg-dark);
+}
+
+/* Service Grid */
+.services-grid {
+    display: grid;
+    gap: 32px;
+}
+
+.service-tab-content {
+    display: none;
+    animation: fadeInUp 0.5s ease;
+}
+
+.service-tab-content.active {
+    display: block;
+}
+
+/* Service Category */
+.service-category {
+    background: var(--content-bg);
+    border-radius: var(--radius-xl);
+    padding: 40px;
+    border: 1px solid var(--border-subtle);
+    transition: all var(--transition-base);
+}
+
+.service-category:hover {
+    border-color: var(--border-accent);
+    box-shadow: 0 0 40px rgba(0, 255, 136, 0.05);
+}
+
+.category-title {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.category-title svg {
+    width: 28px;
+    height: 28px;
+    color: var(--accent-green);
+}
+
+.category-description {
+    color: var(--text-gray);
+    margin-bottom: 32px;
+    font-size: 0.95rem;
+}
+
+/* Price Legend */
+.price-legend {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: var(--text-gray);
+}
+
+/* Service Items */
+.service-list {
+    display: grid;
+    gap: 16px;
+}
+
+.service-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items: center;
+    padding: 20px 24px;
+    background: var(--content-bg-light);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-bounce);
+    position: relative;
+    border: 1px solid transparent;
+}
+
+.service-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 0;
+    background: var(--accent-green);
+    border-radius: 0 3px 3px 0;
+    transition: height var(--transition-base);
+}
+
+.service-item:hover {
+    background: rgba(0, 255, 136, 0.08);
+    transform: translateX(12px);
+    border-color: var(--border-accent);
+    box-shadow: var(--shadow-card);
+}
+
+.service-item:hover::before {
+    height: 60%;
+}
+
+.service-name {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.service-note {
+    font-size: 0.85rem;
+    color: var(--text-gray);
+    margin-top: 4px;
+}
+
+.service-prices {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .service-tabs {
+        gap: 12px;
+    }
+
+    .service-tab {
+        padding: 12px 24px;
+        font-size: 0.9rem;
+    }
+
+    .service-tab svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .service-item {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .service-prices {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .price-legend {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .service-category {
+        padding: 24px;
+    }
+}

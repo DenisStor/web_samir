@@ -1,0 +1,49 @@
+/* =====================================================================
+   SOCIAL.CSS - Стили секции соцсетей
+   ===================================================================== */
+
+.social {
+    background: var(--bg-darker);
+    padding: 60px 0;
+}
+
+.social-content {
+    text-align: center;
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 32px;
+}
+
+.social-link {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-md);
+    background: var(--content-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-base);
+    border: 1px solid var(--border-subtle);
+}
+
+.social-link svg {
+    width: 28px;
+    height: 28px;
+    color: var(--text-gray-light);
+    transition: color var(--transition-base);
+}
+
+.social-link:hover {
+    background: var(--accent-green-subtle);
+    border-color: var(--accent-green);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-glow-md);
+}
+
+.social-link:hover svg {
+    color: var(--accent-green);
+}

@@ -1,0 +1,16 @@
+/* =====================================================================
+   SHOP/INDEX.CSS - Стили интернет-магазина
+   =====================================================================
+   Импортирует все модули в правильном порядке.
+   ===================================================================== */
+
+@import 'layout.css';
+@import 'search.css';
+@import 'toolbar.css';
+@import 'products.css';
+@import 'product-detail.css';
+@import 'gallery.css';
+@import 'empty-states.css';
+@import 'filter.css';
+@import 'footer.css';
+@import 'responsive.css';

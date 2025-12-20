@@ -1,0 +1,213 @@
+/* =====================================================================
+   SHOP-PRODUCTS.CSS - Стили таблицы товаров и пагинации
+   ===================================================================== */
+
+.products-controls {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.products-filter {
+    min-width: 200px;
+}
+
+.products-filter .form-select {
+    padding: 10px 14px;
+    padding-right: 36px;
+    font-size: 0.9rem;
+}
+
+.products-table {
+    width: 100%;
+    background: var(--content-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    border-collapse: collapse;
+    overflow: hidden;
+}
+
+.products-table th,
+.products-table td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.products-table th {
+    background: var(--content-bg-light);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.products-table tr:last-child td {
+    border-bottom: none;
+}
+
+.products-table tr:hover td {
+    background: var(--accent-green-subtle);
+}
+
+.product-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.product-thumb {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    background: var(--content-bg-light);
+}
+
+.product-thumb-placeholder {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-sm);
+    background: var(--content-bg-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-thumb-placeholder svg {
+    width: 24px;
+    height: 24px;
+    color: var(--text-gray);
+}
+
+.product-cell-name {
+    font-weight: 500;
+    color: var(--text-white);
+}
+
+.price-cell {
+    font-weight: 600;
+    color: var(--accent-green);
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-badge.success {
+    background: var(--badge-green-bg);
+    color: var(--badge-green);
+}
+
+.status-badge.warning {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+}
+
+.status-badge.secondary {
+    background: var(--content-bg-light);
+    color: var(--text-gray);
+}
+
+.status-badge.active {
+    background: rgba(47, 178, 106, 0.15);
+    color: var(--accent-green);
+}
+
+.status-badge.inactive {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-gray);
+}
+
+.actions-cell {
+    white-space: nowrap;
+}
+
+.actions-cell .btn-icon {
+    margin-left: 4px;
+}
+
+.empty-cell {
+    text-align: center;
+    padding: 48px 24px !important;
+}
+
+/* =================================================================
+   PAGINATION
+   ================================================================= */
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding: 16px;
+    background: var(--content-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+}
+
+.pagination-info {
+    font-size: 0.9rem;
+    color: var(--text-gray);
+}
+
+.pagination-buttons {
+    display: flex;
+    gap: 4px;
+}
+
+.pagination-btn {
+    min-width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--content-bg-light);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    color: var(--text-gray);
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.pagination-btn:hover {
+    background: var(--accent-green-subtle);
+    border-color: var(--accent-green);
+    color: var(--accent-green);
+}
+
+.pagination-btn.active {
+    background: var(--accent-green);
+    border-color: var(--accent-green);
+    color: var(--bg-dark);
+}
+
+@media (max-width: 768px) {
+    .products-table {
+        display: block;
+        overflow-x: auto;
+    }
+
+    .products-table th,
+    .products-table td {
+        padding: 12px;
+        white-space: nowrap;
+    }
+
+    .pagination {
+        flex-direction: column;
+        gap: 12px;
+    }
+}

@@ -1,0 +1,427 @@
+/* =====================================================================
+   UTILITIES.CSS - Вспомогательные стили админ-панели
+   ===================================================================== */
+
+/* =================================================================
+   STATUS TOGGLE
+   ================================================================= */
+
+.status-toggle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.toggle {
+    position: relative;
+    width: 48px;
+    height: 26px;
+    background: var(--content-bg-light);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: var(--text-gray);
+    border-radius: 50%;
+    transition: all var(--transition-base);
+}
+
+.toggle.active {
+    background: var(--accent-green);
+    border-color: var(--accent-green);
+}
+
+.toggle.active::after {
+    left: 24px;
+    background: var(--bg-dark);
+}
+
+.status-label {
+    font-size: 0.9rem;
+    color: var(--text-gray-light);
+}
+
+/* =================================================================
+   EMPTY STATES
+   ================================================================= */
+
+.empty-message {
+    color: var(--text-gray);
+    text-align: center;
+    padding: 48px 24px;
+    font-size: 1rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 48px 24px;
+}
+
+.empty-state p {
+    color: var(--text-gray);
+    font-size: 1rem;
+    margin: 0;
+}
+
+.empty-state .empty-hint {
+    color: var(--text-gray);
+    font-size: 0.85rem;
+    margin-top: 8px;
+    opacity: 0.7;
+}
+
+/* =================================================================
+   LOADING STATE
+   ================================================================= */
+
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* =================================================================
+   ICON SELECTOR
+   ================================================================= */
+
+/* Old simple icon selector */
+.icon-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* Grouped icon selector */
+.icon-selector-grouped {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-height: 280px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.icon-selector-grouped::-webkit-scrollbar {
+    width: 6px;
+}
+
+.icon-selector-grouped::-webkit-scrollbar-track {
+    background: var(--content-bg-light);
+    border-radius: 3px;
+}
+
+.icon-selector-grouped::-webkit-scrollbar-thumb {
+    background: var(--border-light);
+    border-radius: 3px;
+}
+
+.icon-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.icon-group-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.icon-group-icons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.icon-option {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--content-bg-light);
+    border: 2px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.icon-option svg {
+    width: 20px;
+    height: 20px;
+    color: var(--text-gray);
+}
+
+.icon-option:hover {
+    border-color: var(--border-light);
+    background: var(--accent-green-subtle);
+    transform: scale(1.05);
+}
+
+.icon-option:hover svg {
+    color: var(--text-white);
+}
+
+.icon-option.active {
+    border-color: var(--accent-green);
+    background: var(--accent-green-subtle);
+    box-shadow: 0 0 0 2px rgba(0, 255, 136, 0.2);
+}
+
+.icon-option.active svg {
+    color: var(--accent-green);
+}
+
+/* =================================================================
+   DRAG & DROP
+   ================================================================= */
+
+.drag-handle {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    color: var(--text-gray);
+    opacity: 0.4;
+    transition: all var(--transition-base);
+    flex-shrink: 0;
+    border-radius: var(--radius-sm);
+}
+
+.drag-handle:hover {
+    opacity: 1;
+    color: var(--accent-green);
+    background: var(--accent-green-subtle);
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}
+
+.drag-handle svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Dragging states */
+[draggable="true"] {
+    transition: transform 0.2s, opacity 0.2s, box-shadow 0.2s;
+}
+
+[draggable="true"].dragging {
+    opacity: 0.4;
+    transform: scale(0.98);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+    z-index: 100;
+}
+
+[draggable="true"].drag-over {
+    border-color: var(--accent-green) !important;
+    box-shadow: 0 0 0 2px var(--accent-green-subtle);
+}
+
+.drag-placeholder {
+    background: var(--accent-green-subtle);
+    border: 2px dashed var(--accent-green);
+    border-radius: var(--radius-lg);
+    opacity: 0.5;
+}
+
+/* =================================================================
+   SEARCH BOX
+   ================================================================= */
+
+.search-box {
+    position: relative;
+    width: 100%;
+    max-width: 320px;
+}
+
+.search-input {
+    padding-left: 44px !important;
+}
+
+.search-box .search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    color: var(--text-gray);
+    pointer-events: none;
+}
+
+.search-box .search-clear {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    background: transparent;
+    border: none;
+    color: var(--text-gray);
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-base);
+}
+
+.search-box .search-clear:hover {
+    background: var(--content-bg-light);
+    color: var(--text-white);
+}
+
+.search-box.has-value .search-clear {
+    display: flex;
+}
+
+.search-box .search-clear svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* =================================================================
+   SKELETON LOADING
+   ================================================================= */
+
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        var(--content-bg) 25%,
+        var(--content-bg-light) 50%,
+        var(--content-bg) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s infinite;
+    border-radius: var(--radius-md);
+}
+
+@keyframes skeleton-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.skeleton-card {
+    background: var(--content-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-xl);
+    padding: 24px;
+}
+
+.skeleton-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-lg);
+}
+
+.skeleton-text {
+    height: 20px;
+    width: 70%;
+    margin: 12px 0;
+}
+
+.skeleton-text-sm {
+    height: 14px;
+    width: 50%;
+}
+
+.skeleton-text-xs {
+    height: 12px;
+    width: 30%;
+}
+
+.skeleton-image {
+    width: 100%;
+    height: 160px;
+    border-radius: var(--radius-lg);
+}
+
+.skeleton-btn {
+    height: 40px;
+    width: 100px;
+    border-radius: var(--radius-md);
+}
+
+.skeleton-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+}
+
+/* =================================================================
+   SECTION TOOLBAR & HEADER
+   ================================================================= */
+
+.section-toolbar {
+    margin-bottom: 24px;
+}
+
+.section-toolbar .search-box {
+    max-width: 320px;
+}
+
+.section-toolbar .search-input {
+    width: 100%;
+    padding: 12px 16px 12px 44px;
+    background: var(--content-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    color: var(--text-white);
+    font-family: inherit;
+    font-size: 0.9rem;
+    transition: all var(--transition-base);
+}
+
+.section-toolbar .search-input:focus {
+    outline: none;
+    border-color: var(--accent-green);
+    box-shadow: 0 0 0 3px var(--accent-green-subtle);
+}
+
+.section-toolbar .search-input::placeholder {
+    color: var(--text-gray);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.section-header .search-box {
+    flex: 0 0 auto;
+}
+
+@media (max-width: 768px) {
+    .section-toolbar .search-box {
+        max-width: none;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .section-header .search-box {
+        max-width: none;
+    }
+}

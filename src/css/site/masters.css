@@ -1,0 +1,350 @@
+/* =====================================================================
+   MASTERS.CSS - Стили секции мастеров
+   ===================================================================== */
+
+.masters {
+    background: var(--bg-dark);
+}
+
+.masters-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Master Card */
+.master-card {
+    background: var(--content-bg);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    border: 1px solid var(--border-subtle);
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
+    will-change: transform, box-shadow;
+}
+
+.master-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    border-color: var(--accent-green);
+    box-shadow:
+        0 0 0 1px var(--accent-green),
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        0 0 60px rgba(0, 255, 136, 0.15);
+}
+
+/* Square photo */
+.master-image {
+    aspect-ratio: 1 / 1;
+    background: linear-gradient(135deg, var(--content-bg-light) 0%, var(--content-bg) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.master-image img.master-photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), filter 0.4s ease;
+}
+
+.master-card:hover .master-image img.master-photo {
+    transform: scale(1.08);
+    filter: brightness(1.1);
+}
+
+.master-image::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 40%, var(--content-bg) 100%);
+    z-index: 1;
+    transition: opacity 0.4s ease;
+}
+
+.master-card:hover .master-image::before {
+    opacity: 0.8;
+}
+
+/* Decorative line */
+.master-image::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%) scaleX(0);
+    width: 60%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
+    border-radius: 2px;
+    z-index: 2;
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.master-card:hover .master-image::after {
+    transform: translateX(-50%) scaleX(1);
+}
+
+.master-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-green-dim), var(--badge-blue));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: white;
+    position: relative;
+    z-index: var(--z-base);
+    box-shadow: 0 8px 32px rgba(0, 255, 136, 0.3);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.master-card:hover .master-avatar {
+    transform: scale(1.1);
+    box-shadow: 0 12px 40px rgba(0, 255, 136, 0.4);
+}
+
+.master-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    z-index: 3;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.master-card:hover .master-badge {
+    transform: scale(1.05);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* Badge colors for readability on photos */
+.master-badge.badge-green {
+    background: rgba(0, 30, 15, 0.85);
+    color: #00ff88;
+    border-color: rgba(0, 255, 136, 0.3);
+}
+
+.master-badge.badge-pink {
+    background: rgba(40, 15, 30, 0.85);
+    color: #ff6b9d;
+    border-color: rgba(255, 107, 157, 0.3);
+}
+
+.master-badge.badge-blue {
+    background: rgba(10, 20, 40, 0.85);
+    color: #6ba3ff;
+    border-color: rgba(107, 163, 255, 0.3);
+}
+
+.master-content {
+    padding: 28px 24px 24px;
+    position: relative;
+}
+
+.master-name {
+    font-size: 1.4rem;
+    margin-bottom: 6px;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    transition: color 0.3s ease;
+}
+
+.master-card:hover .master-name {
+    color: var(--accent-green);
+}
+
+.master-role {
+    color: var(--accent-green);
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    opacity: 0.9;
+}
+
+.master-specialization {
+    color: var(--text-gray);
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+}
+
+.master-principles {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.master-principle {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 0.85rem;
+    color: var(--text-gray-light);
+    line-height: 1.5;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    border-left: 2px solid transparent;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.master-principle::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(0, 255, 136, 0.08), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.master-principle span {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+}
+
+.master-card:hover .master-principle {
+    color: var(--text-white);
+    background: rgba(255, 255, 255, 0.04);
+    border-left-color: var(--accent-green);
+    transform: translateX(4px);
+}
+
+.master-card:hover .master-principle::before {
+    opacity: 1;
+}
+
+/* Cascade animation for principles */
+.master-card:hover .master-principles > .master-principle:nth-child(1) { transition-delay: 0s; }
+.master-card:hover .master-principles > .master-principle:nth-child(2) { transition-delay: 0.05s; }
+
+.master-principle svg {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    color: var(--accent-green);
+    flex-shrink: 0;
+    margin-top: 1px;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 0 0 transparent);
+}
+
+.master-card:hover .master-principle svg {
+    transform: scale(1.2) rotate(5deg);
+    filter: drop-shadow(0 0 6px rgba(0, 255, 136, 0.5));
+}
+
+/* Master Extra (reveal on hover) */
+.master-extra {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+                opacity 0.4s ease;
+}
+
+.master-card:hover .master-extra {
+    max-height: 400px;
+    opacity: 1;
+}
+
+.master-extra .master-principle {
+    transform: translateX(-20px);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.master-card:hover .master-extra .master-principle {
+    transform: translateX(4px);
+    opacity: 1;
+}
+
+.master-card:hover .master-extra .master-principle:nth-child(1) { transition-delay: 0.1s; }
+.master-card:hover .master-extra .master-principle:nth-child(2) { transition-delay: 0.15s; }
+.master-card:hover .master-extra .master-principle:nth-child(3) { transition-delay: 0.2s; }
+.master-card:hover .master-extra .master-principle:nth-child(4) { transition-delay: 0.25s; }
+.master-card:hover .master-extra .master-principle:nth-child(5) { transition-delay: 0.3s; }
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .masters-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .masters-grid {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+    }
+}
+
+@media (max-width: 480px) {
+    .master-content {
+        padding: 28px 24px 24px;
+    }
+
+    .master-name {
+        font-size: 1.4rem;
+        margin-bottom: 6px;
+    }
+
+    .master-role {
+        font-size: 0.85rem;
+        margin-bottom: 16px;
+    }
+
+    .master-specialization {
+        font-size: 0.95rem;
+        margin-bottom: 20px;
+        line-height: 1.6;
+    }
+
+    .master-principles {
+        gap: 12px;
+    }
+
+    .master-principle {
+        font-size: 0.85rem;
+        gap: 10px;
+    }
+
+    .master-principle svg {
+        width: 16px;
+        height: 16px;
+    }
+}

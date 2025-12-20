@@ -1,0 +1,214 @@
+/* =====================================================================
+   UPLOADS.CSS - Стили загрузки изображений
+   ===================================================================== */
+
+/* Single Image Upload */
+.image-upload {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    border: 2px dashed var(--border-light);
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    overflow: hidden;
+}
+
+.image-upload:hover {
+    border-color: var(--accent-green);
+    background: var(--accent-green-subtle);
+}
+
+.image-upload.has-image {
+    border-style: solid;
+}
+
+.image-upload input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.image-upload svg {
+    width: 40px;
+    height: 40px;
+    color: var(--text-gray);
+}
+
+.image-upload span {
+    color: var(--text-gray);
+    font-size: 0.9rem;
+}
+
+.image-upload img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-upload .remove-image {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 71, 87, 0.9);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    opacity: 0;
+    transition: all var(--transition-base);
+}
+
+.image-upload:hover .remove-image {
+    opacity: 1;
+}
+
+.image-upload .remove-image svg {
+    width: 16px;
+    height: 16px;
+    color: white;
+}
+
+/* Fix image upload text visibility */
+.image-upload.has-image svg,
+.image-upload.has-image span {
+    display: none;
+}
+
+/* =================================================================
+   MULTIPLE IMAGE UPLOAD
+   ================================================================= */
+
+.images-upload-area {
+    padding: 16px;
+    background: var(--content-bg-light);
+    border: 2px dashed var(--border-light);
+    border-radius: var(--radius-lg);
+}
+
+.images-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.images-grid:empty {
+    display: none;
+}
+
+.images-grid:empty + .image-upload-btn {
+    margin-top: 0;
+}
+
+.image-preview {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    cursor: grab;
+    transition: all var(--transition-base);
+}
+
+.image-preview:active {
+    cursor: grabbing;
+}
+
+.image-preview.dragging {
+    opacity: 0.5;
+    transform: scale(0.95);
+}
+
+.image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-preview .main-badge {
+    position: absolute;
+    bottom: 4px;
+    left: 4px;
+    padding: 2px 6px;
+    background: var(--accent-green);
+    color: var(--bg-dark);
+    border-radius: 3px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.image-preview .remove-image-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 24px;
+    height: 24px;
+    background: rgba(255, 71, 87, 0.9);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all var(--transition-base);
+}
+
+.image-preview:hover .remove-image-btn {
+    opacity: 1;
+}
+
+.image-preview .remove-image-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+.image-upload-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 20px;
+    background: var(--bg-dark);
+    border: 1px dashed var(--border-light);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.image-upload-btn:hover {
+    border-color: var(--accent-green);
+    background: var(--accent-green-subtle);
+}
+
+.image-upload-btn input {
+    display: none;
+}
+
+.image-upload-btn svg {
+    width: 24px;
+    height: 24px;
+    color: var(--text-gray);
+}
+
+.image-upload-btn span {
+    font-size: 0.8rem;
+    color: var(--text-gray);
+}

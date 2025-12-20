@@ -1,0 +1,112 @@
+/* =====================================================================
+   FOOTER.CSS - Футер магазина
+   ===================================================================== */
+
+.shop-footer {
+    background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+    padding: 32px 0;
+    margin-top: auto;
+    position: relative;
+}
+
+.shop-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(400px, 80%);
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        var(--accent-green) 20%,
+        var(--accent-green) 80%,
+        transparent 100%
+    );
+    opacity: 0.4;
+}
+
+.shop-footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+}
+
+.shop-footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.shop-footer-logo {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-white);
+    letter-spacing: 0.02em;
+}
+
+.shop-footer-copy {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    padding-left: 16px;
+    border-left: 1px solid var(--border-subtle);
+}
+
+.shop-footer-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.shop-footer-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    color: var(--text-gray);
+    text-decoration: none;
+    font-size: 0.85rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    background: transparent;
+}
+
+.shop-footer-link svg {
+    opacity: 0.6;
+    transition: all 0.2s ease;
+}
+
+.shop-footer-link:hover {
+    color: var(--text-white);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.shop-footer-link:hover svg {
+    opacity: 1;
+    stroke: var(--accent-green);
+}
+
+@media (max-width: 768px) {
+    .shop-footer-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+
+    .shop-footer-brand {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .shop-footer-copy {
+        border-left: none;
+        padding-left: 0;
+    }
+
+    .shop-footer-links {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}

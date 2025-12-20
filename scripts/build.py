@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
 """
-Build script для сборки index.html из секций и admin.bundle.js из модулей.
+Build script для сборки HTML страниц из секций и admin.bundle.js из модулей.
 
 Использование:
-    python3 build.py              # Собрать index.html и admin.bundle.js
-    python3 build.py --watch      # Собрать и следить за изменениями
-    python3 build.py --admin-only # Собрать только admin.bundle.js
+    python3 build.py                    # Собрать все страницы и admin.bundle.js
+    python3 build.py --watch            # Собрать и следить за изменениями
+    python3 build.py --admin-only       # Собрать только admin.bundle.js
+    python3 build.py --page=index       # Собрать только index.html
+    python3 build.py --page=shop        # Собрать только shop.html
+    python3 build.py --page=admin       # Собрать только admin.html
+    python3 build.py --page=legal       # Собрать только legal.html
+    python3 build.py --list-pages       # Показать список страниц
 
-Порядок секций определён в SECTIONS.
+Порядок секций определён в PAGES.
 Порядок модулей admin определён в ADMIN_MODULES.
 """
 
@@ -16,24 +21,67 @@ import sys
 import time
 from pathlib import Path
 
-# Порядок секций для сборки index.html
-SECTIONS = [
-    'head.html',
-    'navigation.html',
-    'marquee.html',
-    'hero.html',
-    'services.html',
-    'podology.html',
-    'masters.html',
-    'location.html',
-    'social.html',
-    'blog.html',
-    'faq.html',
-    'booking.html',
-    'blog-modal.html',
-    'footer.html',
-    'scripts.html',
-]
+# Конфигурация страниц
+PAGES = {
+    'index': {
+        'sections_dir': 'index',
+        'sections': [
+            'head.html',
+            'navigation.html',
+            'marquee.html',
+            'hero.html',
+            'services.html',
+            'podology.html',
+            'masters.html',
+            'location.html',
+            'social.html',
+            'blog.html',
+            'faq.html',
+            'booking.html',
+            'blog-modal.html',
+            'footer.html',
+            'scripts.html',
+        ],
+        'output': 'index.html',
+    },
+    'shop': {
+        'sections_dir': 'shop',
+        'sections': [
+            'head.html',
+            'navigation.html',
+            'main.html',
+            'footer.html',
+            'lightbox.html',
+            'mobile-filter.html',
+            'scripts.html',
+        ],
+        'output': 'shop.html',
+    },
+    'admin': {
+        'sections_dir': 'admin',
+        'sections': [
+            'head.html',
+            'svg-sprite.html',
+            'login.html',
+            'sidebar.html',
+            'content.html',
+            'modals.html',
+            'scripts.html',
+        ],
+        'output': 'admin.html',
+    },
+    'legal': {
+        'sections_dir': 'legal',
+        'sections': [
+            'head.html',
+            'header.html',
+            'main.html',
+            'footer.html',
+            'scripts.html',
+        ],
+        'output': 'legal.html',
+    },
+}
 
 # Порядок модулей admin для сборки admin.bundle.js
 # ВАЖНО: порядок имеет значение - зависимости должны идти раньше зависящих модулей
@@ -79,19 +127,27 @@ ADMIN_MODULES = [
 BASE_DIR = Path(__file__).parent.parent  # Корень проекта (на уровень выше scripts/)
 SRC_DIR = BASE_DIR / 'src'
 SECTIONS_DIR = SRC_DIR / 'sections'
-OUTPUT_FILE = BASE_DIR / 'index.html'  # В корне для совместимости с сервером
 ADMIN_MODULES_DIR = SRC_DIR / 'js' / 'admin'
 ADMIN_BUNDLE_FILE = SRC_DIR / 'js' / 'admin.bundle.js'
 
 
-def build():
-    """Собирает index.html из секций."""
+def build_page(page_name):
+    """Собирает HTML страницу из секций."""
+    if page_name not in PAGES:
+        print(f'❌ Неизвестная страница: {page_name}')
+        print(f'   Доступные: {", ".join(PAGES.keys())}')
+        return None
+
+    config = PAGES[page_name]
+    sections_dir = SECTIONS_DIR / config['sections_dir']
+    output_file = BASE_DIR / config['output']
+
     parts = []
 
-    for section in SECTIONS:
-        section_path = SECTIONS_DIR / section
+    for section in config['sections']:
+        section_path = sections_dir / section
         if not section_path.exists():
-            print(f'⚠️  Секция не найдена: {section}')
+            print(f'⚠️  [{page_name}] Секция не найдена: {section}')
             continue
 
         content = section_path.read_text(encoding='utf-8')
@@ -101,10 +157,16 @@ def build():
     html = '\n'.join(parts)
 
     # Записываем результат
-    OUTPUT_FILE.write_text(html, encoding='utf-8')
-    print(f'✅ Собран index.html ({len(html):,} байт)')
+    output_file.write_text(html, encoding='utf-8')
+    print(f'✅ Собран {config["output"]} ({len(html):,} байт)')
 
     return html
+
+
+def build_all_pages():
+    """Собирает все HTML страницы."""
+    for page_name in PAGES:
+        build_page(page_name)
 
 
 def build_admin():
@@ -154,11 +216,17 @@ def get_admin_modules_mtime():
     return max_mtime
 
 
-def get_sections_mtime():
-    """Возвращает максимальное время модификации секций."""
+def get_page_sections_mtime(page_name):
+    """Возвращает максимальное время модификации секций страницы."""
+    if page_name not in PAGES:
+        return 0
+
+    config = PAGES[page_name]
+    sections_dir = SECTIONS_DIR / config['sections_dir']
     max_mtime = 0
-    for section in SECTIONS:
-        section_path = SECTIONS_DIR / section
+
+    for section in config['sections']:
+        section_path = sections_dir / section
         if section_path.exists():
             mtime = section_path.stat().st_mtime
             if mtime > max_mtime:
@@ -167,21 +235,24 @@ def get_sections_mtime():
 
 
 def watch():
-    """Следит за изменениями в секциях и admin модулях, пересобирает при изменении."""
+    """Следит за изменениями в секциях всех страниц и admin модулях."""
     print('👀 Режим наблюдения. Нажмите Ctrl+C для выхода.')
+    print(f'   Отслеживаемые страницы: {", ".join(PAGES.keys())}')
 
-    last_sections_mtime = 0
+    # Инициализация времени модификации для всех страниц
+    last_page_mtimes = {page: 0 for page in PAGES}
     last_admin_mtime = 0
 
     try:
         while True:
-            # Проверка секций
-            current_sections_mtime = get_sections_mtime()
-            if current_sections_mtime > last_sections_mtime:
-                if last_sections_mtime > 0:
-                    print('🔄 Обнаружены изменения в секциях, пересборка...')
-                build()
-                last_sections_mtime = current_sections_mtime
+            # Проверка секций каждой страницы
+            for page_name in PAGES:
+                current_mtime = get_page_sections_mtime(page_name)
+                if current_mtime > last_page_mtimes[page_name]:
+                    if last_page_mtimes[page_name] > 0:
+                        print(f'🔄 [{page_name}] Обнаружены изменения, пересборка...')
+                    build_page(page_name)
+                    last_page_mtimes[page_name] = current_mtime
 
             # Проверка admin модулей
             current_admin_mtime = get_admin_modules_mtime()
@@ -196,19 +267,53 @@ def watch():
         print('\n👋 Наблюдение остановлено.')
 
 
+def list_pages():
+    """Выводит список доступных страниц."""
+    print('📄 Доступные страницы:')
+    for page_name, config in PAGES.items():
+        sections_count = len(config['sections'])
+        print(f'   • {page_name:10} → {config["output"]:15} ({sections_count} секций)')
+
+
 def build_all():
-    """Собирает и index.html и admin.bundle.js."""
-    build()
+    """Собирает все страницы и admin.bundle.js."""
+    build_all_pages()
     build_admin()
 
 
+# Для обратной совместимости
+def build():
+    """Собирает только index.html (для обратной совместимости)."""
+    return build_page('index')
+
+
+def get_sections_mtime():
+    """Возвращает mtime для index страницы (обратная совместимость)."""
+    return get_page_sections_mtime('index')
+
+
 if __name__ == '__main__':
-    if '--watch' in sys.argv or '-w' in sys.argv:
+    # Парсинг аргументов
+    args = sys.argv[1:]
+
+    if '--list-pages' in args:
+        list_pages()
+    elif '--watch' in args or '-w' in args:
         build_all()
         watch()
-    elif '--admin-only' in sys.argv:
+    elif '--admin-only' in args:
         build_admin()
-    elif '--html-only' in sys.argv:
-        build()
+    elif '--html-only' in args:
+        build_all_pages()
     else:
-        build_all()
+        # Проверка --page=xxx
+        page_arg = None
+        for arg in args:
+            if arg.startswith('--page='):
+                page_arg = arg.split('=', 1)[1]
+                break
+
+        if page_arg:
+            build_page(page_arg)
+        else:
+            build_all()

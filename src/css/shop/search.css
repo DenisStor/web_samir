@@ -1,0 +1,74 @@
+/* =====================================================================
+   SEARCH.CSS - Стили поиска магазина
+   ===================================================================== */
+
+.shop-search {
+    position: relative;
+    flex: 1;
+    max-width: 400px;
+}
+
+.shop-search input {
+    width: 100%;
+    padding: 12px 44px 12px 44px;
+    background: var(--content-bg);
+    border: 2px solid var(--border-subtle);
+    border-radius: var(--radius-full);
+    color: var(--text-white);
+    font-size: 0.95rem;
+    font-family: 'Manrope', sans-serif;
+    transition: all var(--transition-base);
+}
+
+.shop-search input::placeholder {
+    color: var(--text-gray);
+}
+
+.shop-search input:focus {
+    outline: none;
+    border-color: var(--accent-green);
+    box-shadow: 0 0 0 4px rgba(163, 230, 53, 0.1);
+}
+
+.shop-search .search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    color: var(--text-gray);
+    pointer-events: none;
+}
+
+.search-clear {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    color: var(--text-gray);
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-base);
+}
+
+.search-clear svg {
+    width: 14px;
+    height: 14px;
+}
+
+.search-clear:hover {
+    background: var(--border-subtle);
+    color: var(--text-white);
+}
+
+.shop-search.has-value .search-clear {
+    display: flex;
+}

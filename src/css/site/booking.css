@@ -1,0 +1,153 @@
+/* =====================================================================
+   BOOKING.CSS - Стили секции бронирования
+   ===================================================================== */
+
+.booking {
+    background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.booking::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(0, 255, 136, 0.08) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.booking-content {
+    position: relative;
+    z-index: var(--z-base);
+}
+
+/* Booking CTA Card */
+.booking-cta {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.booking-cta-card {
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.08) 0%, rgba(0, 200, 100, 0.03) 100%);
+    border: 1px solid var(--border-accent);
+    border-radius: var(--radius-2xl);
+    padding: 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.booking-cta-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
+}
+
+.booking-cta-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    background: rgba(0, 255, 136, 0.1);
+    border-radius: 50%;
+    margin-bottom: 24px;
+    color: var(--accent-green);
+}
+
+.booking-cta-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--text-white);
+}
+
+.booking-cta-text {
+    color: var(--text-gray);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 32px;
+    max-width: 450px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.booking-cta-features {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 32px;
+}
+
+.booking-cta-feature {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: var(--text-light);
+    font-size: 0.95rem;
+}
+
+.booking-cta-feature svg {
+    color: var(--accent-green);
+    flex-shrink: 0;
+}
+
+.booking-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 40px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-glow-sm);
+}
+
+.booking-cta-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-glow-md);
+}
+
+.booking-cta-hint {
+    margin-top: 16px;
+    color: var(--text-gray);
+    font-size: 0.85rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .booking-cta-card {
+        padding: 32px 24px;
+    }
+
+    .booking-cta-icon {
+        width: 64px;
+        height: 64px;
+    }
+
+    .booking-cta-icon svg {
+        width: 36px;
+        height: 36px;
+    }
+
+    .booking-cta-title {
+        font-size: 1.4rem;
+    }
+
+    .booking-cta-text {
+        font-size: 1rem;
+    }
+
+    .booking-cta-btn {
+        padding: 16px 32px;
+        font-size: 1rem;
+        width: 100%;
+        justify-content: center;
+    }
+}

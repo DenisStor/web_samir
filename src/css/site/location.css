@@ -1,0 +1,65 @@
+/* =====================================================================
+   LOCATION.CSS - Стили секции локации
+   ===================================================================== */
+
+.location {
+    background: var(--bg-dark);
+}
+
+.location-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+}
+
+.location-info {
+    display: grid;
+    gap: 32px;
+}
+
+.location-block h3 {
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.location-block h3 svg {
+    width: 24px;
+    height: 24px;
+    color: var(--accent-green);
+}
+
+.location-block p {
+    color: var(--text-gray);
+    font-size: 1rem;
+    line-height: 1.8;
+}
+
+.location-map {
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    height: 400px;
+    background: var(--content-bg);
+    border: 1px solid var(--border-light);
+}
+
+.location-map iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    filter: grayscale(0.5) contrast(1.1);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .location-content {
+        grid-template-columns: 1fr;
+    }
+
+    .location-map {
+        height: 300px;
+    }
+}

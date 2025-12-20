@@ -1,0 +1,43 @@
+    <!-- Modal for editing -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <h2 id="modalTitle">Редактирование</h2>
+                <button class="modal-close" id="modalClose">
+                    <svg><use href="#icon-x"/></svg>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="modalCancel">Отмена</button>
+                <button class="btn btn-primary" id="modalSave">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteModalOverlay">
+        <div class="modal modal-small delete-modal">
+            <div class="modal-header">
+                <h2>Подтверждение удаления</h2>
+                <button class="modal-close" id="deleteModalClose">
+                    <svg><use href="#icon-x"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="delete-modal-icon">
+                    <svg><use href="#icon-trash"/></svg>
+                </div>
+                <p class="delete-modal-text">Вы уверены, что хотите удалить</p>
+                <p class="delete-item-name"></p>
+                <p class="delete-modal-warning">Это действие нельзя отменить</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="deleteCancel" data-action="cancel-delete">Отмена</button>
+                <button class="btn btn-danger" id="deleteConfirm" data-action="confirm-delete">Удалить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>

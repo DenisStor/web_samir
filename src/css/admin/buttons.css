@@ -1,0 +1,157 @@
+/* =====================================================================
+   BUTTONS.CSS - Стили кнопок админ-панели
+   ===================================================================== */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.btn-primary {
+    background: var(--accent-green);
+    color: var(--bg-dark);
+}
+
+.btn-primary:hover {
+    background: var(--accent-green-dim);
+    box-shadow: var(--shadow-glow-sm);
+}
+
+.btn-secondary {
+    background: var(--content-bg);
+    color: var(--text-white);
+    border: 1px solid var(--border-light);
+}
+
+.btn-secondary:hover {
+    background: var(--content-bg-light);
+    border-color: var(--border-medium);
+}
+
+.btn-danger {
+    background: #ff4757;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #ff3344;
+}
+
+.btn-icon {
+    padding: 10px;
+    background: var(--content-bg-light);
+    border: 1px solid var(--border-light);
+}
+
+.btn-icon svg {
+    color: var(--text-white);
+}
+
+.btn-icon:hover {
+    background: var(--accent-green-subtle);
+    border-color: var(--accent-green);
+}
+
+.btn-icon:hover svg {
+    color: var(--accent-green);
+}
+
+/* Danger button (delete) */
+.btn-icon.danger svg {
+    color: #ff6b6b;
+}
+
+.btn-icon.danger:hover {
+    background: rgba(255, 71, 87, 0.15);
+    border-color: rgba(255, 71, 87, 0.4);
+}
+
+.btn-icon.danger:hover svg {
+    color: #ff4757;
+}
+
+/* Button outline */
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--border-light);
+    color: var(--text-gray);
+}
+
+.btn-outline:hover {
+    border-color: var(--accent-green);
+    color: var(--accent-green);
+}
+
+/* Button loading state */
+.btn-loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.75;
+}
+
+.btn-loading .btn-text {
+    opacity: 0.5;
+}
+
+.btn-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: btn-spin 0.7s linear infinite;
+    display: inline-block;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+@keyframes btn-spin {
+    to { transform: rotate(360deg); }
+}
+
+.btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Export button */
+.export-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: transparent;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    color: var(--text-gray);
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.export-btn:hover {
+    background: var(--content-bg);
+    border-color: var(--accent-green);
+    color: var(--accent-green);
+}
+
+.export-btn svg {
+    width: 16px;
+    height: 16px;
+}

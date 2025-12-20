@@ -1,0 +1,87 @@
+/* =====================================================================
+   LEGAL.CSS - Стили юридических документов в админке
+   ===================================================================== */
+
+.legal-documents-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.legal-document-card {
+    background: var(--content-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    transition: all var(--transition-base);
+}
+
+.legal-document-card:hover {
+    border-color: var(--border-light);
+}
+
+.legal-document-card.inactive {
+    opacity: 0.6;
+}
+
+.legal-document-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.legal-document-info {
+    flex: 1;
+}
+
+.legal-document-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-white);
+    margin-bottom: 4px;
+}
+
+.legal-document-meta {
+    display: flex;
+    gap: 16px;
+    font-size: 0.85rem;
+    color: var(--text-gray);
+}
+
+.legal-document-slug {
+    font-family: monospace;
+    color: var(--accent-green);
+}
+
+.legal-document-status {
+    flex-shrink: 0;
+}
+
+.legal-document-preview {
+    font-size: 0.9rem;
+    color: var(--text-gray);
+    line-height: 1.5;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: var(--bg-dark);
+    border-radius: var(--radius-md);
+    max-height: 80px;
+    overflow: hidden;
+}
+
+.legal-document-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.legal-document-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legal-document-actions .btn svg {
+    width: 16px;
+    height: 16px;
+}

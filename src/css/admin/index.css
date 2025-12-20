@@ -1,0 +1,24 @@
+/* =====================================================================
+   ADMIN/INDEX.CSS - Стили админ-панели Say's Barbers
+   =====================================================================
+   Импортирует все модули в правильном порядке.
+   ===================================================================== */
+
+@import 'layout.css';
+@import 'buttons.css';
+@import 'cards.css';
+@import 'services.css';
+@import 'modals.css';
+@import 'forms.css';
+@import 'uploads.css';
+@import 'toast.css';
+@import 'editor.css';
+@import 'faq.css';
+@import 'stats.css';
+@import 'login.css';
+@import 'social.css';
+@import 'shop-categories.css';
+@import 'shop-products.css';
+@import 'legal.css';
+@import 'utilities.css';
+@import 'responsive.css';

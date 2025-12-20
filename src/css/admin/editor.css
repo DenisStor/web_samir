@@ -1,0 +1,162 @@
+/* =====================================================================
+   EDITOR.CSS - Стили WYSIWYG редактора
+   ===================================================================== */
+
+.editor-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 8px 12px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-light);
+    border-bottom: none;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.toolbar-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    color: var(--text-gray);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all var(--transition-base);
+}
+
+.toolbar-btn:hover {
+    background: var(--content-bg);
+    border-color: var(--border-light);
+    color: var(--text-white);
+}
+
+.toolbar-btn:active,
+.toolbar-btn.active {
+    background: var(--accent-green-subtle);
+    border-color: var(--accent-green);
+    color: var(--accent-green);
+}
+
+.toolbar-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.toolbar-btn strong,
+.toolbar-btn em {
+    font-size: 14px;
+}
+
+.toolbar-divider {
+    width: 1px;
+    height: 24px;
+    background: var(--border-light);
+    margin: 0 4px;
+    align-self: center;
+}
+
+/* WYSIWYG Editor */
+.wysiwyg-editor {
+    min-height: 300px;
+    max-height: 500px;
+    overflow-y: auto;
+    padding: 16px;
+    background: var(--content-bg);
+    border: 1px solid var(--border-light);
+    border-top: none;
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    color: var(--text-white);
+    font-size: 1rem;
+    line-height: 1.7;
+    outline: none;
+    transition: border-color var(--transition-base);
+}
+
+.wysiwyg-editor:focus {
+    border-color: var(--accent-green);
+}
+
+.wysiwyg-editor:empty::before {
+    content: attr(data-placeholder);
+    color: var(--text-gray);
+    pointer-events: none;
+}
+
+/* Editor content styles */
+.wysiwyg-editor h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 1.5em 0 0.5em;
+    color: var(--accent-green);
+}
+
+.wysiwyg-editor h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 1.25em 0 0.5em;
+    color: var(--text-white);
+}
+
+.wysiwyg-editor p {
+    margin: 0.75em 0;
+}
+
+.wysiwyg-editor ul,
+.wysiwyg-editor ol {
+    margin: 1em 0;
+    padding-left: 1.5em;
+}
+
+.wysiwyg-editor li {
+    margin: 0.5em 0;
+}
+
+.wysiwyg-editor blockquote {
+    margin: 1em 0;
+    padding: 12px 20px;
+    border-left: 4px solid var(--accent-green);
+    background: rgba(0, 255, 136, 0.05);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-style: italic;
+    color: var(--text-gray);
+}
+
+.wysiwyg-editor a {
+    color: var(--accent-green);
+    text-decoration: underline;
+}
+
+.wysiwyg-editor strong {
+    font-weight: 700;
+    color: var(--text-white);
+}
+
+.wysiwyg-editor em {
+    font-style: italic;
+}
+
+.wysiwyg-editor u {
+    text-decoration: underline;
+}
+
+/* Сброс стилей вставленного контента */
+.wysiwyg-editor * {
+    background-color: transparent !important;
+    font-family: inherit !important;
+}
+
+.wysiwyg-editor span {
+    color: inherit;
+}
+
+/* Icon preview */
+.icon-preview svg {
+    width: 48px;
+    height: 48px;
+    color: var(--accent-green);
+}

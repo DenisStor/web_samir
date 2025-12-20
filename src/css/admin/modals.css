@@ -1,0 +1,171 @@
+/* =====================================================================
+   MODALS.CSS - Стили модальных окон
+   ===================================================================== */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-base);
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal {
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    background: var(--content-bg);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-xl);
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.9) translateY(20px);
+    transition: all var(--transition-bounce);
+}
+
+.modal-overlay.active .modal {
+    transform: scale(1) translateY(0);
+}
+
+.modal-small {
+    max-width: 420px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.modal-header h2 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.modal-close {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    color: var(--text-gray);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.modal-close:hover {
+    background: var(--content-bg-light);
+    color: var(--text-white);
+    border-color: var(--border-light);
+}
+
+.modal-close svg {
+    width: 18px;
+    height: 18px;
+}
+
+.modal-body {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px 24px;
+    border-top: 1px solid var(--border-subtle);
+}
+
+/* Scrollbar for modal body */
+.modal-body {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-light) transparent;
+}
+
+.modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: var(--border-light);
+    border-radius: 3px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: var(--border-medium);
+}
+
+/* =================================================================
+   DELETE MODAL
+   ================================================================= */
+
+.delete-modal .modal-body {
+    text-align: center;
+    padding: 32px 24px;
+}
+
+.delete-modal .delete-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 20px;
+    background: rgba(255, 71, 87, 0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-modal .delete-icon svg {
+    width: 32px;
+    height: 32px;
+    color: #ff4757;
+}
+
+.delete-modal .delete-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-white);
+    margin-bottom: 12px;
+}
+
+.delete-modal .delete-message {
+    color: var(--text-gray);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.delete-modal .delete-message strong {
+    color: var(--text-white);
+}
+
+.delete-modal .delete-warning {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: rgba(255, 71, 87, 0.1);
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+    color: #ff8a8a;
+}
