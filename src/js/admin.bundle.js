@@ -1708,8 +1708,8 @@ var AdminWYSIWYG = (function() {
             if (html && typeof DOMPurify !== 'undefined') {
                 // Очищаем HTML через DOMPurify
                 text = DOMPurify.sanitize(html, {
-                    ALLOWED_TAGS: ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'a', 'ul', 'ol', 'li', 'h2', 'h3', 'blockquote'],
-                    ALLOWED_ATTR: ['href']
+                    ALLOWED_TAGS: ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'span', 'div'],
+                    ALLOWED_ATTR: ['href', 'target', 'class', 'style']
                 });
             } else {
                 // Fallback - только текст
@@ -5340,19 +5340,19 @@ var AdminLegalForm = (function() {
     /**
      * Показать форму редактирования
      */
-    function show(document) {
-        currentDocumentId = document ? document.id : null;
+    function show(legalDoc) {
+        currentDocumentId = legalDoc ? legalDoc.id : null;
 
-        var title = document ? 'Редактирование документа' : 'Новый документ';
+        var title = legalDoc ? 'Редактирование документа' : 'Новый документ';
 
         var formHtml = '<form id="legalForm" class="modal-form">' +
             '<div class="form-group">' +
                 '<label class="form-label">Название документа *</label>' +
-                '<input type="text" class="form-input" id="legalTitle" value="' + window.escapeHtml(document ? document.title : '') + '" required placeholder="Политика конфиденциальности">' +
+                '<input type="text" class="form-input" id="legalTitle" value="' + window.escapeHtml(legalDoc ? legalDoc.title : '') + '" required placeholder="Политика конфиденциальности">' +
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-label">URL-идентификатор (slug) *</label>' +
-                '<input type="text" class="form-input" id="legalSlug" value="' + window.escapeHtml(document ? document.slug : '') + '" required placeholder="privacy" pattern="[a-z0-9-]+">' +
+                '<input type="text" class="form-input" id="legalSlug" value="' + window.escapeHtml(legalDoc ? legalDoc.slug : '') + '" required placeholder="privacy" pattern="[a-z0-9-]+">' +
                 '<small class="form-hint">Только латинские буквы, цифры и дефис. Будет доступен по адресу /legal/slug</small>' +
             '</div>' +
             '<div class="form-group">' +
@@ -5371,26 +5371,36 @@ var AdminLegalForm = (function() {
                         SharedIcons.get('listOrdered') +
                     '</button>' +
                     '<span class="wysiwyg-separator"></span>' +
-                    '<button type="button" class="wysiwyg-btn" onclick="AdminWYSIWYG.insertHeading(2)" title="Заголовок H2">' +
+                    '<button type="button" class="wysiwyg-btn" onclick="AdminWYSIWYG.formatText(\'h2\')" title="Заголовок H2">' +
                         'H2' +
                     '</button>' +
-                    '<button type="button" class="wysiwyg-btn" onclick="AdminWYSIWYG.insertHeading(3)" title="Заголовок H3">' +
+                    '<button type="button" class="wysiwyg-btn" onclick="AdminWYSIWYG.formatText(\'h3\')" title="Заголовок H3">' +
                         'H3' +
                     '</button>' +
                 '</div>' +
                 '<div class="wysiwyg-editor" id="legalContent" contenteditable="true">' +
-                    (document ? document.content : '') +
+                    (legalDoc ? legalDoc.content : '') +
                 '</div>' +
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-checkbox">' +
-                    '<input type="checkbox" id="legalActive" ' + (document && document.active !== false ? 'checked' : '') + '>' +
+                    '<input type="checkbox" id="legalActive" ' + (legalDoc && legalDoc.active !== false ? 'checked' : '') + '>' +
                     '<span>Документ активен (отображается на сайте)</span>' +
                 '</label>' +
             '</div>' +
         '</form>';
 
-        AdminModals.open('modal', title, formHtml);
+        AdminModals.setTitle('modal', title);
+        var modalBody = document.getElementById('modalBody');
+        if (modalBody) {
+            modalBody.innerHTML = formHtml;
+        }
+        AdminModals.open('modal');
+
+        // Инициализация WYSIWYG редактора
+        setTimeout(function() {
+            AdminWYSIWYG.init('legalContent');
+        }, 100);
     }
 
     /**
@@ -5474,11 +5484,11 @@ var AdminLegalForm = (function() {
      * Удалить документ
      */
     function remove(id) {
-        var document = AdminState.findLegalDocument(id);
-        if (!document) return;
+        var legalDoc = AdminState.findLegalDocument(id);
+        if (!legalDoc) return;
 
         AdminModals.openDeleteConfirm(
-            document.title,
+            legalDoc.title,
             async function() {
                 var documents = AdminState.legalDocuments.filter(function(d) {
                     return d.id !== id;

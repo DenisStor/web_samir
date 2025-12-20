@@ -518,8 +518,8 @@ var AdminWYSIWYG = (function() {
             if (html && typeof DOMPurify !== 'undefined') {
                 // Очищаем HTML через DOMPurify
                 text = DOMPurify.sanitize(html, {
-                    ALLOWED_TAGS: ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'a', 'ul', 'ol', 'li', 'h2', 'h3', 'blockquote'],
-                    ALLOWED_ATTR: ['href']
+                    ALLOWED_TAGS: ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'span', 'div'],
+                    ALLOWED_ATTR: ['href', 'target', 'class', 'style']
                 });
             } else {
                 // Fallback - только текст

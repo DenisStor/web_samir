@@ -14,6 +14,62 @@
     const API_BASE = '/api';
 
     // =================================================================
+    // SANITIZATION
+    // =================================================================
+
+    /**
+     * Санитизация HTML для защиты от XSS
+     * Использует DOMPurify если доступен, иначе экранирует опасные символы
+     */
+    function sanitizeHTML(html) {
+        if (typeof DOMPurify !== 'undefined') {
+            return DOMPurify.sanitize(html, {
+                ALLOWED_TAGS: ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'span', 'div'],
+                ALLOWED_ATTR: ['href', 'target', 'class', 'style'],
+                ALLOW_DATA_ATTR: false
+            });
+        }
+        // Fallback: удаляем опасные теги, но сохраняем безопасные
+        let safe = html;
+        // Удаляем script, style, iframe, object, embed
+        safe = safe.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+        safe = safe.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+        safe = safe.replace(/<iframe[^>]*>[\s\S]*?<\/iframe>/gi, '');
+        safe = safe.replace(/<object[^>]*>[\s\S]*?<\/object>/gi, '');
+        safe = safe.replace(/<embed[^>]*\/?>/gi, '');
+        // Удаляем on* атрибуты (onclick, onerror, etc.)
+        safe = safe.replace(/\s+on\w+\s*=\s*["'][^"']*["']/gi, '');
+        safe = safe.replace(/\s+on\w+\s*=\s*[^\s>]+/gi, '');
+        // Удаляем javascript: в href/src
+        safe = safe.replace(/(href|src)\s*=\s*["']?\s*javascript:[^"'>\s]*/gi, '$1=""');
+        return safe;
+    }
+
+    /**
+     * Экранирование текста для безопасной вставки в HTML атрибуты
+     */
+    function escapeAttr(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+
+    /**
+     * Экранирование текста для безопасной вставки в HTML
+     */
+    function escapeHTML(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+
+    // =================================================================
     // ICONS
     // =================================================================
 
@@ -46,24 +102,31 @@
         const firstPrinciples = (master.principles || []).slice(0, 2);
         const extraPrinciples = (master.principles || []).slice(2);
 
+        // Sanitize user data
+        const safeName = escapeHTML(master.name);
+        const safeRole = escapeHTML(master.role || 'Мастер');
+        const safeSpec = escapeHTML(master.specialization || '');
+        const safePhoto = escapeAttr(master.photo);
+        const safeInitial = escapeHTML(master.initial || master.name.charAt(0));
+
         return `
             <div class="master-card fade-in visible">
                 <div class="master-image">
                     ${master.photo
-                        ? `<img src="${master.photo}" alt="${master.name}" class="master-photo">`
-                        : `<div class="master-avatar">${master.initial || master.name.charAt(0)}</div>`
+                        ? `<img src="${safePhoto}" alt="${escapeAttr(master.name)}" class="master-photo">`
+                        : `<div class="master-avatar">${safeInitial}</div>`
                     }
                     <span class="master-badge ${badgeClass}">${badgeLabel}</span>
                 </div>
                 <div class="master-content">
-                    <h3 class="master-name">${master.name}</h3>
-                    <div class="master-role">${master.role || 'Мастер'}</div>
-                    <p class="master-specialization">${master.specialization || ''}</p>
+                    <h3 class="master-name">${safeName}</h3>
+                    <div class="master-role">${safeRole}</div>
+                    <p class="master-specialization">${safeSpec}</p>
                     <div class="master-principles">
                         ${firstPrinciples.map(p => `
                             <div class="master-principle">
                                 ${icons.check}
-                                <span>${p}</span>
+                                <span>${escapeHTML(p)}</span>
                             </div>
                         `).join('')}
                         ${extraPrinciples.length > 0 ? `
@@ -71,7 +134,7 @@
                                 ${extraPrinciples.map(p => `
                                     <div class="master-principle">
                                         ${icons.check}
-                                        <span>${p}</span>
+                                        <span>${escapeHTML(p)}</span>
                                     </div>
                                 `).join('')}
                             </div>
@@ -83,52 +146,65 @@
     }
 
     function createServiceItem(service) {
+        const safeName = escapeHTML(service.name);
+        const priceGreen = parseInt(service.priceGreen) || 0;
+        const pricePink = parseInt(service.pricePink) || 0;
+        const priceBlue = parseInt(service.priceBlue) || 0;
+
         return `
             <div class="service-item">
                 <div>
-                    <div class="service-name">${service.name}</div>
+                    <div class="service-name">${safeName}</div>
                 </div>
                 <div class="service-prices">
-                    <span class="price-tag price-green">${service.priceGreen || 0} ₽</span>
-                    <span class="price-tag price-pink">${service.pricePink || 0} ₽</span>
-                    <span class="price-tag price-blue">${service.priceBlue || 0} ₽</span>
+                    <span class="price-tag price-green">${priceGreen} ₽</span>
+                    <span class="price-tag price-pink">${pricePink} ₽</span>
+                    <span class="price-tag price-blue">${priceBlue} ₽</span>
                 </div>
             </div>
         `;
     }
 
     function createPodologyServiceItem(service) {
+        const safeName = escapeHTML(service.name);
+        const safePrice = escapeHTML(service.price);
+
         return `
             <div class="podology-service-item">
                 <div class="podology-service-info">
-                    <div class="podology-service-name">${service.name}</div>
+                    <div class="podology-service-name">${safeName}</div>
                 </div>
-                <div class="podology-service-price">${service.price}</div>
+                <div class="podology-service-price">${safePrice}</div>
             </div>
         `;
     }
 
     function createBlogCard(article) {
         const formattedDate = formatDate(article.date);
+        const safeId = escapeAttr(article.id);
+        const safeTitle = escapeHTML(article.title);
+        const safeTag = escapeHTML(article.tag || 'Статья');
+        const safeExcerpt = escapeHTML(article.excerpt || '');
+        const safeImage = escapeAttr(article.image);
 
         return `
-            <article class="blog-card fade-in visible" onclick="openBlogModal('${article.id}')">
+            <article class="blog-card fade-in visible" onclick="openBlogModal('${safeId}')">
                 <div class="blog-image">
                     ${article.image
-                        ? `<img src="${article.image}" alt="${article.title}">`
+                        ? `<img src="${safeImage}" alt="${escapeAttr(article.title)}">`
                         : icons.scissors
                     }
                 </div>
                 <div class="blog-content">
                     <div class="blog-meta">
-                        <span class="blog-tag">${article.tag || 'Статья'}</span>
+                        <span class="blog-tag">${safeTag}</span>
                         <div class="blog-date">
                             ${icons.calendar}
                             ${formattedDate}
                         </div>
                     </div>
-                    <h3 class="blog-title">${article.title}</h3>
-                    <p class="blog-excerpt">${article.excerpt || ''}</p>
+                    <h3 class="blog-title">${safeTitle}</h3>
+                    <p class="blog-excerpt">${safeExcerpt}</p>
                     <div class="blog-read-more">
                         <span>Читать далее</span>
                         ${icons.arrow}
@@ -158,16 +234,14 @@
                     const activeMasters = (data.masters || []).filter(m => m.active !== false);
                     if (activeMasters.length > 0) {
                         mastersGrid.innerHTML = activeMasters.map(createMasterCard).join('');
-                        console.log(`Loaded ${activeMasters.length} masters from API`);
                     } else {
                         // Пустой массив - скрываем секцию или показываем заглушку
                         mastersGrid.innerHTML = '<p class="empty-message" style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,0.5); padding: 40px;">Информация о мастерах скоро появится</p>';
-                        console.log('Masters: empty array from API');
                     }
                 }
             }
         } catch (error) {
-            console.log('Using static masters data:', error.message);
+            // Fallback to static data
         }
     }
 
@@ -191,7 +265,6 @@
                         }
                     }
                 });
-                console.log('Loaded services from API');
             }
 
             // Загружаем услуги подологии (если есть контейнер на странице)
@@ -201,14 +274,13 @@
                     const services = data.podology?.services || [];
                     if (services.length > 0) {
                         podologyContainer.innerHTML = services.map(createPodologyServiceItem).join('');
-                        console.log('Loaded podology services from API');
                     } else {
                         podologyContainer.innerHTML = '<p class="empty-message">Услуги подологии скоро появятся</p>';
                     }
                 }
             }
         } catch (error) {
-            console.log('Using static services data:', error.message);
+            // Fallback to static data
         }
     }
 
@@ -241,8 +313,6 @@
                         // Добавляем кнопку "Показать ещё" если статей больше 3
                         updateShowMoreButton(blogSection, blogGrid);
 
-                        console.log(`Loaded ${articlesToShow.length}/${allArticles.length} articles from API`);
-
                         // Store articles data for modal
                         window.dynamicArticlesData = allArticles;
                     } else {
@@ -250,24 +320,26 @@
                         blogGrid.innerHTML = '<p class="empty-message" style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,0.5); padding: 40px;">Статьи скоро появятся</p>';
                         window.dynamicArticlesData = [];
                         removeShowMoreButton();
-                        console.log('Articles: empty array from API');
                     }
                 }
             }
         } catch (error) {
-            console.log('Using static articles data:', error.message);
+            // Fallback to static data
         }
     }
 
     function createFaqItem(item) {
+        const safeQuestion = escapeHTML(item.question);
+        const safeAnswer = escapeHTML(item.answer);
+
         return `
             <div class="faq-item fade-in visible">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    <h3>${item.question}</h3>
+                <div class="faq-question" onclick="toggleFaq(this)" role="button" tabindex="0" aria-expanded="false">
+                    <h3>${safeQuestion}</h3>
                     <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </div>
                 <div class="faq-answer">
-                    <p>${item.answer}</p>
+                    <p>${safeAnswer}</p>
                 </div>
             </div>
         `;
@@ -286,15 +358,13 @@
                     const faqItems = data.faq || [];
                     if (faqItems.length > 0) {
                         faqContainer.innerHTML = faqItems.map(createFaqItem).join('');
-                        console.log(`Loaded ${faqItems.length} FAQ items from API`);
                     } else {
                         faqContainer.innerHTML = '<p class="empty-message" style="text-align: center; color: rgba(255,255,255,0.5); padding: 40px;">FAQ скоро появятся</p>';
-                        console.log('FAQ: empty array from API');
                     }
                 }
             }
         } catch (error) {
-            console.log('Using static FAQ data:', error.message);
+            // Fallback to static data
         }
     }
 
@@ -310,8 +380,11 @@
 
     function createSocialLink(socialItem) {
         const iconSvg = socialIconsSvg[socialItem.icon] || socialIconsSvg.vk;
+        const safeUrl = escapeAttr(socialItem.url);
+        const safeName = escapeAttr(socialItem.name);
+
         return `
-            <a href="${socialItem.url}" target="_blank" class="social-link" title="${socialItem.name}">
+            <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="social-link" title="${safeName}">
                 ${iconSvg}
             </a>
         `;
@@ -330,9 +403,6 @@
                     const activeSocialLinks = (data.social || []).filter(s => s.active && s.url);
                     if (activeSocialLinks.length > 0) {
                         socialLinksContainer.innerHTML = activeSocialLinks.map(createSocialLink).join('');
-                        console.log(`Loaded ${activeSocialLinks.length} social links from API`);
-                    } else {
-                        console.log('Social: no active links from API');
                     }
                 }
             }
@@ -354,10 +424,9 @@
                         link.textContent = data.phone;
                     }
                 });
-                console.log('Updated phone:', data.phone);
             }
         } catch (error) {
-            console.log('Using static social data:', error.message);
+            // Fallback to static data
         }
     }
 
@@ -434,6 +503,9 @@
         }
     };
 
+    // Store escape handler reference for cleanup
+    let currentEscapeHandler = null;
+
     function showDynamicArticleModal(article) {
         const modal = document.getElementById('blogModal');
         if (!modal) return;
@@ -445,9 +517,13 @@
         const modalTitle = modal.querySelector('.blog-modal-title');
         const modalContent = modal.querySelector('.blog-modal-text, .blog-modal-body');
 
+        // Sanitize data
+        const safeImage = escapeAttr(article.image);
+        const safeTitle = escapeAttr(article.title);
+
         if (modalImage) {
             if (article.image) {
-                modalImage.innerHTML = `<img src="${article.image}" alt="${article.title}" style="width:100%; height:100%; object-fit:cover;">`;
+                modalImage.innerHTML = `<img src="${safeImage}" alt="${safeTitle}" style="width:100%; height:100%; object-fit:cover;">`;
             } else {
                 modalImage.innerHTML = icons.scissors;
             }
@@ -472,36 +548,63 @@
         }
 
         if (modalContent) {
-            // Convert content to paragraphs
             const content = article.content || article.excerpt || '';
-            const paragraphs = content.split('\n\n')
-                .filter(p => p.trim())
-                .map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`)
-                .join('');
-            modalContent.innerHTML = paragraphs || `<p>${article.excerpt}</p>`;
+            // Если контент уже содержит HTML-теги, санитизируем напрямую
+            // Иначе оборачиваем в параграфы
+            if (/<[a-z][\s\S]*>/i.test(content)) {
+                // Контент с HTML - только санитизация
+                modalContent.innerHTML = sanitizeHTML(content);
+            } else {
+                // Плоский текст - разбиваем на параграфы
+                const paragraphs = content.split('\n\n')
+                    .filter(p => p.trim())
+                    .map(p => `<p>${escapeHTML(p).replace(/\n/g, '<br>')}</p>`)
+                    .join('');
+                modalContent.innerHTML = sanitizeHTML(paragraphs || `<p>${escapeHTML(article.excerpt || '')}</p>`);
+            }
         }
 
         // Show modal
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
 
+        // Remove previous escape handler if exists
+        if (currentEscapeHandler) {
+            document.removeEventListener('keydown', currentEscapeHandler);
+        }
+
         // Handle escape key
-        const handleEscape = (e) => {
+        currentEscapeHandler = (e) => {
             if (e.key === 'Escape') {
                 closeBlogModal();
-                document.removeEventListener('keydown', handleEscape);
             }
         };
-        document.addEventListener('keydown', handleEscape);
+        document.addEventListener('keydown', currentEscapeHandler);
     }
+
+    // Override closeBlogModal to clean up escape handler
+    const originalCloseBlogModal = window.closeBlogModal;
+    window.closeBlogModal = function() {
+        if (currentEscapeHandler) {
+            document.removeEventListener('keydown', currentEscapeHandler);
+            currentEscapeHandler = null;
+        }
+        if (typeof originalCloseBlogModal === 'function') {
+            originalCloseBlogModal();
+        } else {
+            const modal = document.getElementById('blogModal');
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+    };
 
     // =================================================================
     // INITIALIZATION
     // =================================================================
 
     async function init() {
-        console.log('Data Loader: Initializing...');
-
         // Load all data in parallel
         await Promise.all([
             loadMasters(),
@@ -511,7 +614,10 @@
             loadSocial()
         ]);
 
-        console.log('Data Loader: Complete');
+        // Re-initialize animations for dynamically loaded elements
+        if (SaysApp.animations && SaysApp.animations.reinit) {
+            SaysApp.animations.reinit();
+        }
     }
 
     // Run on DOM ready

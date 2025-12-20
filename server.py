@@ -14,15 +14,33 @@ import base64
 import re
 import hashlib
 import threading
+import gzip
+import io
 from pathlib import Path
 from urllib.parse import urlparse, parse_qs
 from datetime import datetime, timedelta
 import subprocess
 import sys
 
+
+def load_env_file():
+    """Загрузка переменных окружения из .env файла."""
+    env_file = Path(__file__).parent / '.env'
+    if env_file.exists():
+        with open(env_file, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, _, value = line.partition('=')
+                    os.environ.setdefault(key.strip(), value.strip())
+
+
+# Загружаем .env до чтения переменных окружения
+load_env_file()
+
 # Настройки сервера
-PORT = 8000
-HOST = "localhost"
+PORT = int(os.environ.get('SERVER_PORT', 8000))
+HOST = os.environ.get('SERVER_HOST', 'localhost')
 FILENAME = "index.html"
 DATA_DIR = Path("data")
 UPLOADS_DIR = Path("uploads")
@@ -38,20 +56,34 @@ UPLOADS_DIR.mkdir(exist_ok=True)
 # ============================================
 
 def load_config():
-    """Загрузка конфигурации из файла."""
+    """Загрузка конфигурации из файла и переменных окружения."""
+    # Приоритет: переменные окружения > config.json > значения по умолчанию
     default_config = {
-        "admin_password": "says2024",
         "session_timeout_hours": 24,
         "max_login_attempts": 5,
         "lockout_minutes": 15
     }
+
+    # Загружаем из config.json если есть
     if CONFIG_FILE.exists():
         try:
             with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
-                return {**default_config, **json.load(f)}
-        except:
+                file_config = json.load(f)
+                # Убираем пароль из файла config - он должен быть в .env
+                file_config.pop('admin_password', None)
+                default_config.update(file_config)
+        except Exception:
             pass
-    return default_config
+
+    # Переопределяем из переменных окружения
+    config = {
+        "admin_password": os.environ.get('ADMIN_PASSWORD', 'changeme'),
+        "session_timeout_hours": int(os.environ.get('SESSION_TIMEOUT_HOURS', default_config['session_timeout_hours'])),
+        "max_login_attempts": int(os.environ.get('MAX_LOGIN_ATTEMPTS', default_config['max_login_attempts'])),
+        "lockout_minutes": int(os.environ.get('LOCKOUT_MINUTES', default_config['lockout_minutes']))
+    }
+
+    return config
 
 CONFIG = load_config()
 
@@ -91,11 +123,50 @@ def is_valid_filename(filename):
     # Только буквы, цифры, дефис, подчёркивание и точка
     if not re.match(r'^[a-zA-Z0-9_\-]+\.[a-zA-Z0-9]+$', filename):
         return False
-    # Запрет опасных расширений
-    dangerous_ext = ['.py', '.sh', '.exe', '.bat', '.cmd', '.php', '.js', '.html']
+    # Расширенный список опасных расширений
+    dangerous_ext = [
+        '.py', '.sh', '.exe', '.bat', '.cmd', '.php', '.js', '.html',
+        '.jsp', '.aspx', '.asp', '.cgi', '.pl', '.phtml', '.phar',
+        '.htaccess', '.htpasswd', '.config', '.ini', '.env',
+        '.rb', '.erb', '.lua', '.ps1', '.vbs', '.wsf'
+    ]
     if any(filename.lower().endswith(ext) for ext in dangerous_ext):
         return False
     return True
+
+
+# Magic bytes для проверки типа файла
+IMAGE_SIGNATURES = {
+    b'\x89PNG\r\n\x1a\n': 'png',
+    b'\xff\xd8\xff': 'jpg',
+    b'GIF87a': 'gif',
+    b'GIF89a': 'gif',
+    b'RIFF': 'webp',  # Начало WEBP (после RIFF идёт размер и WEBP)
+}
+
+
+def validate_image_bytes(image_bytes):
+    """Проверка magic bytes изображения. Возвращает (is_valid, detected_extension)."""
+    if len(image_bytes) < 12:
+        return False, None
+
+    # Проверяем PNG
+    if image_bytes[:8] == b'\x89PNG\r\n\x1a\n':
+        return True, 'png'
+
+    # Проверяем JPEG (начинается с FF D8 FF)
+    if image_bytes[:3] == b'\xff\xd8\xff':
+        return True, 'jpg'
+
+    # Проверяем GIF
+    if image_bytes[:6] in (b'GIF87a', b'GIF89a'):
+        return True, 'gif'
+
+    # Проверяем WebP (RIFF....WEBP)
+    if image_bytes[:4] == b'RIFF' and image_bytes[8:12] == b'WEBP':
+        return True, 'webp'
+
+    return False, None
 
 
 def check_rate_limit(ip):
@@ -170,6 +241,33 @@ def validate_service(data):
     return True, None
 
 
+def sanitize_html_content(text):
+    """
+    Простая санитизация HTML контента.
+    Удаляет опасные теги и атрибуты.
+    """
+    if not text:
+        return text
+
+    # Удаляем script теги
+    text = re.sub(r'<script[^>]*>.*?</script>', '', text, flags=re.IGNORECASE | re.DOTALL)
+    # Удаляем style теги
+    text = re.sub(r'<style[^>]*>.*?</style>', '', text, flags=re.IGNORECASE | re.DOTALL)
+    # Удаляем iframe
+    text = re.sub(r'<iframe[^>]*>.*?</iframe>', '', text, flags=re.IGNORECASE | re.DOTALL)
+    # Удаляем object/embed
+    text = re.sub(r'<object[^>]*>.*?</object>', '', text, flags=re.IGNORECASE | re.DOTALL)
+    text = re.sub(r'<embed[^>]*/?>', '', text, flags=re.IGNORECASE)
+    # Удаляем опасные атрибуты (onclick, onerror, etc.)
+    text = re.sub(r'\s+on\w+\s*=\s*["\'][^"\']*["\']', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'\s+on\w+\s*=\s*\S+', '', text, flags=re.IGNORECASE)
+    # Удаляем javascript: в href/src
+    text = re.sub(r'(href|src)\s*=\s*["\']?\s*javascript:[^"\'>\s]*', r'\1=""', text, flags=re.IGNORECASE)
+    text = re.sub(r'(href|src)\s*=\s*["\']?\s*data:[^"\'>\s]*', r'\1=""', text, flags=re.IGNORECASE)
+
+    return text
+
+
 def validate_article(data):
     """Валидация данных статьи."""
     if not isinstance(data, dict):
@@ -179,9 +277,22 @@ def validate_article(data):
     if not title or not isinstance(title, str) or len(title) > 500:
         return False, "Invalid or missing title"
 
+    # Защита от XSS в заголовке
+    if '<' in title or '>' in title:
+        return False, "Invalid characters in title"
+
     content = data.get('content', '')
     if len(content) > 100000:  # 100KB max
         return False, "Content too long"
+
+    # Санитизируем контент
+    if content:
+        data['content'] = sanitize_html_content(content)
+
+    # Санитизируем excerpt если есть
+    excerpt = data.get('excerpt', '')
+    if excerpt:
+        data['excerpt'] = sanitize_html_content(excerpt)
 
     return True, None
 
@@ -195,9 +306,40 @@ def validate_faq(data):
     if not question or not isinstance(question, str) or len(question) > 500:
         return False, "Invalid or missing question"
 
+    # Защита от XSS в вопросе
+    if '<' in question or '>' in question:
+        return False, "Invalid characters in question"
+
     answer = data.get('answer', '')
     if len(answer) > 10000:
         return False, "Answer too long"
+
+    # Защита от XSS в ответе
+    if '<' in answer or '>' in answer:
+        return False, "Invalid characters in answer"
+
+    return True, None
+
+
+def validate_principle(data):
+    """Валидация принципа качества."""
+    if not isinstance(data, dict):
+        return False, "Invalid data format"
+
+    title = data.get('title', '')
+    if not title or not isinstance(title, str) or len(title) > 200:
+        return False, "Invalid or missing title"
+
+    # Защита от XSS
+    if '<' in title or '>' in title:
+        return False, "Invalid characters in title"
+
+    description = data.get('description', '')
+    if len(description) > 1000:
+        return False, "Description too long"
+
+    if '<' in description or '>' in description:
+        return False, "Invalid characters in description"
 
     return True, None
 
@@ -218,8 +360,54 @@ def build_html():
 class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
     """HTTP Handler с поддержкой REST API для админ-панели"""
 
+    # Типы файлов для gzip сжатия
+    COMPRESSIBLE_TYPES = {'.html', '.css', '.js', '.json', '.svg', '.xml', '.txt'}
+    # Типы файлов для долгого кеширования (1 неделя)
+    CACHEABLE_EXTENSIONS = {'.css', '.js', '.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.woff', '.woff2', '.ttf', '.eot'}
+
+    def send_response_with_gzip(self, content, content_type='text/html; charset=utf-8'):
+        """Отправка ответа с gzip сжатием если клиент поддерживает."""
+        accept_encoding = self.headers.get('Accept-Encoding', '')
+        use_gzip = 'gzip' in accept_encoding and len(content) > 1024
+
+        if use_gzip:
+            buf = io.BytesIO()
+            with gzip.GzipFile(fileobj=buf, mode='wb') as gz:
+                gz.write(content if isinstance(content, bytes) else content.encode('utf-8'))
+            compressed = buf.getvalue()
+
+            self.send_response(200)
+            self.send_header('Content-Type', content_type)
+            self.send_header('Content-Encoding', 'gzip')
+            self.send_header('Content-Length', len(compressed))
+            self.end_headers()
+            self.wfile.write(compressed)
+        else:
+            data = content if isinstance(content, bytes) else content.encode('utf-8')
+            self.send_response(200)
+            self.send_header('Content-Type', content_type)
+            self.send_header('Content-Length', len(data))
+            self.end_headers()
+            self.wfile.write(data)
+
+    def get_cache_header(self):
+        """Определяет правильный Cache-Control заголовок для запроса."""
+        path = self.path.split('?')[0]  # Убираем query string
+        ext = os.path.splitext(path)[1].lower()
+
+        # API запросы - без кеша
+        if path.startswith('/api/'):
+            return 'no-store, no-cache, must-revalidate'
+
+        # Статические ресурсы - кеш на неделю
+        if ext in self.CACHEABLE_EXTENSIONS:
+            return 'public, max-age=604800, immutable'
+
+        # HTML и прочее - короткий кеш с проверкой
+        return 'public, max-age=300, must-revalidate'
+
     def end_headers(self):
-        self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate')
+        self.send_header('Cache-Control', self.get_cache_header())
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
@@ -522,6 +710,13 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
         with lock:
             try:
                 content_length = int(self.headers['Content-Length'])
+
+                # Лимит размера POST данных (1MB для JSON)
+                max_post_size = 1 * 1024 * 1024
+                if content_length > max_post_size:
+                    self.send_error_response(413, 'Request too large. Max size is 1MB.')
+                    return
+
                 post_data = self.rfile.read(content_length)
                 data = json.loads(post_data.decode('utf-8'))
 
@@ -544,13 +739,13 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_error_response(500, str(e))
 
     def handle_upload(self):
-        """Загрузка изображений с ограничением размера."""
+        """Загрузка изображений с ограничением размера и валидацией типа."""
         try:
             content_length = int(self.headers['Content-Length'])
 
             # Ограничение размера (10MB max)
-            MAX_UPLOAD_SIZE = 10 * 1024 * 1024
-            if content_length > MAX_UPLOAD_SIZE:
+            max_upload_size = 10 * 1024 * 1024
+            if content_length > max_upload_size:
                 self.send_error_response(413, 'File too large. Max size is 10MB.')
                 return
 
@@ -561,25 +756,29 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
             image_data = data.get('image', '')
             if ',' in image_data:
                 # Убираем data:image/...;base64, prefix
-                header, image_data = image_data.split(',', 1)
-                # Определяем расширение
-                if 'png' in header:
-                    ext = 'png'
-                elif 'gif' in header:
-                    ext = 'gif'
-                elif 'webp' in header:
-                    ext = 'webp'
-                else:
-                    ext = 'jpg'
-            else:
-                ext = 'jpg'
+                _, image_data = image_data.split(',', 1)
+
+            # Декодируем и валидируем изображение
+            try:
+                image_bytes = base64.b64decode(image_data)
+            except Exception:
+                self.send_error_response(400, 'Invalid base64 data')
+                return
+
+            # Проверяем magic bytes для определения реального типа файла
+            is_valid, detected_ext = validate_image_bytes(image_bytes)
+            if not is_valid:
+                self.send_error_response(400, 'Invalid image format. Only PNG, JPG, GIF, WebP allowed.')
+                return
+
+            # Используем расширение, определённое по magic bytes
+            ext = detected_ext
 
             # Генерируем уникальное имя файла
             filename = f"{uuid.uuid4().hex}.{ext}"
             filepath = UPLOADS_DIR / filename
 
             # Сохраняем файл
-            image_bytes = base64.b64decode(image_data)
             with open(filepath, 'wb') as f:
                 f.write(image_bytes)
 
@@ -606,10 +805,11 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_error_response(403, 'Access denied')
                 return
 
-            if filepath.exists():
+            # Используем try/except вместо exists() для избежания TOCTOU
+            try:
                 filepath.unlink()
                 self.send_json_response({'success': True, 'message': 'Файл удалён'})
-            else:
+            except FileNotFoundError:
                 self.send_error_response(404, 'Файл не найден')
         except Exception as e:
             self.send_error_response(500, str(e))

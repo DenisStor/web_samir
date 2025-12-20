@@ -7,11 +7,53 @@
       "description": "Классические и современные стрижки, работа с бородой и бритьё",
       "services": [
         {
-          "id": 1764958757756,
-          "name": "пенис",
-          "priceGreen": 100,
-          "pricePink": 200,
-          "priceBlue": 300
+          "id": 1,
+          "name": "Мужская стрижка",
+          "priceGreen": 900,
+          "pricePink": 1200,
+          "priceBlue": 1500
+        },
+        {
+          "id": 2,
+          "name": "Детская стрижка (до 12 лет)",
+          "priceGreen": 700,
+          "pricePink": 900,
+          "priceBlue": 1100
+        },
+        {
+          "id": 3,
+          "name": "Стрижка машинкой",
+          "priceGreen": 600,
+          "pricePink": 800,
+          "priceBlue": 1000
+        },
+        {
+          "id": 4,
+          "name": "Моделирование бороды",
+          "priceGreen": 600,
+          "pricePink": 800,
+          "priceBlue": 1000
+        },
+        {
+          "id": 5,
+          "name": "Камуфляж седины",
+          "priceGreen": 800,
+          "pricePink": 1000,
+          "priceBlue": 1200
+        },
+        {
+          "id": 6,
+          "name": "Королевское бритьё",
+          "priceGreen": 1000,
+          "pricePink": 1300,
+          "priceBlue": 1600
+        },
+        {
+          "id": 7,
+          "name": "Бритьё головы",
+          "priceGreen": 800,
+          "pricePink": 1000,
+          "priceBlue": 1200
         }
       ]
     },

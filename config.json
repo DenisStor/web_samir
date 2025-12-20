@@ -1,5 +1,4 @@
 {
-  "admin_password": "says2024",
   "session_timeout_hours": 24,
   "max_login_attempts": 5,
   "lockout_minutes": 15

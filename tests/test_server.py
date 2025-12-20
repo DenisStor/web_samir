@@ -25,6 +25,8 @@ try:
         validate_article,
         validate_faq,
         validate_principle,
+        validate_image_bytes,
+        sanitize_html_content,
         generate_token
     )
     SERVER_IMPORTS_OK = True
@@ -304,8 +306,153 @@ class TestXSSPrevention:
         }
 
         is_valid, error = validate_article(xss_article)
-        # Валидация должна проверять на опасные атрибуты
-        # Это зависит от реализации
+        # Валидация пропускает контент, но санитизирует его
+        assert is_valid, "Article should be valid but with sanitized content"
+        # Проверяем что onerror был удалён
+        assert 'onerror' not in xss_article['content'], "onerror attribute should be removed"
+
+    def test_article_script_tag_xss(self):
+        """Проверка XSS со script тегом в контенте"""
+        if not SERVER_IMPORTS_OK:
+            return
+
+        xss_article = {
+            'id': 'article_1',
+            'title': 'Test',
+            'content': '<script>alert("xss")</script>Some text'
+        }
+
+        is_valid, error = validate_article(xss_article)
+        assert is_valid
+        assert '<script>' not in xss_article['content'], "script tag should be removed"
+
+    def test_article_title_xss(self):
+        """Проверка XSS в заголовке статьи"""
+        if not SERVER_IMPORTS_OK:
+            return
+
+        xss_article = {
+            'id': 'article_1',
+            'title': '<script>alert("xss")</script>',
+            'content': 'Normal content'
+        }
+
+        is_valid, error = validate_article(xss_article)
+        assert not is_valid, "Should reject XSS in title"
+
+    def test_faq_question_xss(self):
+        """Проверка XSS в вопросе FAQ"""
+        if not SERVER_IMPORTS_OK:
+            return
+
+        xss_faq = {
+            'id': 'faq_1',
+            'question': '<script>alert("xss")</script>',
+            'answer': 'Normal answer'
+        }
+
+        is_valid, error = validate_faq(xss_faq)
+        assert not is_valid, "Should reject XSS in question"
+
+
+class TestImageValidation:
+    """Тесты валидации изображений по magic bytes"""
+
+    def test_valid_png(self):
+        """Проверка валидного PNG"""
+        if not SERVER_IMPORTS_OK:
+            return
+
+        # PNG magic bytes
+        png_bytes = b'\x89PNG\r\n\x1a\n' + b'\x00' * 10
+        is_valid, ext = validate_image_bytes(png_bytes)
+        assert is_valid
+        assert ext == 'png'
+
+    def test_valid_jpeg(self):
+        """Проверка валидного JPEG"""
+        if not SERVER_IMPORTS_OK:
+            return
+
+        # JPEG magic bytes
+        jpeg_bytes = b'\xff\xd8\xff' + b'\x00' * 10
+        is_valid, ext = validate_image_bytes(jpeg_bytes)
+        assert is_valid
+        assert ext == 'jpg'
+
+    def test_valid_gif(self):
+        """Проверка валидного GIF"""
+        if not SERVER_IMPORTS_OK:
+            return
+
+        # GIF magic bytes
+        gif_bytes = b'GIF89a' + b'\x00' * 10
+        is_valid, ext = validate_image_bytes(gif_bytes)
+        assert is_valid
+        assert ext == 'gif'
+
+    def test_valid_webp(self):
+        """Проверка валидного WebP"""
+        if not SERVER_IMPORTS_OK:
+            return
+
+        # WebP magic bytes
+        webp_bytes = b'RIFF' + b'\x00\x00\x00\x00' + b'WEBP' + b'\x00' * 10
+        is_valid, ext = validate_image_bytes(webp_bytes)
+        assert is_valid
+        assert ext == 'webp'
+
+    def test_invalid_file(self):
+        """Проверка невалидного файла"""
+        if not SERVER_IMPORTS_OK:
+            return
+
+        # Произвольные байты
+        invalid_bytes = b'This is not an image' + b'\x00' * 10
+        is_valid, ext = validate_image_bytes(invalid_bytes)
+        assert not is_valid
+        assert ext is None
+
+    def test_empty_file(self):
+        """Проверка пустого файла"""
+        if not SERVER_IMPORTS_OK:
+            return
+
+        is_valid, ext = validate_image_bytes(b'')
+        assert not is_valid
+
+
+class TestHTMLSanitization:
+    """Тесты санитизации HTML"""
+
+    def test_remove_script_tag(self):
+        """Проверка удаления script тега"""
+        if not SERVER_IMPORTS_OK:
+            return
+
+        html = '<p>Hello</p><script>alert("xss")</script><p>World</p>'
+        sanitized = sanitize_html_content(html)
+        assert '<script>' not in sanitized
+        assert 'alert' not in sanitized
+        assert '<p>Hello</p>' in sanitized
+
+    def test_remove_onclick(self):
+        """Проверка удаления onclick атрибута"""
+        if not SERVER_IMPORTS_OK:
+            return
+
+        html = '<button onclick="alert(1)">Click</button>'
+        sanitized = sanitize_html_content(html)
+        assert 'onclick' not in sanitized
+
+    def test_remove_javascript_href(self):
+        """Проверка удаления javascript: в href"""
+        if not SERVER_IMPORTS_OK:
+            return
+
+        html = '<a href="javascript:alert(1)">Link</a>'
+        sanitized = sanitize_html_content(html)
+        assert 'javascript:' not in sanitized
 
 
 # Запуск тестов через pytest

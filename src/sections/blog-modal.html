@@ -1,9 +1,9 @@
     <!-- Blog Modal -->
-    <div class="blog-modal" id="blogModal">
+    <div class="blog-modal" id="blogModal" role="dialog" aria-modal="true" aria-labelledby="blogModalTitle" aria-hidden="true">
         <div class="blog-modal-content">
-            <div class="blog-modal-close" onclick="closeBlogModal()">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </div>
+            <button class="blog-modal-close" onclick="closeBlogModal()" aria-label="Закрыть статью" type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
 
             <!-- Article 1 -->
             <div class="blog-modal-article" id="article1">
@@ -15,7 +15,7 @@
                             15 ноября 2024
                         </div>
                     </div>
-                    <h2 class="blog-modal-title">Как правильно выбрать шампунь для вашего типа волос</h2>
+                    <h2 class="blog-modal-title" id="blogModalTitle">Как правильно выбрать шампунь для вашего типа волос</h2>
                 </div>
                 <div class="blog-modal-body">
                     <p>Выбор правильного шампуня — это не просто покупка первого попавшегося средства с полки магазина. Это важный шаг к здоровым, блестящим и ухоженным волосам. В этой статье мы разберём, как определить свой тип волос и подобрать идеальный шампунь.</p>

@@ -23,25 +23,6 @@
       "order": 1,
       "createdAt": "2025-12-18T16:19:23.548Z",
       "updatedAt": "2025-12-18T16:19:23.548Z"
-    },
-    {
-      "id": "product_1766074856993",
-      "name": "УРА",
-      "slug": "ura",
-      "description": "мкурушгпмшугмугшмру",
-      "price": 200,
-      "categoryId": "category_1766074727298",
-      "images": [
-        {
-          "url": "/uploads/760232780dd24c9281b1456393430e73.jpg",
-          "isMain": true,
-          "order": 1
-        }
-      ],
-      "status": "active",
-      "order": 2,
-      "createdAt": "2025-12-18T16:20:56.993Z",
-      "updatedAt": "2025-12-18T16:20:56.993Z"
     }
   ]
 }

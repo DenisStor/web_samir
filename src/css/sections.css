@@ -118,7 +118,7 @@
 .hero-description {
     font-size: 1.25rem;
     color: var(--text-gray-light);
-    margin-bottom: 24px;
+    margin-bottom: 56px;
     max-width: 700px;
     animation: fadeInUp 0.8s ease 0.2s forwards;
     opacity: 0;
@@ -471,7 +471,7 @@
     color: var(--medical-text-dark);
 }
 
-@media (max-width: 500px) {
+@media (max-width: 480px) {
     .podology-intro {
         margin-bottom: 36px;
     }
@@ -634,36 +634,53 @@
 .podology-consultation {
     display: flex;
     align-items: center;
-    gap: 16px;
-    max-width: 700px;
-    margin: 0 auto 40px;
-    padding: 20px 28px;
-    background: linear-gradient(135deg, rgba(0, 204, 106, 0.12) 0%, rgba(0, 255, 136, 0.06) 100%);
-    border: 1px solid rgba(0, 204, 106, 0.25);
-    border-radius: var(--radius-xl);
-    box-shadow: 0 4px 20px rgba(0, 204, 106, 0.1);
-    transition: all var(--transition-base);
+    gap: 20px;
+    margin: 40px auto 0;
+    padding: 20px 24px;
+    background: var(--content-bg-light);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-bounce);
+    position: relative;
+}
+
+.podology-consultation::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 0;
+    background: var(--accent-green);
+    border-radius: 0 3px 3px 0;
+    transition: height var(--transition-base);
 }
 
 .podology-consultation:hover {
-    box-shadow: 0 6px 28px rgba(0, 204, 106, 0.15);
-    border-color: var(--accent-green-dim);
+    background: rgba(0, 255, 136, 0.08);
+    transform: translateX(12px);
+    border-color: var(--border-accent);
+    box-shadow: var(--shadow-card);
+}
+
+.podology-consultation:hover::before {
+    height: 60%;
 }
 
 .podology-consultation-icon {
-    width: 48px;
-    height: 48px;
-    min-width: 48px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent-green-dim) 0%, var(--accent-green) 100%);
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    border-radius: var(--radius-md);
+    background: rgba(0, 255, 136, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 14px rgba(0, 204, 106, 0.3);
 }
 
 .podology-consultation-icon svg {
-    color: white;
+    color: var(--accent-green);
     width: 22px;
     height: 22px;
 }
@@ -673,35 +690,34 @@
 }
 
 .podology-consultation-content h4 {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: var(--medical-text-dark);
-    margin-bottom: 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-white);
+    margin-bottom: 2px;
 }
 
 .podology-consultation-content p {
-    color: var(--medical-text-muted);
-    font-size: 0.9rem;
-    line-height: 1.5;
+    color: var(--text-gray);
+    font-size: 0.88rem;
+    line-height: 1.4;
     margin: 0;
 }
 
 .podology-consultation-btn {
-    padding: 14px 28px;
-    background: linear-gradient(135deg, var(--accent-green-dim) 0%, var(--accent-green) 100%);
-    color: white;
-    font-weight: 700;
-    font-size: 0.95rem;
+    padding: 10px 24px;
+    background: var(--accent-green);
+    color: var(--bg-dark);
+    font-weight: 600;
+    font-size: 0.9rem;
     text-decoration: none;
-    border-radius: var(--radius-full);
+    border-radius: var(--radius-md);
     white-space: nowrap;
     transition: all var(--transition-base);
-    box-shadow: 0 4px 14px rgba(0, 204, 106, 0.3);
 }
 
 .podology-consultation-btn:hover {
-    transform: scale(1.03);
-    box-shadow: 0 6px 20px rgba(0, 204, 106, 0.4);
+    background: var(--accent-green-bright);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
 }
 
 /* Podology Category */
@@ -838,16 +854,20 @@
 /* Responsive Podology Categories */
 @media (max-width: 768px) {
     .podology-consultation {
-        flex-direction: column;
-        text-align: center;
-        padding: 18px 20px;
+        flex-wrap: wrap;
+        padding: 16px 18px;
         gap: 12px;
+        margin: 24px auto 0;
+    }
+
+    .podology-consultation:hover {
+        transform: translateX(8px);
     }
 
     .podology-consultation-icon {
-        width: 44px;
-        height: 44px;
-        min-width: 44px;
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
     }
 
     .podology-consultation-icon svg {
@@ -856,16 +876,17 @@
     }
 
     .podology-consultation-content h4 {
-        font-size: 1rem;
+        font-size: 0.95rem;
     }
 
     .podology-consultation-content p {
-        font-size: 0.85rem;
+        font-size: 0.82rem;
     }
 
     .podology-consultation-btn {
-        padding: 12px 24px;
-        font-size: 0.9rem;
+        padding: 10px 20px;
+        font-size: 0.85rem;
+        margin-left: auto;
     }
 
     .podology-category {
@@ -1219,7 +1240,7 @@
     }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
     .masters-grid {
         grid-template-columns: 1fr;
         max-width: 400px;
@@ -1637,7 +1658,7 @@
     }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
     .blog-grid {
         grid-template-columns: 1fr;
         max-width: 400px;
@@ -1854,7 +1875,7 @@
 }
 
 .blog-modal-body h3 {
-    color: var(--text-white);
+    color: var(--accent-green);
     font-size: 1.4rem;
     margin: 32px 0 16px;
 }
@@ -1882,7 +1903,7 @@
 }
 
 .blog-modal-body h2 {
-    color: var(--text-white);
+    color: var(--accent-green);
     font-size: 1.6rem;
     margin: 40px 0 20px;
     padding-bottom: 12px;

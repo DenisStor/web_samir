@@ -449,7 +449,7 @@ var ShopApp = (function() {
                     sortedImages.map(function(img) {
                         var isActive = img.isMain ? ' active' : '';
                         return '<button class="gallery-thumb' + isActive + '" onclick="ShopApp.setGalleryImage(\'' + escapeHtml(img.url) + '\', this)">' +
-                            '<img src="' + escapeHtml(img.url) + '" alt="">' +
+                            '<img src="' + escapeHtml(img.url) + '" alt="' + escapeHtml(product.name) + '">' +
                         '</button>';
                     }).join('') +
                 '</div>' +
