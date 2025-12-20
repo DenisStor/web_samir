@@ -4,7 +4,7 @@
       "id": "product_1766074763548",
       "name": "Помадка для укладки",
       "slug": "pomadka-dlya-ukladki",
-      "description": "",
+      "description": "cevkjhebvbrehhverbvh berhverhvherghvbcjefh bvjhfegvjbfedhvhfrjeudbjvbfeud bvjufdbjfuvidbjeivfdbvjviuefd",
       "price": 100,
       "categoryId": "category_1766074727298",
       "images": [
@@ -22,7 +22,45 @@
       "status": "active",
       "order": 1,
       "createdAt": "2025-12-18T16:19:23.548Z",
-      "updatedAt": "2025-12-18T16:19:23.548Z"
+      "updatedAt": "2025-12-20T22:08:58.654Z"
+    },
+    {
+      "id": "product_1766269758801",
+      "name": "Помада для бороды",
+      "slug": "pomada-dlya-borody",
+      "description": "мкмики",
+      "price": 990,
+      "categoryId": "category_1766269730925",
+      "images": [
+        {
+          "url": "/uploads/1b0a7b587d9b4149b84b44cc68d891ca.jpg",
+          "isMain": true,
+          "order": 1
+        }
+      ],
+      "status": "active",
+      "order": 2,
+      "createdAt": "2025-12-20T22:29:18.801Z",
+      "updatedAt": "2025-12-20T22:29:18.801Z"
+    },
+    {
+      "id": "product_1766269821385",
+      "name": "Помада для волос новая",
+      "slug": "pomada-dlya-volos-novaya",
+      "description": "умуму",
+      "price": 1200,
+      "categoryId": "category_1766269730925",
+      "images": [
+        {
+          "url": "/uploads/f2880b1d83b2419cbb393e99efd7deaa.jpg",
+          "isMain": true,
+          "order": 1
+        }
+      ],
+      "status": "active",
+      "order": 3,
+      "createdAt": "2025-12-20T22:30:21.385Z",
+      "updatedAt": "2025-12-20T22:30:21.385Z"
     }
   ]
 }

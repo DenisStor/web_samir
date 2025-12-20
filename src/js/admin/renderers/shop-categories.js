@@ -36,13 +36,28 @@ var AdminShopCategoriesRenderer = (function() {
                 }).length;
 
                 var iconHtml = SharedIcons.get(cat.icon || 'folder');
+                var isInactive = cat.active === false;
+                var statusBadge = isInactive
+                    ? '<span class="category-card-badge inactive">Скрыта</span>'
+                    : '';
 
-                return '<div class="shop-category-card" data-id="' + escapeHtml(cat.id) + '">' +
+                var productWord = getProductWord(productsCount);
+                var descriptionHtml = cat.description
+                    ? '<p class="category-card-description">' + escapeHtml(cat.description) + '</p>'
+                    : '';
+
+                return '<div class="shop-category-card' + (isInactive ? ' inactive' : '') + '" data-id="' + escapeHtml(cat.id) + '">' +
                     '<div class="category-card-icon">' + iconHtml + '</div>' +
                     '<div class="category-card-info">' +
-                        '<h3 class="category-card-name">' + escapeHtml(cat.name) + '</h3>' +
-                        '<p class="category-card-description">' + escapeHtml(cat.description || '') + '</p>' +
-                        '<span class="category-card-count">' + productsCount + ' товаров</span>' +
+                        '<h3 class="category-card-name">' +
+                            escapeHtml(cat.name) +
+                            statusBadge +
+                        '</h3>' +
+                        descriptionHtml +
+                        '<span class="category-card-count">' +
+                            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>' +
+                            productsCount + ' ' + productWord +
+                        '</span>' +
                     '</div>' +
                     '<div class="category-card-actions">' +
                         '<button class="btn btn-icon" data-action="edit-shop-category" data-id="' + escapeHtml(cat.id) + '" title="Редактировать">' +
@@ -63,6 +78,15 @@ var AdminShopCategoriesRenderer = (function() {
         var div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    function getProductWord(count) {
+        var n = Math.abs(count) % 100;
+        var n1 = n % 10;
+        if (n > 10 && n < 20) return 'товаров';
+        if (n1 > 1 && n1 < 5) return 'товара';
+        if (n1 === 1) return 'товар';
+        return 'товаров';
     }
 
     return {

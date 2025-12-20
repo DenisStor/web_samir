@@ -477,6 +477,14 @@ var ShopApp = (function() {
         // Related products
         var relatedHtml = renderRelatedProducts(product);
 
+        // Description with fallback
+        var descriptionHtml = product.description
+            ? '<div class="product-detail-description">' + escapeHtml(product.description) + '</div>'
+            : '';
+
+        // CTA buttons (removed)
+        var ctaHtml = '';
+
         elements.productDetail.innerHTML = breadcrumbsHtml +
             '<div class="product-detail-grid">' +
                 galleryHtml +
@@ -484,7 +492,8 @@ var ShopApp = (function() {
                     categoryTagHtml +
                     '<h1 class="product-detail-name">' + escapeHtml(product.name) + '</h1>' +
                     '<div class="product-detail-price">' + formatPrice(product.price) + '</div>' +
-                    '<div class="product-detail-description">' + escapeHtml(product.description || '') + '</div>' +
+                    descriptionHtml +
+                    ctaHtml +
                 '</div>' +
             '</div>' +
             relatedHtml;

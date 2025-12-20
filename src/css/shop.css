@@ -25,11 +25,24 @@
     margin-bottom: 24px;
 }
 
+.shop-title-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
 .shop-title {
     font-family: 'Unbounded', sans-serif;
     font-size: clamp(1.75rem, 4vw, 2.5rem);
     font-weight: 700;
     color: var(--text-white);
+    margin: 0;
+}
+
+.shop-subtitle {
+    font-family: 'Manrope', sans-serif;
+    font-size: 1rem;
+    color: var(--text-gray);
     margin: 0;
 }
 
@@ -396,7 +409,7 @@
 @media (max-width: 1024px) {
     .product-detail-grid {
         grid-template-columns: 1fr;
-        gap: 40px;
+        gap: 32px;
     }
 }
 
@@ -404,6 +417,12 @@
 .product-gallery {
     position: sticky;
     top: 100px;
+}
+
+@media (max-width: 1024px) {
+    .product-gallery {
+        position: static;
+    }
 }
 
 .gallery-main {
@@ -469,51 +488,113 @@
 
 /* Product Info */
 .product-detail-info {
-    padding: 20px 0;
+    padding: 32px;
+    background: var(--content-bg);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border-subtle);
+}
+
+@media (max-width: 1024px) {
+    .product-detail-info {
+        padding: 24px;
+        border-radius: var(--radius-lg);
+    }
 }
 
 .product-category-tag {
-    display: inline-block;
-    padding: 6px 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
     background: rgba(163, 230, 53, 0.1);
     border: 1px solid var(--border-accent);
-    border-radius: 20px;
+    border-radius: 100px;
     color: var(--accent-green);
     font-family: 'Manrope', sans-serif;
     font-size: 0.85rem;
     font-weight: 600;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
     cursor: pointer;
     transition: all var(--transition-base);
 }
 
 .product-category-tag:hover {
     background: rgba(163, 230, 53, 0.2);
+    transform: translateY(-1px);
 }
 
 .product-detail-name {
     font-family: 'Unbounded', sans-serif;
-    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
     font-weight: 700;
     color: var(--text-white);
-    margin-bottom: 16px;
-    line-height: 1.2;
+    margin-bottom: 20px;
+    line-height: 1.25;
 }
 
 .product-detail-price {
     font-family: 'Unbounded', sans-serif;
-    font-size: 2rem;
+    font-size: 2.25rem;
     font-weight: 700;
     color: var(--accent-green);
-    margin-bottom: 32px;
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border-subtle);
 }
 
 .product-detail-description {
     color: var(--text-gray-light, #a0a0a0);
     font-family: 'Manrope', sans-serif;
-    font-size: 1.1rem;
+    font-size: 1rem;
     line-height: 1.8;
     white-space: pre-line;
+}
+
+/* Product CTA Button */
+.product-detail-cta {
+    margin-top: 32px;
+    display: flex;
+    gap: 12px;
+}
+
+.product-buy-btn {
+    flex: 1;
+    padding: 16px 32px;
+    background: var(--accent-green);
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--bg-dark);
+    font-family: 'Manrope', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    text-decoration: none;
+    text-align: center;
+}
+
+.product-buy-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(163, 230, 53, 0.3);
+}
+
+.product-contact-btn {
+    padding: 16px 24px;
+    background: transparent;
+    border: 2px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    color: var(--text-white);
+    font-family: 'Manrope', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    text-decoration: none;
+}
+
+.product-contact-btn:hover {
+    border-color: var(--accent-green);
+    color: var(--accent-green);
 }
 
 /* =================================================================
@@ -1139,5 +1220,118 @@
     .category-chip .chip-count {
         font-size: 0.7rem;
         padding: 0 5px;
+    }
+}
+
+/* =================================================================
+   SHOP FOOTER
+   ================================================================= */
+
+.shop-footer {
+    background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+    padding: 32px 0;
+    margin-top: auto;
+    position: relative;
+}
+
+.shop-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(400px, 80%);
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        var(--accent-green) 20%,
+        var(--accent-green) 80%,
+        transparent 100%
+    );
+    opacity: 0.4;
+}
+
+.shop-footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+}
+
+.shop-footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.shop-footer-logo {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-white);
+    letter-spacing: 0.02em;
+}
+
+.shop-footer-copy {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    padding-left: 16px;
+    border-left: 1px solid var(--border-subtle);
+}
+
+.shop-footer-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.shop-footer-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    color: var(--text-gray);
+    text-decoration: none;
+    font-size: 0.85rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    background: transparent;
+}
+
+.shop-footer-link svg {
+    opacity: 0.6;
+    transition: all 0.2s ease;
+}
+
+.shop-footer-link:hover {
+    color: var(--text-white);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.shop-footer-link:hover svg {
+    opacity: 1;
+    stroke: var(--accent-green);
+}
+
+@media (max-width: 768px) {
+    .shop-footer-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+
+    .shop-footer-brand {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .shop-footer-copy {
+        border-left: none;
+        padding-left: 0;
+    }
+
+    .shop-footer-links {
+        flex-wrap: wrap;
+        justify-content: center;
     }
 }

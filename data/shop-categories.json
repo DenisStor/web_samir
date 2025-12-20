@@ -8,6 +8,15 @@
       "icon": "scissors",
       "order": 1,
       "active": true
+    },
+    {
+      "id": "category_1766269730925",
+      "name": "Средство для бороды",
+      "slug": "sredstvo-dlya-borody",
+      "description": "мукикуиукиуи",
+      "icon": "folder",
+      "order": 2,
+      "active": true
     }
   ]
 }

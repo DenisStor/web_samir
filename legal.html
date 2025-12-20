@@ -15,47 +15,126 @@
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Security: DOMPurify for XSS protection -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js" integrity="sha512-H+rglffZ6f5gF7UJgvH4Naa+fGCgjrHKMgoFOGmcPTRwR6iAaWkO4bXrpB0aZzIqR0pxKkf8KXJRA2CFNN7TKA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <!-- CSS Modules -->
-    <link rel="stylesheet" href="/src/css/variables.css">
-    <link rel="stylesheet" href="/src/css/utilities.css">
-    <link rel="stylesheet" href="/src/css/base.css">
-    <link rel="stylesheet" href="/src/css/navigation.css">
-    <link rel="stylesheet" href="/src/css/components.css">
     <style>
-        .legal-main {
-            padding-top: 100px;
+        :root {
+            --bg-dark: #0a0a0a;
+            --bg-card: #111111;
+            --text-white: #ffffff;
+            --text-light: #e0e0e0;
+            --text-gray: #888888;
+            --accent-green: #00ff88;
+            --accent-green-subtle: rgba(0, 255, 136, 0.1);
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --radius-md: 12px;
+            --radius-lg: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+        }
+
+        /* Minimal Header */
+        .legal-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .header-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Unbounded', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-white);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: opacity 0.2s;
+        }
+
+        .logo:hover {
+            opacity: 0.8;
+        }
+
+        .logo-icon {
+            width: 20px;
+            height: 20px;
+            color: var(--text-gray);
+            transition: color 0.2s, transform 0.2s;
+        }
+
+        .logo:hover .logo-icon {
+            color: var(--accent-green);
+            transform: translateX(-3px);
+        }
+
+        .logo-accent {
+            color: var(--accent-green);
+        }
+
+
+        /* Main Content */
+        .legal-main {
+            flex: 1;
+            padding-top: 80px;
         }
 
         .legal-container {
             max-width: 800px;
             margin: 0 auto;
-            padding: 40px 20px 80px;
+            padding: 48px 24px 80px;
         }
 
-        .legal-back {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+        .legal-loading {
+            text-align: center;
+            padding: 80px 20px;
             color: var(--text-gray);
-            text-decoration: none;
-            font-size: 0.9rem;
-            margin-bottom: 24px;
-            transition: color 0.2s ease;
         }
 
-        .legal-back:hover {
-            color: var(--accent-green);
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-subtle);
+            border-top-color: var(--accent-green);
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            animation: spin 1s linear infinite;
         }
 
-        .legal-back svg {
-            width: 20px;
-            height: 20px;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .legal-title {
             font-family: 'Unbounded', sans-serif;
-            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-size: clamp(1.75rem, 5vw, 2.5rem);
             font-weight: 700;
             color: var(--text-white);
             margin-bottom: 16px;
@@ -68,20 +147,37 @@
             margin-bottom: 32px;
             padding-bottom: 24px;
             border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legal-meta svg {
+            width: 16px;
+            height: 16px;
+            opacity: 0.6;
         }
 
         .legal-content {
             color: var(--text-light);
-            line-height: 1.8;
+            line-height: 1.9;
             font-size: 1rem;
         }
 
         .legal-content h2 {
             font-family: 'Unbounded', sans-serif;
-            font-size: 1.25rem;
+            font-size: 1.3rem;
             font-weight: 600;
             color: var(--text-white);
-            margin: 32px 0 16px;
+            margin: 40px 0 16px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .legal-content h2:first-child {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
         }
 
         .legal-content h3 {
@@ -89,7 +185,7 @@
             font-size: 1.1rem;
             font-weight: 600;
             color: var(--text-white);
-            margin: 24px 0 12px;
+            margin: 28px 0 12px;
         }
 
         .legal-content p {
@@ -103,27 +199,37 @@
         }
 
         .legal-content li {
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+        }
+
+        .legal-content strong {
+            color: var(--text-white);
+            font-weight: 600;
         }
 
         .legal-content a {
             color: var(--accent-green);
             text-decoration: none;
+            transition: opacity 0.2s;
         }
 
         .legal-content a:hover {
             text-decoration: underline;
+            opacity: 0.8;
         }
 
-        .legal-loading {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-gray);
-        }
-
+        /* Error State */
         .legal-error {
             text-align: center;
-            padding: 60px 20px;
+            padding: 80px 20px;
+        }
+
+        .legal-error-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 24px;
+            color: var(--text-gray);
+            opacity: 0.5;
         }
 
         .legal-error-title {
@@ -135,40 +241,99 @@
 
         .legal-error-text {
             color: var(--text-gray);
-            margin-bottom: 24px;
+            margin-bottom: 32px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .legal-documents-list {
-            margin-top: 24px;
-        }
-
-        .legal-documents-list a {
-            display: block;
-            padding: 16px;
-            margin-bottom: 12px;
-            background: var(--content-bg);
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            background: var(--accent-green);
+            color: var(--bg-dark);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
             border-radius: var(--radius-md);
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 255, 136, 0.4);
+        }
+
+        /* Documents List */
+        .legal-documents-list {
+            margin-top: 32px;
+        }
+
+        .legal-doc-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px 24px;
+            margin-bottom: 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
             color: var(--text-white);
             text-decoration: none;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
         }
 
-        .legal-documents-list a:hover {
+        .legal-doc-card:hover {
             background: var(--accent-green-subtle);
+            border-color: var(--accent-green);
+            transform: translateX(8px);
+        }
+
+        .legal-doc-card:hover .doc-icon {
+            color: var(--accent-green);
+        }
+
+        .doc-icon {
+            width: 24px;
+            height: 24px;
+            color: var(--text-gray);
+            flex-shrink: 0;
+            transition: color 0.3s;
+        }
+
+        .doc-title {
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .doc-arrow {
+            width: 20px;
+            height: 20px;
+            color: var(--text-gray);
+            transition: transform 0.3s, color 0.3s;
+        }
+
+        .legal-doc-card:hover .doc-arrow {
+            transform: translateX(4px);
             color: var(--accent-green);
         }
 
         /* Footer */
-        .footer {
-            background: var(--bg-dark);
+        .legal-footer {
+            background: var(--bg-card);
             border-top: 1px solid var(--border-subtle);
             padding: 24px 0;
+            margin-top: auto;
         }
 
         .footer-content {
             max-width: 800px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -179,122 +344,60 @@
         .footer-copy {
             color: var(--text-gray);
             font-size: 0.85rem;
+            text-align: center;
+            width: 100%;
         }
 
-        .footer-links {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
+        @media (max-width: 600px) {
+            .header-content {
+                padding: 14px 16px;
+            }
 
-        .footer-links a {
-            color: var(--text-gray);
-            text-decoration: none;
-            font-size: 0.85rem;
-            transition: color 0.2s ease;
-        }
-
-        .footer-links a:hover {
-            color: var(--accent-green);
-        }
-
-        @media (max-width: 768px) {
-            .footer-content {
-                flex-direction: column;
-                text-align: center;
+            .legal-container {
+                padding: 32px 16px 60px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="nav">
-        <div class="container nav-content">
+    <!-- Minimal Header -->
+    <header class="legal-header">
+        <div class="header-content">
             <a href="/" class="logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"/>
+                    <polyline points="12 19 5 12 12 5"/>
+                </svg>
                 Say's<span class="logo-accent">Barbers</span>
             </a>
-            <ul class="nav-links">
-                <li><a href="/#services">Услуги</a></li>
-                <li><a href="/#podology">Подологический кабинет</a></li>
-                <li><a href="/shop">Магазин</a></li>
-                <li><a href="/#masters">Мастера</a></li>
-                <li><a href="/#blog">Блог</a></li>
-                <li><a href="/#faq">FAQ</a></li>
-                <li><a href="/#location">Контакты</a></li>
-            </ul>
-            <a href="/#booking" class="nav-cta">Онлайн-запись</a>
-            <button class="burger" type="button" aria-expanded="false" aria-controls="mobileMenu" aria-label="Открыть меню" onclick="LegalApp.toggleMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
         </div>
-    </nav>
-
-    <!-- Mobile Menu -->
-    <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
-        <a href="/#services" onclick="LegalApp.closeMenu()">Услуги</a>
-        <a href="/#podology" onclick="LegalApp.closeMenu()">Подологический кабинет</a>
-        <a href="/shop" onclick="LegalApp.closeMenu()">Магазин</a>
-        <a href="/#masters" onclick="LegalApp.closeMenu()">Мастера</a>
-        <a href="/#blog" onclick="LegalApp.closeMenu()">Блог</a>
-        <a href="/#faq" onclick="LegalApp.closeMenu()">FAQ</a>
-        <a href="/#location" onclick="LegalApp.closeMenu()">Контакты</a>
-        <a href="/#booking" onclick="LegalApp.closeMenu()">Онлайн-запись</a>
-    </div>
+    </header>
 
     <!-- Legal Content -->
     <main class="legal-main">
         <div class="legal-container" id="legalContainer">
-            <div class="legal-loading">Загрузка документа...</div>
+            <div class="legal-loading">
+                <div class="loading-spinner"></div>
+                Загрузка документа...
+            </div>
         </div>
     </main>
 
     <!-- Footer -->
-    <footer class="footer">
+    <footer class="legal-footer">
         <div class="footer-content">
             <div class="footer-copy">
-                © 2025 Say's Barbers. Все права защищены.
-            </div>
-            <div class="footer-links">
-                <a href="/legal/cookies">Политика cookie</a>
-                <a href="/legal/privacy">Политика конфиденциальности</a>
-                <a href="/legal/terms">Пользовательское соглашение</a>
+                &copy; 2025 Say's Barbers. Все права защищены.
             </div>
         </div>
     </footer>
 
     <script>
-        var LegalApp = (function() {
+        (function() {
             'use strict';
 
-            var mobileMenu = null;
-            var burger = null;
-
             function init() {
-                mobileMenu = document.getElementById('mobileMenu');
-                burger = document.querySelector('.burger');
                 loadDocument();
-            }
-
-            function toggleMenu() {
-                if (mobileMenu && burger) {
-                    var isOpen = mobileMenu.classList.toggle('active');
-                    burger.classList.toggle('active', isOpen);
-                    burger.setAttribute('aria-expanded', isOpen);
-                    mobileMenu.setAttribute('aria-hidden', !isOpen);
-                    document.body.style.overflow = isOpen ? 'hidden' : '';
-                }
-            }
-
-            function closeMenu() {
-                if (mobileMenu && burger) {
-                    mobileMenu.classList.remove('active');
-                    burger.classList.remove('active');
-                    burger.setAttribute('aria-expanded', 'false');
-                    mobileMenu.setAttribute('aria-hidden', 'true');
-                    document.body.style.overflow = '';
-                }
             }
 
             async function loadDocument() {
@@ -335,18 +438,27 @@
                         return d.active !== false;
                     });
 
-                    var html = '<a href="/" class="legal-back">' +
-                        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
-                        '<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>' +
-                        '</svg>' +
-                        'На главную' +
-                    '</a>' +
-                    '<h1 class="legal-title">Юридическая информация</h1>' +
-                    '<p class="legal-meta">Правовые документы и политики</p>' +
-                    '<div class="legal-documents-list">';
+                    var html = '<h1 class="legal-title">Юридическая информация</h1>' +
+                        '<p class="legal-meta">' +
+                        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' +
+                        'Правовые документы и политики' +
+                        '</p>' +
+                        '<div class="legal-documents-list">';
 
                     documents.forEach(function(doc) {
-                        html += '<a href="/legal/' + doc.slug + '">' + escapeHtml(doc.title) + '</a>';
+                        html += '<a href="/legal/' + doc.slug + '" class="legal-doc-card">' +
+                            '<svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+                            '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>' +
+                            '<polyline points="14 2 14 8 20 8"/>' +
+                            '<line x1="16" y1="13" x2="8" y2="13"/>' +
+                            '<line x1="16" y1="17" x2="8" y2="17"/>' +
+                            '</svg>' +
+                            '<span class="doc-title">' + escapeHtml(doc.title) + '</span>' +
+                            '<svg class="doc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+                            '<line x1="5" y1="12" x2="19" y2="12"/>' +
+                            '<polyline points="12 5 19 12 12 19"/>' +
+                            '</svg>' +
+                            '</a>';
                     });
 
                     html += '</div>';
@@ -367,31 +479,27 @@
                     day: 'numeric'
                 }) : '';
 
-                var html = '<a href="/" class="legal-back">' +
-                    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
-                    '<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>' +
-                    '</svg>' +
-                    'На главную' +
-                '</a>' +
-                '<h1 class="legal-title">' + escapeHtml(doc.title) + '</h1>' +
-                (updatedAt ? '<p class="legal-meta">Последнее обновление: ' + updatedAt + '</p>' : '') +
-                '<div class="legal-content">' + sanitizeHtml(doc.content) + '</div>';
+                var html = '<h1 class="legal-title">' + escapeHtml(doc.title) + '</h1>' +
+                    (updatedAt ? '<p class="legal-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Обновлено: ' + updatedAt + '</p>' : '') +
+                    '<div class="legal-content">' + sanitizeHtml(doc.content) + '</div>';
 
                 container.innerHTML = html;
             }
 
             function renderError() {
                 var container = document.getElementById('legalContainer');
-                container.innerHTML = '<a href="/" class="legal-back">' +
-                    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
-                    '<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>' +
+                container.innerHTML = '<div class="legal-error">' +
+                    '<svg class="legal-error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">' +
+                    '<circle cx="12" cy="12" r="10"/>' +
+                    '<line x1="12" y1="8" x2="12" y2="12"/>' +
+                    '<line x1="12" y1="16" x2="12.01" y2="16"/>' +
                     '</svg>' +
-                    'На главную' +
-                '</a>' +
-                '<div class="legal-error">' +
                     '<h2 class="legal-error-title">Документ не найден</h2>' +
                     '<p class="legal-error-text">Запрашиваемый документ не существует или был удалён.</p>' +
-                    '<a href="/legal" class="btn btn-primary">Все документы</a>' +
+                    '<a href="/legal" class="btn-primary">' +
+                    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' +
+                    'Все документы' +
+                    '</a>' +
                 '</div>';
             }
 
@@ -419,11 +527,6 @@
             } else {
                 init();
             }
-
-            return {
-                toggleMenu: toggleMenu,
-                closeMenu: closeMenu
-            };
         })();
     </script>
 </body>
