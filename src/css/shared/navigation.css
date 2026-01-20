@@ -155,6 +155,10 @@
     height: 2px;
     background: var(--text-white);
     transition: transform var(--transition-base), opacity var(--transition-base), top var(--transition-base);
+    transform-origin: center center;
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
 }
 
 .burger span::before,
