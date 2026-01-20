@@ -186,9 +186,14 @@
 
 .service-item:hover {
     background: var(--accent-green-muted);
-    transform: translateX(12px);
     border-color: var(--border-accent);
     box-shadow: var(--shadow-card);
+}
+
+@media (min-width: 769px) {
+    .service-item:hover {
+        transform: translateX(12px);
+    }
 }
 
 .service-item:hover::before {

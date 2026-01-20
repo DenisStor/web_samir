@@ -24,6 +24,8 @@
 .footer-links {
     display: flex;
     gap: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .footer-links a {
@@ -52,5 +54,9 @@
     .footer-content {
         flex-direction: column;
         text-align: center;
+    }
+
+    .footer-links {
+        gap: 16px;
     }
 }

@@ -15,9 +15,14 @@
     box-sizing: border-box;
 }
 
+html,
+body {
+    overflow-x: hidden;
+    overscroll-behavior-x: none;
+}
+
 html {
     scroll-behavior: smooth;
-    overflow-x: hidden;
 }
 
 body {
@@ -25,7 +30,6 @@ body {
     background-color: var(--bg-dark);
     color: var(--text-white);
     line-height: 1.6;
-    overflow-x: hidden;
 }
 
 /* =================================================================
