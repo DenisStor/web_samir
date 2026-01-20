@@ -54,22 +54,27 @@
 @media (max-width: 768px) {
     .footer-content {
         display: block;
+        text-align: left;
     }
 
     .footer-info {
         margin-bottom: 20px;
+        text-align: left;
+    }
+
+    .footer-legal {
+        text-align: left;
     }
 
     .footer-links {
-        display: block;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
     }
 
     .footer-links a {
         display: block;
-        margin-bottom: 12px;
-    }
-
-    .footer-links a:last-child {
-        margin-bottom: 0;
+        text-align: left;
     }
 }
