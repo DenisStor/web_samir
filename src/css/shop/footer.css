@@ -100,11 +100,6 @@
     opacity: 0.7;
 }
 
-.shop-footer .footer-legal span {
-    display: block;
-    margin-bottom: 2px;
-}
-
 @media (max-width: 768px) {
     .shop-footer-content {
         display: block;
