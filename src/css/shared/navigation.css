@@ -137,15 +137,29 @@
     z-index: calc(var(--z-fixed) + 1);
     background: transparent;
     border: none;
+    outline: none;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.burger::before,
+.burger::after {
+    display: none;
 }
 
 .burger span {
+    display: block;
     position: absolute;
     left: 10px;
     width: 28px;
     height: 2px;
     background: var(--text-white);
     transition: transform var(--transition-base), opacity var(--transition-base), top var(--transition-base);
+}
+
+.burger span::before,
+.burger span::after {
+    display: none;
 }
 
 .burger span:nth-child(1) {
