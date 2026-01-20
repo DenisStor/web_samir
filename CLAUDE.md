@@ -19,6 +19,7 @@ npm test                               # Тесты
 3. **Использовать `SharedHelpers`** для `escapeHtml`, `generateId`, `debounce`
 4. **parseInt** — всегда с radix: `parseInt(value, 10)`
 5. **Legal URL**: `/legal.html?page=privacy`, НЕ `/legal/privacy`
+6. **ВАЖНО: Версионирование CSS/JS** — при изменении любого CSS/JS файла **обязательно** увеличить версию `?v=X.X` в соответствующем `head.html` или `scripts.html`, затем `build.py`. Иначе пользователи увидят закешированную версию!
 
 ## Ссылки
 
