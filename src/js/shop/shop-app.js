@@ -20,6 +20,15 @@ var ShopApp = (function() {
     // DOM elements cache
     var elements = {};
 
+    // Для cleanup и throttle
+    var scrollRAF = null;
+    var boundHandlers = {
+        hashchange: null,
+        scroll: null,
+        keydown: null,
+        click: null
+    };
+
     // =================================================================
     // INITIALIZATION
     // =================================================================
@@ -30,11 +39,15 @@ var ShopApp = (function() {
         loadData();
         handleRoute();
 
-        // Listen for hash changes
-        window.addEventListener('hashchange', handleRoute);
+        // Сохраняем ссылки на handlers для возможности cleanup
+        boundHandlers.hashchange = handleRoute;
+        boundHandlers.scroll = handleScrollThrottled;
 
-        // Handle scroll for nav
-        window.addEventListener('scroll', handleScroll);
+        // Listen for hash changes
+        window.addEventListener('hashchange', boundHandlers.hashchange);
+
+        // Handle scroll for nav с throttle и passive для лучшей производительности
+        window.addEventListener('scroll', boundHandlers.scroll, { passive: true });
     }
 
     function initElements() {
@@ -391,7 +404,7 @@ var ShopApp = (function() {
             : '';
 
         var imageHtml = mainImage
-            ? '<img src="' + escapeHtml(mainImage.url) + '" alt="' + escapeHtml(product.name) + '" loading="lazy">'
+            ? '<img src="' + escapeAttr(mainImage.url) + '" alt="' + escapeAttr(product.name) + '" loading="lazy" decoding="async">'
             : '<div class="product-image-placeholder">' +
                 '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
                     '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>' +
@@ -442,14 +455,14 @@ var ShopApp = (function() {
 
             galleryHtml = '<div class="product-gallery">' +
                 '<div class="gallery-main" title="Нажмите для увеличения">' +
-                    '<img src="' + escapeHtml(mainImage.url) + '" alt="' + escapeHtml(product.name) + '" id="galleryMainImage">' +
+                    '<img src="' + escapeAttr(mainImage.url) + '" alt="' + escapeAttr(product.name) + '" id="galleryMainImage">' +
                     '<div class="gallery-zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></div>' +
                 '</div>' +
                 '<div class="gallery-thumbs">' +
                     sortedImages.map(function(img) {
                         var isActive = img.isMain ? ' active' : '';
-                        return '<button class="gallery-thumb' + isActive + '" onclick="ShopApp.setGalleryImage(\'' + escapeHtml(img.url) + '\', this)">' +
-                            '<img src="' + escapeHtml(img.url) + '" alt="' + escapeHtml(product.name) + '">' +
+                        return '<button class="gallery-thumb' + isActive + '" onclick="ShopApp.setGalleryImage(\'' + escapeAttr(img.url) + '\', this)">' +
+                            '<img src="' + escapeAttr(img.url) + '" alt="' + escapeAttr(product.name) + '" loading="lazy" decoding="async">' +
                         '</button>';
                     }).join('') +
                 '</div>' +
@@ -458,7 +471,7 @@ var ShopApp = (function() {
             var imgSrc = mainImage ? mainImage.url : '';
             galleryHtml = '<div class="product-single-image gallery-main" title="Нажмите для увеличения">' +
                 (imgSrc
-                    ? '<img src="' + escapeHtml(imgSrc) + '" alt="' + escapeHtml(product.name) + '">' +
+                    ? '<img src="' + escapeAttr(imgSrc) + '" alt="' + escapeAttr(product.name) + '">' +
                       '<div class="gallery-zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></div>'
                     : '<div class="product-image-placeholder" style="height:100%;display:flex;align-items:center;justify-content:center;">' +
                         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:64px;height:64px;opacity:0.5;">' +
@@ -580,24 +593,7 @@ var ShopApp = (function() {
         return new Intl.NumberFormat('ru-RU').format(price) + ' ₽';
     }
 
-    function escapeHtml(text) {
-        if (!text) return '';
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    function debounce(func, wait) {
-        var timeout;
-        return function() {
-            var context = this;
-            var args = arguments;
-            clearTimeout(timeout);
-            timeout = setTimeout(function() {
-                func.apply(context, args);
-            }, wait);
-        };
-    }
+    // escapeHtml и debounce теперь используются из SharedHelpers (helpers.js)
 
     // =================================================================
     // MOBILE MENU
@@ -631,14 +627,16 @@ var ShopApp = (function() {
         document.body.style.overflow = '';
     }
 
-    function handleScroll() {
-        if (elements.nav) {
-            if (window.scrollY > 50) {
-                elements.nav.classList.add('scrolled');
-            } else {
-                elements.nav.classList.remove('scrolled');
+    // Throttled версия handleScroll через requestAnimationFrame
+    function handleScrollThrottled() {
+        if (scrollRAF) return;
+
+        scrollRAF = requestAnimationFrame(function() {
+            if (elements.nav) {
+                elements.nav.classList.toggle('scrolled', window.scrollY > 50);
             }
-        }
+            scrollRAF = null;
+        });
     }
 
     // =================================================================
@@ -721,6 +719,34 @@ var ShopApp = (function() {
     }
 
     // =================================================================
+    // CLEANUP
+    // =================================================================
+
+    function destroy() {
+        // Удаляем window listeners
+        if (boundHandlers.hashchange) {
+            window.removeEventListener('hashchange', boundHandlers.hashchange);
+            boundHandlers.hashchange = null;
+        }
+        if (boundHandlers.scroll) {
+            window.removeEventListener('scroll', boundHandlers.scroll);
+            boundHandlers.scroll = null;
+        }
+
+        // Отменяем requestAnimationFrame
+        if (scrollRAF) {
+            cancelAnimationFrame(scrollRAF);
+            scrollRAF = null;
+        }
+
+        // Очищаем состояние
+        categories = [];
+        products = [];
+        lightboxImages = [];
+        elements = {};
+    }
+
+    // =================================================================
     // INIT ON DOM READY
     // =================================================================
 
@@ -746,6 +772,7 @@ var ShopApp = (function() {
         prevImage: prevImage,
         nextImage: nextImage,
         openFilterSheet: openFilterSheet,
-        closeFilterSheet: closeFilterSheet
+        closeFilterSheet: closeFilterSheet,
+        destroy: destroy
     };
 })();

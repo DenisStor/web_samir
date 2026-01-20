@@ -69,15 +69,32 @@ def load_config():
         try:
             with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
                 file_config = json.load(f)
-                # Убираем пароль из файла config - он должен быть в .env
-                file_config.pop('admin_password', None)
-                default_config.update(file_config)
-        except Exception:
-            pass
+                # Поддержка новой вложенной структуры (auth секция)
+                if 'auth' in file_config:
+                    auth = file_config['auth']
+                    default_config['session_timeout_hours'] = auth.get('sessionTimeoutHours', default_config['session_timeout_hours'])
+                    default_config['max_login_attempts'] = auth.get('maxLoginAttempts', default_config['max_login_attempts'])
+                    default_config['lockout_minutes'] = auth.get('lockoutMinutes', default_config['lockout_minutes'])
+                else:
+                    # Обратная совместимость со старой структурой
+                    file_config.pop('admin_password', None)
+                    default_config.update(file_config)
+        except json.JSONDecodeError as e:
+            print(f"⚠️  Ошибка парсинга config.json: {e}")
+            print("   Используются значения по умолчанию")
+        except Exception as e:
+            print(f"⚠️  Ошибка загрузки config.json: {e}")
 
     # Переопределяем из переменных окружения
+    admin_password = os.environ.get('ADMIN_PASSWORD')
+    if not admin_password:
+        print("⚠️  ВНИМАНИЕ: ADMIN_PASSWORD не установлен!")
+        print("   Установите переменную окружения ADMIN_PASSWORD или добавьте в .env файл")
+        print("   Пример: ADMIN_PASSWORD=your_secure_password")
+        admin_password = None  # Блокируем вход без установленного пароля
+
     config = {
-        "admin_password": os.environ.get('ADMIN_PASSWORD', 'changeme'),
+        "admin_password": admin_password,
         "session_timeout_hours": int(os.environ.get('SESSION_TIMEOUT_HOURS', default_config['session_timeout_hours'])),
         "max_login_attempts": int(os.environ.get('MAX_LOGIN_ATTEMPTS', default_config['max_login_attempts'])),
         "lockout_minutes": int(os.environ.get('LOCKOUT_MINUTES', default_config['lockout_minutes']))
@@ -89,9 +106,55 @@ CONFIG = load_config()
 
 # Хранилище сессий и rate limiting (в памяти)
 sessions = {}  # {token: {'created': datetime, 'expires': datetime}}
+sessions_lock = threading.Lock()  # Lock для безопасного доступа к sessions
 login_attempts = {}  # {ip: {'count': int, 'lockout_until': datetime}}
+upload_attempts = {}  # {ip: {'count': int, 'window_start': datetime}}
 file_locks = {}  # {filename: threading.Lock()}
 file_locks_lock = threading.Lock()
+
+# Rate limiting настройки для uploads
+UPLOAD_RATE_LIMIT = 10  # Максимум загрузок
+UPLOAD_RATE_WINDOW = 60  # За период в секундах
+
+# CORS настройки
+ALLOWED_ORIGINS = {
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'https://saysbarbers.ru',
+    'https://www.saysbarbers.ru'
+}
+
+
+def cleanup_expired_data():
+    """Очистка устаревших сессий и попыток входа (thread-safe)."""
+    now = datetime.now()
+
+    # Очистка истёкших сессий (с блокировкой)
+    with sessions_lock:
+        expired_tokens = [
+            token for token, session in sessions.items()
+            if now > session['expires']
+        ]
+        for token in expired_tokens:
+            del sessions[token]
+
+    # Очистка старых записей login_attempts (старше 24 часов)
+    cutoff = now - timedelta(hours=24)
+    old_ips = [
+        ip for ip, attempt in login_attempts.items()
+        if 'lockout_until' in attempt and attempt['lockout_until'] < cutoff
+    ]
+    for ip in old_ips:
+        del login_attempts[ip]
+
+    # Очистка старых записей upload_attempts
+    upload_window = now - timedelta(seconds=UPLOAD_RATE_WINDOW * 2)
+    old_upload_ips = [
+        ip for ip, attempt in upload_attempts.items()
+        if attempt.get('window_start', now) < upload_window
+    ]
+    for ip in old_upload_ips:
+        del upload_attempts[ip]
 
 
 def generate_token():
@@ -99,15 +162,50 @@ def generate_token():
     return hashlib.sha256(f"{uuid.uuid4().hex}{datetime.now().isoformat()}".encode()).hexdigest()
 
 
+def hash_password(password, salt=None):
+    """Хеширование пароля с использованием PBKDF2-SHA256."""
+    if salt is None:
+        salt = os.urandom(16)
+    elif isinstance(salt, str):
+        salt = bytes.fromhex(salt)
+    key = hashlib.pbkdf2_hmac('sha256', password.encode(), salt, 100000)
+    return salt.hex() + ':' + key.hex()
+
+
+def verify_password(password, stored_password):
+    """
+    Проверка пароля. Поддерживает:
+    - Хешированные пароли (формат: salt:hash)
+    - Plaintext пароли (для обратной совместимости)
+    """
+    if ':' in stored_password and len(stored_password) > 70:
+        # Хешированный пароль
+        try:
+            salt_hex, _ = stored_password.split(':', 1)
+            return hash_password(password, salt_hex) == stored_password
+        except (ValueError, TypeError):
+            return False
+    else:
+        # Plaintext пароль (deprecated, для обратной совместимости)
+        return password == stored_password
+
+
 def validate_token(token):
-    """Проверка валидности токена."""
-    if not token or token not in sessions:
+    """Проверка валидности токена (thread-safe)."""
+    # Периодическая очистка устаревших данных (при каждой проверке токена)
+    cleanup_expired_data()
+
+    if not token:
         return False
-    session = sessions[token]
-    if datetime.now() > session['expires']:
-        del sessions[token]
-        return False
-    return True
+
+    with sessions_lock:
+        if token not in sessions:
+            return False
+        session = sessions[token]
+        if datetime.now() > session['expires']:
+            del sessions[token]
+            return False
+        return True
 
 
 def get_file_lock(filename):
@@ -202,17 +300,63 @@ def record_login_attempt(ip, success):
 # ВАЛИДАЦИЯ ДАННЫХ
 # ============================================
 
+# ID prefixes for different entity types
+ID_PREFIXES = {
+    'master': 'master_',
+    'article': 'article_',
+    'product': 'product_',
+    'category': 'category_',
+    'legal': 'legal_',
+    'faq': 'faq_',
+    'service': ''  # Services use numeric IDs
+}
+
+
+def is_valid_id(id_value, entity_type):
+    """
+    Validate ID format for the given entity type.
+    IDs should match pattern: prefix_timestamp(_random)?
+    """
+    if not id_value or not isinstance(id_value, str):
+        return False
+
+    prefix = ID_PREFIXES.get(entity_type, '')
+
+    # Services use numeric IDs
+    if entity_type == 'service':
+        try:
+            int(id_value)
+            return True
+        except (ValueError, TypeError):
+            return False
+
+    # Check prefix
+    if prefix and not id_value.startswith(prefix):
+        return False
+
+    # Check format: only alphanumeric and underscores allowed
+    if not re.match(r'^[a-z]+_[0-9]+(_[a-z0-9]+)?$', id_value):
+        return False
+
+    return True
+
+
 def validate_master(data):
     """Валидация данных мастера."""
     if not isinstance(data, dict):
         return False, "Invalid data format"
+
+    # Validate ID if provided
+    master_id = data.get('id')
+    if master_id and not is_valid_id(master_id, 'master'):
+        return False, "Invalid ID format"
 
     name = data.get('name', '')
     if not name or not isinstance(name, str) or len(name) > 100:
         return False, "Invalid or missing name"
 
     # Защита от XSS - запрещаем HTML теги в имени
-    if '<' in name or '>' in name:
+    if contains_html_chars(name):
         return False, "Invalid characters in name"
 
     badge = data.get('badge', 'green')
@@ -237,8 +381,56 @@ def validate_service(data):
         if price is not None:
             if not isinstance(price, (int, float)) or price < 0 or price > 1000000:
                 return False, f"Invalid {price_key}"
+            # Проверка на Infinity и NaN
+            if isinstance(price, float) and (price != price or price == float('inf') or price == float('-inf')):
+                return False, f"Invalid {price_key} value"
 
     return True, None
+
+
+def contains_html_chars(text):
+    """Проверка наличия HTML символов в тексте."""
+    if not isinstance(text, str):
+        return True
+    # Проверяем на наличие HTML тегов и других опасных паттернов
+    dangerous_patterns = ['<', '>', '&lt;', '&gt;', 'javascript:', 'data:', 'vbscript:']
+    text_lower = text.lower()
+    return any(pattern in text_lower for pattern in dangerous_patterns)
+
+
+def is_valid_slug(slug):
+    """Проверка валидности slug (только буквы, цифры, дефис)."""
+    if not slug or not isinstance(slug, str):
+        return False
+    if len(slug) > 100:
+        return False
+    # Slug может содержать только a-z, 0-9, дефис
+    return bool(re.match(r'^[a-z0-9]+(?:-[a-z0-9]+)*$', slug))
+
+
+def check_upload_rate_limit(ip):
+    """Проверка rate limiting для загрузок."""
+    now = datetime.now()
+
+    if ip not in upload_attempts:
+        upload_attempts[ip] = {'count': 1, 'window_start': now}
+        return True
+
+    attempt = upload_attempts[ip]
+    window_start = attempt.get('window_start', now)
+
+    # Если окно истекло, сбрасываем счётчик
+    if (now - window_start).total_seconds() > UPLOAD_RATE_WINDOW:
+        upload_attempts[ip] = {'count': 1, 'window_start': now}
+        return True
+
+    # Проверяем лимит
+    if attempt['count'] >= UPLOAD_RATE_LIMIT:
+        return False
+
+    # Увеличиваем счётчик
+    upload_attempts[ip]['count'] += 1
+    return True
 
 
 def sanitize_html_content(text):
@@ -258,6 +450,12 @@ def sanitize_html_content(text):
     # Удаляем object/embed
     text = re.sub(r'<object[^>]*>.*?</object>', '', text, flags=re.IGNORECASE | re.DOTALL)
     text = re.sub(r'<embed[^>]*/?>', '', text, flags=re.IGNORECASE)
+    # Удаляем svg теги (XSS через onload)
+    text = re.sub(r'<svg[^>]*>.*?</svg>', '', text, flags=re.IGNORECASE | re.DOTALL)
+    # Удаляем math теги
+    text = re.sub(r'<math[^>]*>.*?</math>', '', text, flags=re.IGNORECASE | re.DOTALL)
+    # Удаляем base теги (могут изменить базовый URL)
+    text = re.sub(r'<base[^>]*/?>', '', text, flags=re.IGNORECASE)
     # Удаляем опасные атрибуты (onclick, onerror, etc.)
     text = re.sub(r'\s+on\w+\s*=\s*["\'][^"\']*["\']', '', text, flags=re.IGNORECASE)
     text = re.sub(r'\s+on\w+\s*=\s*\S+', '', text, flags=re.IGNORECASE)
@@ -273,12 +471,17 @@ def validate_article(data):
     if not isinstance(data, dict):
         return False, "Invalid data format"
 
+    # Validate ID if provided
+    article_id = data.get('id')
+    if article_id and not is_valid_id(article_id, 'article'):
+        return False, "Invalid ID format"
+
     title = data.get('title', '')
     if not title or not isinstance(title, str) or len(title) > 500:
         return False, "Invalid or missing title"
 
     # Защита от XSS в заголовке
-    if '<' in title or '>' in title:
+    if contains_html_chars(title):
         return False, "Invalid characters in title"
 
     content = data.get('content', '')
@@ -302,12 +505,17 @@ def validate_faq(data):
     if not isinstance(data, dict):
         return False, "Invalid data format"
 
+    # Validate ID if provided
+    faq_id = data.get('id')
+    if faq_id and not is_valid_id(faq_id, 'faq'):
+        return False, "Invalid ID format"
+
     question = data.get('question', '')
     if not question or not isinstance(question, str) or len(question) > 500:
         return False, "Invalid or missing question"
 
     # Защита от XSS в вопросе
-    if '<' in question or '>' in question:
+    if contains_html_chars(question):
         return False, "Invalid characters in question"
 
     answer = data.get('answer', '')
@@ -315,7 +523,7 @@ def validate_faq(data):
         return False, "Answer too long"
 
     # Защита от XSS в ответе
-    if '<' in answer or '>' in answer:
+    if contains_html_chars(answer):
         return False, "Invalid characters in answer"
 
     return True, None
@@ -331,15 +539,88 @@ def validate_principle(data):
         return False, "Invalid or missing title"
 
     # Защита от XSS
-    if '<' in title or '>' in title:
+    if contains_html_chars(title):
         return False, "Invalid characters in title"
 
     description = data.get('description', '')
     if len(description) > 1000:
         return False, "Description too long"
 
-    if '<' in description or '>' in description:
+    if contains_html_chars(description):
         return False, "Invalid characters in description"
+
+    return True, None
+
+
+def validate_product(data):
+    """Валидация данных товара."""
+    if not isinstance(data, dict):
+        return False, "Invalid data format"
+
+    # Validate ID if provided
+    product_id = data.get('id')
+    if product_id and not is_valid_id(product_id, 'product'):
+        return False, "Invalid ID format"
+
+    name = data.get('name', '')
+    if not name or not isinstance(name, str) or len(name) > 200:
+        return False, "Invalid or missing name"
+
+    # Защита от XSS в названии
+    if contains_html_chars(name):
+        return False, "Invalid characters in name"
+
+    # Валидация статуса
+    status = data.get('status', 'active')
+    if status not in ['active', 'inactive', 'draft']:
+        return False, "Invalid status. Must be 'active', 'inactive', or 'draft'"
+
+    # Валидация цены
+    price = data.get('price')
+    if price is not None:
+        if not isinstance(price, (int, float)) or price < 0 or price > 10000000:
+            return False, "Invalid price"
+        # Проверка на Infinity и NaN
+        if isinstance(price, float) and (price != price or price == float('inf') or price == float('-inf')):
+            return False, "Invalid price value"
+
+    # Валидация categoryId
+    category_id = data.get('categoryId', '')
+    if category_id and not is_valid_id(category_id, 'category'):
+        return False, "Invalid categoryId format"
+
+    # Санитизируем описание если есть
+    description = data.get('description', '')
+    if description:
+        if len(description) > 10000:
+            return False, "Description too long"
+        data['description'] = sanitize_html_content(description)
+
+    return True, None
+
+
+def validate_category(data):
+    """Валидация данных категории."""
+    if not isinstance(data, dict):
+        return False, "Invalid data format"
+
+    # Validate ID if provided
+    category_id = data.get('id')
+    if category_id and not is_valid_id(category_id, 'category'):
+        return False, "Invalid ID format"
+
+    name = data.get('name', '')
+    if not name or not isinstance(name, str) or len(name) > 100:
+        return False, "Invalid or missing name"
+
+    # Защита от XSS
+    if contains_html_chars(name):
+        return False, "Invalid characters in name"
+
+    # Валидация slug
+    slug = data.get('slug', '')
+    if slug and not is_valid_slug(slug):
+        return False, "Invalid slug format"
 
     return True, None
 
@@ -406,9 +687,22 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
         # HTML и прочее - короткий кеш с проверкой
         return 'public, max-age=300, must-revalidate'
 
+    def get_cors_origin(self):
+        """Получение разрешённого CORS origin."""
+        origin = self.headers.get('Origin', '')
+        if origin in ALLOWED_ORIGINS:
+            return origin
+        # Для локальной разработки разрешаем localhost с любым портом
+        if origin.startswith('http://localhost:') or origin.startswith('http://127.0.0.1:'):
+            return origin
+        return None
+
     def end_headers(self):
         self.send_header('Cache-Control', self.get_cache_header())
-        self.send_header('Access-Control-Allow-Origin', '*')
+        cors_origin = self.get_cors_origin()
+        if cors_origin:
+            self.send_header('Access-Control-Allow-Origin', cors_origin)
+            self.send_header('Access-Control-Allow-Credentials', 'true')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
         super().end_headers()
@@ -468,6 +762,10 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
         elif path.startswith('/api/shop/products/'):
             product_id = path.split('/')[-1]
             self.handle_get_product(product_id)
+        # Public files (robots.txt, sitemap.xml, etc.)
+        elif path in ('/robots.txt', '/sitemap.xml', '/favicon.ico'):
+            self.path = '/public' + path
+            return super().do_GET()
         # Legal page routing
         elif path == '/legal' or path.startswith('/legal/'):
             self.path = '/legal.html'
@@ -564,7 +862,7 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
             data = json.loads(post_data.decode('utf-8'))
             password = data.get('password', '')
 
-            if password == CONFIG['admin_password']:
+            if CONFIG['admin_password'] and verify_password(password, CONFIG['admin_password']):
                 # Успешный вход
                 token = generate_token()
                 sessions[token] = {
@@ -583,7 +881,8 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_error_response(401, 'Invalid password')
 
         except Exception as e:
-            self.send_error_response(500, str(e))
+            print(f"Server error: {e}")  # Логируем для отладки
+            self.send_error_response(500, 'Internal server error')
 
     def handle_logout(self):
         """Выход из системы."""
@@ -593,7 +892,8 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
                 del sessions[token]
             self.send_json_response({'success': True, 'message': 'Logged out'})
         except Exception as e:
-            self.send_error_response(500, str(e))
+            print(f"Server error: {e}")  # Логируем для отладки
+            self.send_error_response(500, 'Internal server error')
 
     def handle_auth_check(self):
         """Проверка валидности текущей сессии."""
@@ -619,7 +919,8 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
             else:
                 self.send_json_response({})
         except Exception as e:
-            self.send_error_response(500, str(e))
+            print(f"Server error: {e}")  # Логируем для отладки
+            self.send_error_response(500, 'Internal server error')
 
     def handle_get_products(self):
         """Получение товаров с фильтрацией по категории"""
@@ -657,7 +958,8 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
 
             self.send_json_response({'products': products})
         except Exception as e:
-            self.send_error_response(500, str(e))
+            print(f"Server error: {e}")  # Логируем для отладки
+            self.send_error_response(500, 'Internal server error')
 
     def handle_get_product(self, product_id):
         """Получение одного товара по ID"""
@@ -679,11 +981,17 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
             else:
                 self.send_error_response(404, 'Product not found')
         except Exception as e:
-            self.send_error_response(500, str(e))
+            print(f"Server error: {e}")  # Логируем для отладки
+            self.send_error_response(500, 'Internal server error')
 
     def handle_get_legal_document(self, slug):
         """Получение одного юридического документа по slug"""
         try:
+            # Валидация slug параметра
+            if not is_valid_slug(slug):
+                self.send_error_response(400, 'Invalid slug format')
+                return
+
             filepath = DATA_DIR / 'legal.json'
             if filepath.exists():
                 with open(filepath, 'r', encoding='utf-8') as f:
@@ -702,7 +1010,8 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
             else:
                 self.send_error_response(404, 'Document not found')
         except Exception as e:
-            self.send_error_response(500, str(e))
+            print(f"Server error: {e}")  # Логируем для отладки
+            self.send_error_response(500, 'Internal server error')
 
     def handle_save_data(self, filename):
         """Сохранение данных в JSON файл с блокировкой и атомарной записью."""
@@ -736,17 +1045,24 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
                 temp_filepath = (DATA_DIR / filename).with_suffix('.tmp')
                 if temp_filepath.exists():
                     temp_filepath.unlink()
-                self.send_error_response(500, str(e))
+                print(f"Server error: {e}")  # Логируем для отладки
+                self.send_error_response(500, 'Internal server error')
 
     def handle_upload(self):
         """Загрузка изображений с ограничением размера и валидацией типа."""
         try:
+            # Rate limiting для загрузок
+            ip = self.get_client_ip()
+            if not check_upload_rate_limit(ip):
+                self.send_error_response(429, 'Too many uploads. Please wait and try again.')
+                return
+
             content_length = int(self.headers['Content-Length'])
 
-            # Ограничение размера (10MB max)
-            max_upload_size = 10 * 1024 * 1024
+            # Ограничение размера (5MB max - синхронизировано с config.json)
+            max_upload_size = 5 * 1024 * 1024
             if content_length > max_upload_size:
-                self.send_error_response(413, 'File too large. Max size is 10MB.')
+                self.send_error_response(413, 'File too large. Max size is 5MB.')
                 return
 
             post_data = self.rfile.read(content_length)
@@ -788,7 +1104,8 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
                 'url': f'/uploads/{filename}'
             })
         except Exception as e:
-            self.send_error_response(500, str(e))
+            print(f"Server error: {e}")  # Логируем для отладки
+            self.send_error_response(500, 'Internal server error')
 
     def handle_delete_upload(self, filename):
         """Удаление загруженного файла с защитой от Path Traversal."""
@@ -800,8 +1117,10 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
 
             filepath = (UPLOADS_DIR / filename).resolve()
 
-            # Проверка что путь внутри UPLOADS_DIR
-            if not filepath.is_relative_to(UPLOADS_DIR.resolve()):
+            # Проверка что путь внутри UPLOADS_DIR (Python 3.8 совместимость)
+            try:
+                filepath.relative_to(UPLOADS_DIR.resolve())
+            except ValueError:
                 self.send_error_response(403, 'Access denied')
                 return
 
@@ -812,7 +1131,8 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
             except FileNotFoundError:
                 self.send_error_response(404, 'Файл не найден')
         except Exception as e:
-            self.send_error_response(500, str(e))
+            print(f"Server error: {e}")  # Логируем для отладки
+            self.send_error_response(500, 'Internal server error')
 
     def handle_get_stats(self):
         """Получение статистики посещений"""
@@ -854,7 +1174,8 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
 
             self.send_json_response(stats)
         except Exception as e:
-            self.send_error_response(500, str(e))
+            print(f"Server error: {e}")  # Логируем для отладки
+            self.send_error_response(500, 'Internal server error')
 
     def handle_record_visit(self):
         """Запись посещения или просмотра секции (с атомарной записью)"""
@@ -928,7 +1249,8 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
             temp_filepath = filepath.with_suffix('.tmp')
             if temp_filepath.exists():
                 temp_filepath.unlink()
-            self.send_error_response(500, str(e))
+            print(f"Server error: {e}")  # Логируем для отладки
+            self.send_error_response(500, 'Internal server error')
 
     def _init_stats(self):
         """Инициализация пустой статистики"""

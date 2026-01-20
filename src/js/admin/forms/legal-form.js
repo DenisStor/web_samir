@@ -28,30 +28,7 @@ var AdminLegalForm = (function() {
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-label">Содержимое документа *</label>' +
-                '<div class="wysiwyg-toolbar">' +
-                    '<button type="button" class="wysiwyg-btn" onclick="AdminWYSIWYG.formatText(\'bold\')" title="Жирный">' +
-                        '<strong>B</strong>' +
-                    '</button>' +
-                    '<button type="button" class="wysiwyg-btn" onclick="AdminWYSIWYG.formatText(\'italic\')" title="Курсив">' +
-                        '<em>I</em>' +
-                    '</button>' +
-                    '<button type="button" class="wysiwyg-btn" onclick="AdminWYSIWYG.formatText(\'insertUnorderedList\')" title="Маркированный список">' +
-                        SharedIcons.get('list') +
-                    '</button>' +
-                    '<button type="button" class="wysiwyg-btn" onclick="AdminWYSIWYG.formatText(\'insertOrderedList\')" title="Нумерованный список">' +
-                        SharedIcons.get('listOrdered') +
-                    '</button>' +
-                    '<span class="wysiwyg-separator"></span>' +
-                    '<button type="button" class="wysiwyg-btn" onclick="AdminWYSIWYG.formatText(\'h2\')" title="Заголовок H2">' +
-                        'H2' +
-                    '</button>' +
-                    '<button type="button" class="wysiwyg-btn" onclick="AdminWYSIWYG.formatText(\'h3\')" title="Заголовок H3">' +
-                        'H3' +
-                    '</button>' +
-                '</div>' +
-                '<div class="wysiwyg-editor" id="legalContent" contenteditable="true">' +
-                    (legalDoc ? legalDoc.content : '') +
-                '</div>' +
+                AdminWYSIWYG.getEditorHTML('legalContent', legalDoc ? legalDoc.content : '', 'Введите текст документа...') +
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-checkbox">' +
@@ -68,10 +45,11 @@ var AdminLegalForm = (function() {
         }
         AdminModals.open('modal');
 
-        // Инициализация WYSIWYG редактора
-        setTimeout(function() {
-            AdminWYSIWYG.init('legalContent');
-        }, 100);
+        // Инициализация WYSIWYG редактора с тулбаром
+        // Используем requestAnimationFrame для гарантии что DOM обновился
+        requestAnimationFrame(function() {
+            AdminWYSIWYG.initWithToolbar('legalContent');
+        });
     }
 
     /**
@@ -80,7 +58,7 @@ var AdminLegalForm = (function() {
     async function save() {
         var title = document.getElementById('legalTitle').value.trim();
         var slug = document.getElementById('legalSlug').value.trim().toLowerCase();
-        var content = document.getElementById('legalContent').innerHTML;
+        var content = AdminWYSIWYG.getContent('legalContent');
         var active = document.getElementById('legalActive').checked;
 
         // Валидация
@@ -129,7 +107,7 @@ var AdminLegalForm = (function() {
         } else {
             // Создание нового
             var newDocument = {
-                id: generateId(),
+                id: SharedHelpers.generateId('legal'),
                 slug: slug,
                 title: title,
                 content: content,
@@ -158,7 +136,7 @@ var AdminLegalForm = (function() {
         var legalDoc = AdminState.findLegalDocument(id);
         if (!legalDoc) return;
 
-        AdminModals.openDeleteConfirm(
+        AdminModals.confirmDelete(
             legalDoc.title,
             async function() {
                 var documents = AdminState.legalDocuments.filter(function(d) {
@@ -178,12 +156,7 @@ var AdminLegalForm = (function() {
         );
     }
 
-    /**
-     * Генерация ID
-     */
-    function generateId() {
-        return 'legal_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    }
+    // generateId теперь используется из SharedHelpers (helpers.js)
 
     // Публичный API
     return {

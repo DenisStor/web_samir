@@ -8,7 +8,7 @@
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-xl);
     padding: 24px;
-    transition: all var(--transition-base);
+    transition: border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base);
 }
 
 .master-card:hover {
@@ -125,7 +125,7 @@
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-xl);
     overflow: hidden;
-    transition: all var(--transition-base);
+    transition: border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base);
     display: flex;
     flex-direction: column;
 }

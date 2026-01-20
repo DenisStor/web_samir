@@ -47,21 +47,7 @@ var AdminArticleForm = (function() {
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-label">Полный текст статьи</label>' +
-                '<div class="editor-toolbar">' +
-                    '<button type="button" class="toolbar-btn" data-command="bold" title="Жирный (Ctrl+B)"><strong>B</strong></button>' +
-                    '<button type="button" class="toolbar-btn" data-command="italic" title="Курсив (Ctrl+I)"><em>I</em></button>' +
-                    '<button type="button" class="toolbar-btn" data-command="underline" title="Подчёркнутый (Ctrl+U)"><u>U</u></button>' +
-                    '<span class="toolbar-divider"></span>' +
-                    '<button type="button" class="toolbar-btn" data-command="h2" title="Заголовок">H2</button>' +
-                    '<button type="button" class="toolbar-btn" data-command="h3" title="Подзаголовок">H3</button>' +
-                    '<span class="toolbar-divider"></span>' +
-                    '<button type="button" class="toolbar-btn" data-command="ul" title="Маркированный список">•</button>' +
-                    '<button type="button" class="toolbar-btn" data-command="ol" title="Нумерованный список">1.</button>' +
-                    '<span class="toolbar-divider"></span>' +
-                    '<button type="button" class="toolbar-btn" data-command="link" title="Ссылка">🔗</button>' +
-                    '<button type="button" class="toolbar-btn" data-command="removeFormat" title="Очистить форматирование">✕</button>' +
-                '</div>' +
-                '<div class="wysiwyg-editor" id="articleContent" contenteditable="true" data-placeholder="Начните писать текст статьи...">' + (article && article.content || '') + '</div>' +
+                AdminWYSIWYG.getEditorHTML('articleContent', article && article.content || '', 'Начните писать текст статьи...') +
             '</div>' +
         '</form>';
 
@@ -72,73 +58,9 @@ var AdminArticleForm = (function() {
         }
         AdminModals.open('modal');
 
-        // Инициализация редактора
-        initEditor();
-    }
-
-    /**
-     * Инициализация WYSIWYG редактора
-     */
-    function initEditor() {
-        var editor = document.getElementById('articleContent');
-        if (!editor) return;
-
-        // Инициализация тулбара
-        var toolbar = document.querySelector('.editor-toolbar');
-        if (toolbar) {
-            toolbar.addEventListener('mousedown', function(e) {
-                var btn = e.target.closest('.toolbar-btn');
-                if (btn) {
-                    e.preventDefault();
-                    var command = btn.dataset.command;
-                    if (command) {
-                        AdminWYSIWYG.formatText(command);
-                    }
-                }
-            });
-        }
-
-        // Горячие клавиши
-        editor.addEventListener('keydown', function(e) {
-            if (e.ctrlKey || e.metaKey) {
-                switch (e.key.toLowerCase()) {
-                    case 'b':
-                        e.preventDefault();
-                        AdminWYSIWYG.formatText('bold');
-                        break;
-                    case 'i':
-                        e.preventDefault();
-                        AdminWYSIWYG.formatText('italic');
-                        break;
-                    case 'u':
-                        e.preventDefault();
-                        AdminWYSIWYG.formatText('underline');
-                        break;
-                }
-            }
-        });
-
-        // Очистка форматирования при вставке
-        editor.addEventListener('paste', function(e) {
-            e.preventDefault();
-            var text = (e.clipboardData || window.clipboardData).getData('text/plain');
-            var selection = window.getSelection();
-            if (!selection.rangeCount) return;
-
-            selection.deleteFromDocument();
-
-            var lines = text.split('\n');
-            var fragment = document.createDocumentFragment();
-
-            lines.forEach(function(line, index) {
-                fragment.appendChild(document.createTextNode(line));
-                if (index < lines.length - 1) {
-                    fragment.appendChild(document.createElement('br'));
-                }
-            });
-
-            selection.getRangeAt(0).insertNode(fragment);
-            selection.collapseToEnd();
+        // Инициализация редактора после рендеринга DOM
+        requestAnimationFrame(function() {
+            AdminWYSIWYG.initWithToolbar('articleContent');
         });
     }
 
@@ -157,13 +79,12 @@ var AdminArticleForm = (function() {
         var tagEl = document.getElementById('articleTag');
         var dateEl = document.getElementById('articleDate');
         var excerptEl = document.getElementById('articleExcerpt');
-        var contentEl = document.getElementById('articleContent');
         var imageEl = document.getElementById('articleImage');
 
         var tag = tagEl ? tagEl.value.trim() : 'Статья';
         var date = dateEl ? dateEl.value : new Date().toISOString().split('T')[0];
         var excerpt = excerptEl ? excerptEl.value.trim() : '';
-        var content = contentEl ? contentEl.innerHTML.trim() : '';
+        var content = AdminWYSIWYG.getContent('articleContent');
         var image = imageEl ? imageEl.value : null;
 
         var articleData = {

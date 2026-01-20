@@ -1,5 +1,38 @@
 {
-  "session_timeout_hours": 24,
-  "max_login_attempts": 5,
-  "lockout_minutes": 15
+  "site": {
+    "name": "Say's Barbers",
+    "domain": "saysbarbers.ru",
+    "phone": "+7 (911) 070-11-07",
+    "telegram": "https://t.me/saysbarbers"
+  },
+  "api": {
+    "baseUrl": "/api",
+    "timeout": 30000
+  },
+  "auth": {
+    "sessionTimeoutHours": 24,
+    "maxLoginAttempts": 5,
+    "lockoutMinutes": 15
+  },
+  "ui": {
+    "toastDuration": 3000,
+    "debounceDelay": 300,
+    "animationDuration": 300,
+    "maxImageSize": 5242880,
+    "maxUploadImages": 10
+  },
+  "colors": {
+    "danger": "#ff4757",
+    "dangerHover": "#ff3344",
+    "dangerLight": "#ff6b6b",
+    "dangerSubtle": "rgba(255, 71, 87, 0.15)"
+  },
+  "idPrefixes": {
+    "master": "master_",
+    "article": "article_",
+    "product": "product_",
+    "category": "category_",
+    "legal": "legal_",
+    "faq": "faq_"
+  }
 }

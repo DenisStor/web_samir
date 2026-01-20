@@ -55,12 +55,12 @@
     font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all var(--transition-base);
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
 }
 
 .empty-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(163, 230, 53, 0.3);
+    box-shadow: 0 8px 20px var(--shop-accent-glow);
 }
 
 /* =================================================================
@@ -97,7 +97,7 @@
     background: linear-gradient(
         90deg,
         var(--content-bg) 25%,
-        rgba(255, 255, 255, 0.05) 50%,
+        var(--border-subtle) 50%,
         var(--content-bg) 75%
     );
     background-size: 200% 100%;

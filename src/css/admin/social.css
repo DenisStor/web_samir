@@ -38,7 +38,7 @@
     padding: 16px;
     background: var(--content-bg-light);
     border-radius: var(--radius-md);
-    transition: all var(--transition-base);
+    transition: background var(--transition-base);
 }
 
 .social-link-item:hover {
@@ -94,7 +94,7 @@
     color: var(--text-white);
     font-family: inherit;
     font-size: 0.85rem;
-    transition: all var(--transition-base);
+    transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
 
 .social-link-url-input:focus {

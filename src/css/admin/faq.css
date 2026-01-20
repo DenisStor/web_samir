@@ -16,12 +16,12 @@
     display: flex;
     gap: 24px;
     align-items: flex-start;
-    transition: all var(--transition-base);
+    transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
 
 .faq-admin-item:hover {
     border-color: var(--accent-green);
-    box-shadow: 0 4px 20px rgba(0, 255, 136, 0.1);
+    box-shadow: 0 4px 20px var(--accent-green-subtle);
 }
 
 .faq-admin-content {

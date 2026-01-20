@@ -7,6 +7,10 @@ var AdminModals = (function() {
     'use strict';
 
     var currentModal = null;
+    var escapeHandlerBound = false;
+    var overlayClickHandlerBound = false;
+    var boundCloseHandlers = []; // Хранение ссылок на обработчики для cleanup
+    var boundOpenHandlers = [];  // Хранение ссылок на обработчики для cleanup
 
     /**
      * Открыть модальное окно
@@ -25,11 +29,17 @@ var AdminModals = (function() {
         document.body.style.overflow = 'hidden';
         currentModal = overlay;
 
-        // Обработчик закрытия по Escape
-        document.addEventListener('keydown', handleEscape);
+        // Обработчик закрытия по Escape (только если ещё не добавлен)
+        if (!escapeHandlerBound) {
+            document.addEventListener('keydown', handleEscape);
+            escapeHandlerBound = true;
+        }
 
-        // Обработчик закрытия по клику на оверлей
-        overlay.addEventListener('click', handleOverlayClick);
+        // Обработчик закрытия по клику на оверлей (только если ещё не добавлен)
+        if (!overlayClickHandlerBound) {
+            overlay.addEventListener('click', handleOverlayClick);
+            overlayClickHandlerBound = true;
+        }
     }
 
     /**
@@ -50,8 +60,14 @@ var AdminModals = (function() {
         document.body.style.overflow = '';
 
         // Удаляем обработчики
-        document.removeEventListener('keydown', handleEscape);
-        overlay.removeEventListener('click', handleOverlayClick);
+        if (escapeHandlerBound) {
+            document.removeEventListener('keydown', handleEscape);
+            escapeHandlerBound = false;
+        }
+        if (overlayClickHandlerBound) {
+            overlay.removeEventListener('click', handleOverlayClick);
+            overlayClickHandlerBound = false;
+        }
 
         currentModal = null;
 
@@ -193,31 +209,67 @@ var AdminModals = (function() {
      * Инициализация кнопок закрытия
      */
     function init() {
+        // Сначала очищаем предыдущие обработчики (если init вызван повторно)
+        destroy();
+
         // Инициализация кнопок закрытия
         var closeButtons = document.querySelectorAll('.modal-close, [data-modal-close]');
         closeButtons.forEach(function(btn) {
-            btn.addEventListener('click', function(e) {
+            var handler = function(e) {
                 e.preventDefault();
                 closeCurrent();
-            });
+            };
+            btn.addEventListener('click', handler);
+            boundCloseHandlers.push({ element: btn, handler: handler });
         });
 
         // Инициализация кнопок открытия
         var openButtons = document.querySelectorAll('[data-modal-open]');
         openButtons.forEach(function(btn) {
-            btn.addEventListener('click', function(e) {
+            var handler = function(e) {
                 e.preventDefault();
-                var modalId = this.getAttribute('data-modal-open');
+                var modalId = btn.getAttribute('data-modal-open');
                 if (modalId) {
                     open(modalId);
                 }
-            });
+            };
+            btn.addEventListener('click', handler);
+            boundOpenHandlers.push({ element: btn, handler: handler });
         });
+    }
+
+    /**
+     * Очистка всех обработчиков событий (предотвращение утечек памяти)
+     */
+    function destroy() {
+        // Закрываем текущий модал если открыт
+        if (currentModal) {
+            close();
+        }
+
+        // Удаляем обработчики кнопок закрытия
+        boundCloseHandlers.forEach(function(item) {
+            item.element.removeEventListener('click', item.handler);
+        });
+        boundCloseHandlers = [];
+
+        // Удаляем обработчики кнопок открытия
+        boundOpenHandlers.forEach(function(item) {
+            item.element.removeEventListener('click', item.handler);
+        });
+        boundOpenHandlers = [];
+
+        // Удаляем глобальные обработчики
+        if (escapeHandlerBound) {
+            document.removeEventListener('keydown', handleEscape);
+            escapeHandlerBound = false;
+        }
     }
 
     // Публичный API
     return {
         init: init,
+        destroy: destroy,
         open: open,
         close: close,
         closeCurrent: closeCurrent,

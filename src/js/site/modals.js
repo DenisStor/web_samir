@@ -11,10 +11,18 @@
 (function() {
     'use strict';
 
-    const { $, $$, byId, lockScroll, toggleClass, hasClass, on, ready, onEscape } = SaysApp;
+    var $ = SaysApp.$;
+    var $$ = SaysApp.$$;
+    var byId = SaysApp.byId;
+    var lockScroll = SaysApp.lockScroll;
+    var toggleClass = SaysApp.toggleClass;
+    var hasClass = SaysApp.hasClass;
+    var on = SaysApp.on;
+    var ready = SaysApp.ready;
+    var onEscape = SaysApp.onEscape;
 
     // Кэшированные элементы
-    let blogModal = null;
+    var blogModal = null;
 
     // =================================================================
     // BLOG MODAL
@@ -31,12 +39,12 @@
         lockScroll(true);
 
         // Скрыть все статьи
-        $$('.blog-modal-article').forEach(article => {
+        $$('.blog-modal-article').forEach(function(article) {
             article.style.display = 'none';
         });
 
         // Показать выбранную статью
-        const selectedArticle = byId(articleId);
+        var selectedArticle = byId(articleId);
         if (selectedArticle) {
             selectedArticle.style.display = 'block';
         }
@@ -61,7 +69,7 @@
      * @param {Element} element - кликнутый элемент (вопрос)
      */
     function toggleFaq(element) {
-        const faqItem = element.closest('.faq-item');
+        var faqItem = element.closest('.faq-item');
         if (!faqItem) return;
 
         // Просто переключаем текущий элемент
@@ -77,7 +85,7 @@
 
         if (blogModal) {
             // Закрытие по клику на backdrop
-            on(blogModal, 'click', (e) => {
+            on(blogModal, 'click', function(e) {
                 if (e.target === blogModal) {
                     closeBlogModal();
                 }
@@ -95,9 +103,23 @@
     // Запуск при готовности DOM
     ready(init);
 
+    /**
+     * Обработчик клавиатуры для элементов с role="button"
+     * Активирует onclick при нажатии Enter или Space
+     * @param {KeyboardEvent} event
+     * @param {Element} element
+     */
+    function handleButtonKeydown(event, element) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            element.click();
+        }
+    }
+
     // Экспорт глобальных функций для onclick в HTML
     window.openBlogModal = openBlogModal;
     window.closeBlogModal = closeBlogModal;
     window.toggleFaq = toggleFaq;
+    window.handleButtonKeydown = handleButtonKeydown;
 
 })();

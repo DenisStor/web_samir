@@ -9,6 +9,13 @@ var AdminPanel = (function() {
     // DOM элементы
     var elements = {};
 
+    // Ссылки на document handlers для cleanup
+    var boundDocumentHandlers = {
+        click: null,
+        change: null,
+        keydown: null
+    };
+
     /**
      * Инициализация DOM элементов
      */
@@ -57,15 +64,15 @@ var AdminPanel = (function() {
         try {
             var data = await AdminAPI.loadAllData();
 
-            // Обновляем состояние
-            AdminState.setMasters(data.masters.masters || []);
+            // Обновляем состояние (с проверкой на null от API)
+            AdminState.setMasters((data.masters && data.masters.masters) || []);
             AdminState.setServices(data.services || {});
-            AdminState.setArticles(data.articles.articles || []);
-            AdminState.setFaq(data.faq.faq || []);
+            AdminState.setArticles((data.articles && data.articles.articles) || []);
+            AdminState.setFaq((data.faq && data.faq.faq) || []);
             AdminState.setSocial(data.social || {});
-            AdminState.setShopCategories(data.shopCategories.categories || []);
-            AdminState.setProducts(data.products.products || []);
-            AdminState.setLegalDocuments(data.legal.documents || []);
+            AdminState.setShopCategories((data.shopCategories && data.shopCategories.categories) || []);
+            AdminState.setProducts((data.products && data.products.products) || []);
+            AdminState.setLegalDocuments((data.legal && data.legal.documents) || []);
 
             // Рендеринг
             renderCurrentSection();
@@ -267,8 +274,8 @@ var AdminPanel = (function() {
      * Инициализация делегирования событий
      */
     function initEventDelegation() {
-        // Глобальный обработчик кликов
-        document.addEventListener('click', function(e) {
+        // Глобальный обработчик кликов (сохраняем ссылку для cleanup)
+        boundDocumentHandlers.click = function(e) {
             var target = e.target.closest('[data-action]');
             if (!target) return;
 
@@ -288,18 +295,18 @@ var AdminPanel = (function() {
 
                 // Services
                 case 'edit-service':
-                    AdminServiceForm.show(category, parseInt(index));
+                    AdminServiceForm.show(category, parseInt(index, 10));
                     break;
                 case 'delete-service':
-                    AdminServiceForm.remove(category, parseInt(index));
+                    AdminServiceForm.remove(category, parseInt(index, 10));
                     break;
 
                 // Podology
                 case 'edit-podology':
-                    AdminServiceForm.showPodology(parseInt(index));
+                    AdminServiceForm.showPodology(parseInt(index, 10));
                     break;
                 case 'delete-podology':
-                    AdminServiceForm.removePodology(parseInt(index));
+                    AdminServiceForm.removePodology(parseInt(index, 10));
                     break;
 
                 // Articles
@@ -365,16 +372,18 @@ var AdminPanel = (function() {
                     AdminLegalRenderer.toggleActive(id);
                     break;
             }
-        });
+        };
+        document.addEventListener('click', boundDocumentHandlers.click);
 
-        // Обработчик загрузки изображений
-        document.addEventListener('change', function(e) {
+        // Обработчик загрузки изображений (сохраняем ссылку для cleanup)
+        boundDocumentHandlers.change = function(e) {
             var target = e.target;
             if (target.matches('[data-upload-target]')) {
                 var inputId = target.getAttribute('data-upload-target');
                 handleImageUpload(e, inputId);
             }
-        });
+        };
+        document.addEventListener('change', boundDocumentHandlers.change);
     }
 
     // =================================================================
@@ -470,7 +479,7 @@ var AdminPanel = (function() {
                         removeBtn.className = 'remove-image';
                         removeBtn.setAttribute('data-action', 'remove-image');
                         removeBtn.setAttribute('data-target', inputId);
-                        removeBtn.innerHTML = SharedIcons.get('close');
+                        removeBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
                         uploadDiv.appendChild(removeBtn);
                     }
                 }
@@ -607,12 +616,13 @@ var AdminPanel = (function() {
             });
         }
 
-        // Escape key
-        document.addEventListener('keydown', function(e) {
+        // Escape key (сохраняем ссылку для cleanup)
+        boundDocumentHandlers.keydown = function(e) {
             if (e.key === 'Escape') {
                 AdminModals.closeCurrent();
             }
-        });
+        };
+        document.addEventListener('keydown', boundDocumentHandlers.keydown);
 
         // Save social button
         if (elements.saveSocialBtn) {
@@ -683,6 +693,43 @@ var AdminPanel = (function() {
                 });
             }
         );
+    }
+
+    /**
+     * Очистка ресурсов и event listeners
+     */
+    function destroy() {
+        // Удаляем document listeners
+        if (boundDocumentHandlers.click) {
+            document.removeEventListener('click', boundDocumentHandlers.click);
+            boundDocumentHandlers.click = null;
+        }
+        if (boundDocumentHandlers.change) {
+            document.removeEventListener('change', boundDocumentHandlers.change);
+            boundDocumentHandlers.change = null;
+        }
+        if (boundDocumentHandlers.keydown) {
+            document.removeEventListener('keydown', boundDocumentHandlers.keydown);
+            boundDocumentHandlers.keydown = null;
+        }
+
+        // Уничтожаем drag-drop если доступен
+        if (window.AdminDragDrop && AdminDragDrop.destroy) {
+            AdminDragDrop.destroy('mastersGrid');
+            AdminDragDrop.destroy('faqList');
+            AdminDragDrop.destroy('shopCategoriesGrid');
+            AdminDragDrop.destroy('shopProductsGrid');
+        }
+
+        // Сбрасываем состояние
+        if (window.AdminState && AdminState.reset) {
+            AdminState.reset();
+        }
+
+        // Очищаем кэш элементов
+        elements = {};
+
+        console.log('Admin Panel destroyed');
     }
 
     // Запуск при готовности DOM
@@ -774,7 +821,10 @@ var AdminPanel = (function() {
         },
 
         // Reload
-        loadData: loadData
+        loadData: loadData,
+
+        // Cleanup
+        destroy: destroy
     };
 })();
 

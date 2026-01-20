@@ -11,11 +11,21 @@
     "lint:fix": "eslint src/js/ --ext .js --fix",
     "format": "prettier --write 'src/js/**/*.js' 'src/css/**/*.css'",
     "format:check": "prettier --check 'src/js/**/*.js' 'src/css/**/*.css'",
-    "test": "python3 -m pytest tests/ -v",
-    "test:server": "python3 -m pytest tests/test_server.py -v"
+    "test": "npm run test:python && npm run test:js",
+    "test:python": "python3 -m pytest tests/ -v --ignore=tests/javascript",
+    "test:js": "jest --config tests/javascript/jest.config.js",
+    "test:js:watch": "jest --config tests/javascript/jest.config.js --watch",
+    "test:js:coverage": "jest --config tests/javascript/jest.config.js --coverage",
+    "test:server": "python3 -m pytest tests/test_server.py -v",
+    "test:auth": "python3 -m pytest tests/test_auth.py -v",
+    "test:api": "python3 -m pytest tests/test_api_endpoints.py -v",
+    "test:files": "python3 -m pytest tests/test_file_operations.py -v",
+    "test:coverage": "python3 -m pytest tests/ --cov=. --cov-report=html --ignore=tests/javascript"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "prettier": "^3.2.0"
   },
   "engines": {

@@ -9,7 +9,11 @@
 (function() {
     'use strict';
 
-    const { $, $$, toggleClass, ready, on } = SaysApp;
+    var $ = SaysApp.$;
+    var $$ = SaysApp.$$;
+    var toggleClass = SaysApp.toggleClass;
+    var ready = SaysApp.ready;
+    var on = SaysApp.on;
 
     // =================================================================
     // SERVICE TABS
@@ -19,30 +23,30 @@
      * Инициализировать табы услуг
      */
     function initServiceTabs() {
-        const tabButtons = $$('.service-tab');
+        var tabButtons = $$('.service-tab');
 
         if (!tabButtons.length) return;
 
-        tabButtons.forEach(button => {
-            on(button, 'click', (e) => {
+        tabButtons.forEach(function(button) {
+            on(button, 'click', function(e) {
                 e.preventDefault();
 
-                const targetTab = button.getAttribute('data-tab-target');
+                var targetTab = button.getAttribute('data-tab-target');
                 if (!targetTab) return;
 
                 // Убрать active со всех табов
-                tabButtons.forEach(btn => toggleClass(btn, 'active', false));
+                tabButtons.forEach(function(btn) { toggleClass(btn, 'active', false); });
 
                 // Добавить active на кликнутый таб
                 toggleClass(button, 'active', true);
 
                 // Скрыть все контенты табов
-                $$('.service-tab-content').forEach(content => {
+                $$('.service-tab-content').forEach(function(content) {
                     toggleClass(content, 'active', false);
                 });
 
                 // Показать выбранный контент
-                const targetContent = $(`.service-tab-content[data-tab="${targetTab}"]`);
+                var targetContent = $('.service-tab-content[data-tab="' + targetTab + '"]');
                 if (targetContent) {
                     toggleClass(targetContent, 'active', true);
                 }
@@ -58,30 +62,30 @@
      * Инициализировать табы подологии
      */
     function initPodologyTabs() {
-        const tabButtons = $$('.podology-tab');
+        var tabButtons = $$('.podology-tab');
 
         if (!tabButtons.length) return;
 
-        tabButtons.forEach(button => {
-            on(button, 'click', (e) => {
+        tabButtons.forEach(function(button) {
+            on(button, 'click', function(e) {
                 e.preventDefault();
 
-                const targetTab = button.getAttribute('data-podology-target');
+                var targetTab = button.getAttribute('data-podology-target');
                 if (!targetTab) return;
 
                 // Убрать active со всех табов
-                tabButtons.forEach(btn => toggleClass(btn, 'active', false));
+                tabButtons.forEach(function(btn) { toggleClass(btn, 'active', false); });
 
                 // Добавить active на кликнутый таб
                 toggleClass(button, 'active', true);
 
                 // Скрыть все контенты табов
-                $$('.podology-tab-content').forEach(content => {
+                $$('.podology-tab-content').forEach(function(content) {
                     toggleClass(content, 'active', false);
                 });
 
                 // Показать выбранный контент
-                const targetContent = $(`.podology-tab-content[data-podology="${targetTab}"]`);
+                var targetContent = $('.podology-tab-content[data-podology="' + targetTab + '"]');
                 if (targetContent) {
                     toggleClass(targetContent, 'active', true);
                 }

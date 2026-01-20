@@ -94,10 +94,10 @@ var AdminShopProductsRenderer = (function() {
                 '<td class="price-cell">' + formatPrice(product.price) + '</td>' +
                 '<td><span class="status-badge ' + statusClass + '">' + statusText + '</span></td>' +
                 '<td class="actions-cell">' +
-                    '<button class="btn btn-icon" data-action="edit-product" data-id="' + escapeHtml(product.id) + '" title="Редактировать">' +
+                    '<button class="btn btn-icon" data-action="edit-product" data-id="' + escapeAttr(product.id) + '" title="Редактировать">' +
                         SharedIcons.get('edit') +
                     '</button>' +
-                    '<button class="btn btn-icon danger" data-action="delete-product" data-id="' + escapeHtml(product.id) + '" title="Удалить">' +
+                    '<button class="btn btn-icon danger" data-action="delete-product" data-id="' + escapeAttr(product.id) + '" title="Удалить">' +
                         SharedIcons.get('delete') +
                     '</button>' +
                 '</td>' +

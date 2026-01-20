@@ -83,6 +83,13 @@ PAGES = {
     },
 }
 
+# Shared модули для всех страниц (включая admin)
+# Эти модули загружаются первыми
+SHARED_MODULES = [
+    'config.js',
+    'helpers.js',
+]
+
 # Порядок модулей admin для сборки admin.bundle.js
 # ВАЖНО: порядок имеет значение - зависимости должны идти раньше зависящих модулей
 ADMIN_MODULES = [
@@ -127,6 +134,7 @@ ADMIN_MODULES = [
 BASE_DIR = Path(__file__).parent.parent  # Корень проекта (на уровень выше scripts/)
 SRC_DIR = BASE_DIR / 'src'
 SECTIONS_DIR = SRC_DIR / 'sections'
+SHARED_MODULES_DIR = SRC_DIR / 'js' / 'shared'
 ADMIN_MODULES_DIR = SRC_DIR / 'js' / 'admin'
 ADMIN_BUNDLE_FILE = SRC_DIR / 'js' / 'admin.bundle.js'
 
@@ -183,6 +191,18 @@ def build_admin():
 '''
     parts.append(header)
 
+    # Сначала добавляем shared модули
+    for module in SHARED_MODULES:
+        module_path = SHARED_MODULES_DIR / module
+        if not module_path.exists():
+            print(f'⚠️  Shared модуль не найден: {module}')
+            continue
+
+        content = module_path.read_text(encoding='utf-8')
+        parts.append(f'\n// ============= shared/{module} =============\n')
+        parts.append(content)
+
+    # Затем admin модули
     for module in ADMIN_MODULES:
         module_path = ADMIN_MODULES_DIR / module
         if not module_path.exists():
@@ -199,20 +219,32 @@ def build_admin():
 
     # Записываем результат
     ADMIN_BUNDLE_FILE.write_text(bundle, encoding='utf-8')
-    print(f'✅ Собран admin.bundle.js ({len(bundle):,} байт, {len(ADMIN_MODULES)} модулей)')
+    total_modules = len(SHARED_MODULES) + len(ADMIN_MODULES)
+    print(f'✅ Собран admin.bundle.js ({len(bundle):,} байт, {total_modules} модулей)')
 
     return bundle
 
 
 def get_admin_modules_mtime():
-    """Возвращает максимальное время модификации admin модулей."""
+    """Возвращает максимальное время модификации admin и shared модулей."""
     max_mtime = 0
+
+    # Проверяем shared модули
+    for module in SHARED_MODULES:
+        module_path = SHARED_MODULES_DIR / module
+        if module_path.exists():
+            mtime = module_path.stat().st_mtime
+            if mtime > max_mtime:
+                max_mtime = mtime
+
+    # Проверяем admin модули
     for module in ADMIN_MODULES:
         module_path = ADMIN_MODULES_DIR / module
         if module_path.exists():
             mtime = module_path.stat().st_mtime
             if mtime > max_mtime:
                 max_mtime = mtime
+
     return max_mtime
 
 

@@ -8,9 +8,7 @@
     <meta name="keywords" content="барбершоп, стрижка, борода, подология, мужская стрижка, барбер, Санкт-Петербург">
     <meta name="author" content="Say's Barbers">
     <meta name="robots" content="index, follow">
-
-    <!-- TODO: Заменить YOUR_DOMAIN на реальный домен перед публикацией -->
-    <link rel="canonical" href="https://YOUR_DOMAIN/">
+    <link rel="canonical" href="https://saysbarbers.ru/">
 
     <!-- Open Graph -->
     <meta property="og:title" content="Say's Barbers — Твой идеальный стиль">
@@ -18,9 +16,8 @@
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ru_RU">
     <meta property="og:site_name" content="Say's Barbers">
-    <!-- TODO: Заменить YOUR_DOMAIN на реальный домен перед публикацией -->
-    <meta property="og:url" content="https://YOUR_DOMAIN/">
-    <meta property="og:image" content="https://YOUR_DOMAIN/uploads/og-image.jpg">
+    <meta property="og:url" content="https://saysbarbers.ru/">
+    <meta property="og:image" content="https://saysbarbers.ru/uploads/og-image.jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="Say's Barbers — барбершоп">
@@ -29,7 +26,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Say's Barbers — Твой идеальный стиль">
     <meta name="twitter:description" content="Барбершоп в Санкт-Петербурге. Стрижки, бороды, подологический кабинет.">
-    <meta name="twitter:image" content="https://YOUR_DOMAIN/uploads/og-image.jpg">
+    <meta name="twitter:image" content="https://saysbarbers.ru/uploads/og-image.jpg">
 
     <!-- Schema.org LocalBusiness -->
     <script type="application/ld+json">
@@ -38,7 +35,7 @@
         "@type": "BarberShop",
         "name": "Say's Barbers",
         "description": "Барбершоп в Санкт-Петербурге. Стрижки, бороды, подологический кабинет.",
-        "url": "https://YOUR_DOMAIN/",
+        "url": "https://saysbarbers.ru/",
         "telephone": "+7 (911) 070-11-07",
         "email": "info@saysbarbers.ru",
         "address": {
@@ -67,13 +64,16 @@
         ]
     }
     </script>
+    <!-- Performance: preload критических ресурсов -->
+    <link rel="preload" href="/src/css/shared/variables.css" as="style">
+    <link rel="preload" href="/src/css/shared/base.css" as="style">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Security: DOMPurify for XSS protection -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js" integrity="sha512-H+rglffZ6f5gF7UJgvH4Naa+fGCgjrHKMgoFOGmcPTRwR6iAaWkO4bXrpB0aZzIqR0pxKkf8KXJRA2CFNN7TKA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.2.3/purify.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- CSS Modules -->
-    <link rel="stylesheet" href="src/css/shared/index.css">
-    <link rel="stylesheet" href="src/css/site/index.css">
+    <link rel="stylesheet" href="/src/css/shared/index.css">
+    <link rel="stylesheet" href="/src/css/site/index.css">
 </head>
 <body>

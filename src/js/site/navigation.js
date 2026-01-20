@@ -11,12 +11,20 @@
 (function() {
     'use strict';
 
-    const { $, byId, lockScroll, setAria, toggleClass, hasClass, on, ready, onEscape } = SaysApp;
+    var $ = SaysApp.$;
+    var byId = SaysApp.byId;
+    var lockScroll = SaysApp.lockScroll;
+    var setAria = SaysApp.setAria;
+    var toggleClass = SaysApp.toggleClass;
+    var hasClass = SaysApp.hasClass;
+    var on = SaysApp.on;
+    var ready = SaysApp.ready;
+    var onEscape = SaysApp.onEscape;
 
     // Кэшированные элементы
-    let burger = null;
-    let mobileMenu = null;
-    let nav = null;
+    var burger = null;
+    var mobileMenu = null;
+    var nav = null;
 
     // =================================================================
     // MOBILE MENU
@@ -28,7 +36,7 @@
     function toggleMenu() {
         if (!burger || !mobileMenu) return;
 
-        const isActive = !hasClass(mobileMenu, 'active');
+        var isActive = !hasClass(mobileMenu, 'active');
 
         toggleClass(burger, 'active', isActive);
         toggleClass(mobileMenu, 'active', isActive);

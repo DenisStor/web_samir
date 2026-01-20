@@ -8,9 +8,7 @@
     <meta name="keywords" content="барбершоп, стрижка, борода, подология, мужская стрижка, барбер, Санкт-Петербург">
     <meta name="author" content="Say's Barbers">
     <meta name="robots" content="index, follow">
-
-    <!-- TODO: Заменить YOUR_DOMAIN на реальный домен перед публикацией -->
-    <link rel="canonical" href="https://YOUR_DOMAIN/">
+    <link rel="canonical" href="https://saysbarbers.ru/">
 
     <!-- Open Graph -->
     <meta property="og:title" content="Say's Barbers — Твой идеальный стиль">
@@ -18,9 +16,8 @@
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ru_RU">
     <meta property="og:site_name" content="Say's Barbers">
-    <!-- TODO: Заменить YOUR_DOMAIN на реальный домен перед публикацией -->
-    <meta property="og:url" content="https://YOUR_DOMAIN/">
-    <meta property="og:image" content="https://YOUR_DOMAIN/uploads/og-image.jpg">
+    <meta property="og:url" content="https://saysbarbers.ru/">
+    <meta property="og:image" content="https://saysbarbers.ru/uploads/og-image.jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="Say's Barbers — барбершоп">
@@ -29,7 +26,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Say's Barbers — Твой идеальный стиль">
     <meta name="twitter:description" content="Барбершоп в Санкт-Петербурге. Стрижки, бороды, подологический кабинет.">
-    <meta name="twitter:image" content="https://YOUR_DOMAIN/uploads/og-image.jpg">
+    <meta name="twitter:image" content="https://saysbarbers.ru/uploads/og-image.jpg">
 
     <!-- Schema.org LocalBusiness -->
     <script type="application/ld+json">
@@ -38,7 +35,7 @@
         "@type": "BarberShop",
         "name": "Say's Barbers",
         "description": "Барбершоп в Санкт-Петербурге. Стрижки, бороды, подологический кабинет.",
-        "url": "https://YOUR_DOMAIN/",
+        "url": "https://saysbarbers.ru/",
         "telephone": "+7 (911) 070-11-07",
         "email": "info@saysbarbers.ru",
         "address": {
@@ -67,14 +64,17 @@
         ]
     }
     </script>
+    <!-- Performance: preload критических ресурсов -->
+    <link rel="preload" href="/src/css/shared/variables.css" as="style">
+    <link rel="preload" href="/src/css/shared/base.css" as="style">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Security: DOMPurify for XSS protection -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js" integrity="sha512-H+rglffZ6f5gF7UJgvH4Naa+fGCgjrHKMgoFOGmcPTRwR6iAaWkO4bXrpB0aZzIqR0pxKkf8KXJRA2CFNN7TKA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.2.3/purify.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- CSS Modules -->
-    <link rel="stylesheet" href="src/css/shared/index.css">
-    <link rel="stylesheet" href="src/css/site/index.css">
+    <link rel="stylesheet" href="/src/css/shared/index.css">
+    <link rel="stylesheet" href="/src/css/site/index.css">
 </head>
 <body>
 
@@ -87,11 +87,11 @@
             <ul class="nav-links">
                 <li><a href="#services">Услуги</a></li>
                 <li><a href="#podology">Подологический кабинет</a></li>
-                <li><a href="/shop">Магазин</a></li>
                 <li><a href="#masters">Мастера</a></li>
+                <li><a href="#location">Контакты</a></li>
                 <li><a href="#blog">Блог</a></li>
                 <li><a href="#faq">FAQ</a></li>
-                <li><a href="#location">Контакты</a></li>
+                <li><a href="/shop">Магазин</a></li>
             </ul>
             <a href="#booking" class="nav-cta">Онлайн-запись</a>
             <button class="burger" type="button" aria-expanded="false" aria-controls="mobileMenu" aria-label="Открыть меню" onclick="toggleMenu()">
@@ -106,11 +106,11 @@
     <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
         <a href="#services" onclick="closeMenu()">Услуги</a>
         <a href="#podology" onclick="closeMenu()">Подологический кабинет</a>
-        <a href="/shop" onclick="closeMenu()">Магазин</a>
         <a href="#masters" onclick="closeMenu()">Мастера</a>
+        <a href="#location" onclick="closeMenu()">Контакты</a>
         <a href="#blog" onclick="closeMenu()">Блог</a>
         <a href="#faq" onclick="closeMenu()">FAQ</a>
-        <a href="#location" onclick="closeMenu()">Контакты</a>
+        <a href="/shop" onclick="closeMenu()">Магазин</a>
         <a href="#booking" onclick="closeMenu()">Онлайн-запись</a>
     </div>
 
@@ -170,9 +170,9 @@
         <div class="hero-noise"></div>
         <div class="container">
             <div class="hero-content">
-                <h1>Say's Barbers — <span class="accent">идеальный образ</span> для каждого</h1>
+                <h1>Say's Barbers<br><span class="accent">— громко<br>стильно<br>уверенно!</span></h1>
                 <p class="hero-description">
-                    Барбершоп с сильной командой мастеров, вниманием к деталям, абсолютной чистотой и честным сервисом. Мы создаём не просто стрижки — мы создаём ваш образ.
+                    Мы — команда профессиональных барберов в Калининграде, которая предоставляет самые популярные и востребованные услуги на высоком уровне.
                 </p>
                 <div class="hero-buttons">
                     <a href="#booking" class="btn btn-primary">
@@ -825,7 +825,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                             Адрес
                         </h3>
-                        <p>
+                        <p id="siteAddress">
                             г. Гурьевск, улица Каштановая, 4<br>
                             Калининградская область<br>
                             Удобная парковка рядом
@@ -847,7 +847,7 @@
                             Телефон
                         </h3>
                         <p>
-                            <a href="tel:+79110701107" style="color: inherit; text-decoration: none;">+7 911 070 11 07</a><br>
+                            <a href="tel:+79110701107" id="sitePhone" style="color: inherit; text-decoration: none;">+7 911 070 11 07</a><br>
                             Звоните или пишите в мессенджеры
                         </p>
                     </div>
@@ -873,7 +873,7 @@
                     <a href="https://vk.com/saysbarbers" target="_blank" class="social-link" title="VK">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 8.316 24h7.368C22.408 24 24 22.408 24 15.684V8.316C24 1.592 22.408 0 15.684 0zm3.692 17.123h-1.744c-.66 0-.864-.525-2.05-1.727-1.033-1-1.49-1.135-1.744-1.135-.356 0-.458.102-.458.593v1.575c0 .424-.135.678-1.253.678-1.846 0-3.896-1.118-5.335-3.202C4.624 10.857 4 8.97 4 8.463c0-.254.102-.491.593-.491h1.744c.44 0 .61.203.78.678.847 2.455 2.27 4.607 2.862 4.607.22 0 .322-.102.322-.66V9.721c-.068-1.186-.695-1.287-.695-1.71 0-.203.17-.407.44-.407h2.744c.373 0 .508.203.508.643v3.473c0 .372.17.508.271.508.22 0 .407-.136.813-.542 1.254-1.406 2.15-3.574 2.15-3.574.119-.254.305-.491.745-.491h1.744c.525 0 .644.27.525.643-.22 1.017-2.354 4.031-2.354 4.031-.186.305-.254.44 0 .78.186.254.796.779 1.203 1.253.745.847 1.32 1.558 1.473 2.05.17.49-.085.744-.576.744z"/></svg>
                     </a>
-                    <a href="https://go.2gis.com/KyTr2" target="_blank" class="social-link" title="Telegram">
+                    <a href="https://t.me/saysbarbers" target="_blank" class="social-link" title="Telegram">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
                     </a>
                     <a href="https://api.whatsapp.com/send/?phone=%2B79110701107&text=%D0%9E%D0%B1%D1%80%D0%B0%D1%89%D0%B5%D0%BD%D0%B8%D0%B5+%D0%B8%D0%B7+%D0%AF%D0%BD%D0%B4%D0%B5%D0%BA%D1%81+%D0%9A%D0%B0%D1%80%D1%82%0A%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%21+%D0%9C%D0%B5%D0%BD%D1%8F+%D0%B7%D0%B0%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D0%BE%D0%B2%D0%B0%D0%BB%D0%BE+%D0%B2%D0%B0%D1%88%D0%B5+%D0%BF%D1%80%D0%B5%D0%B4%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5&type=phone_number&app_absent=0" target="_blank" class="social-link" title="WhatsApp">
@@ -897,16 +897,16 @@
             </div>
 
             <div class="blog-grid">
-                <article class="blog-card fade-in" onclick="openBlogModal('article1')">
+                <article class="blog-card fade-in" onclick="openBlogModal('article1')" onkeydown="handleButtonKeydown(event, this)" role="button" tabindex="0" aria-label="Читать статью: Как правильно выбрать шампунь для вашего типа волос">
                     <div class="blog-image">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>
                     </div>
                     <div class="blog-content">
                         <div class="blog-meta">
                             <span class="blog-tag">Уход за волосами</span>
                             <div class="blog-date">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                                15 ноября 2024
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                <time datetime="2024-11-15">15 ноября 2024</time>
                             </div>
                         </div>
                         <h3 class="blog-title">Как правильно выбрать шампунь для вашего типа волос</h3>
@@ -915,21 +915,21 @@
                         </p>
                         <div class="blog-read-more">
                             <span>Читать далее</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                         </div>
                     </div>
                 </article>
 
-                <article class="blog-card fade-in" onclick="openBlogModal('article2')">
+                <article class="blog-card fade-in" onclick="openBlogModal('article2')" onkeydown="handleButtonKeydown(event, this)" role="button" tabindex="0" aria-label="Читать статью: 5 способов укладки волос для мужчин в 2024">
                     <div class="blog-image">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
                     </div>
                     <div class="blog-content">
                         <div class="blog-meta">
                             <span class="blog-tag">Стайлинг</span>
                             <div class="blog-date">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                                10 ноября 2024
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                <time datetime="2024-11-10">10 ноября 2024</time>
                             </div>
                         </div>
                         <h3 class="blog-title">5 способов укладки волос для мужчин в 2024</h3>
@@ -938,21 +938,21 @@
                         </p>
                         <div class="blog-read-more">
                             <span>Читать далее</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                         </div>
                     </div>
                 </article>
 
-                <article class="blog-card fade-in" onclick="openBlogModal('article3')">
+                <article class="blog-card fade-in" onclick="openBlogModal('article3')" onkeydown="handleButtonKeydown(event, this)" role="button" tabindex="0" aria-label="Читать статью: Полное руководство по уходу за бородой">
                     <div class="blog-image">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
                     </div>
                     <div class="blog-content">
                         <div class="blog-meta">
                             <span class="blog-tag">Уход за бородой</span>
                             <div class="blog-date">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                                5 ноября 2024
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                <time datetime="2024-11-05">5 ноября 2024</time>
                             </div>
                         </div>
                         <h3 class="blog-title">Полное руководство по уходу за бородой</h3>
@@ -961,7 +961,7 @@
                         </p>
                         <div class="blog-read-more">
                             <span>Читать далее</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                         </div>
                     </div>
                 </article>
@@ -980,17 +980,17 @@
 
             <div class="faq-container">
                 <div class="faq-item fade-in">
-                    <div class="faq-question" onclick="toggleFaq(this)">
+                    <div class="faq-question" onclick="toggleFaq(this)" onkeydown="handleButtonKeydown(event, this)" role="button" tabindex="0">
                         <h3>Как записаться к мастеру?</h3>
                         <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </div>
                     <div class="faq-answer">
-                        <p>Вы можете записаться онлайн через форму на сайте, позвонить нам по телефону +7 (999) 123-45-67 или написать в любой удобный мессенджер. Мы работаем ежедневно с 10:00 до 21:00.</p>
+                        <p>Вы можете записаться онлайн через форму на сайте, позвонить нам по телефону +7 (911) 070-11-07 или написать в любой удобный мессенджер. Мы работаем ежедневно с 10:00 до 21:00.</p>
                     </div>
                 </div>
 
                 <div class="faq-item fade-in">
-                    <div class="faq-question" onclick="toggleFaq(this)">
+                    <div class="faq-question" onclick="toggleFaq(this)" onkeydown="handleButtonKeydown(event, this)" role="button" tabindex="0">
                         <h3>Сколько времени занимает стрижка?</h3>
                         <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </div>
@@ -1000,7 +1000,7 @@
                 </div>
 
                 <div class="faq-item fade-in">
-                    <div class="faq-question" onclick="toggleFaq(this)">
+                    <div class="faq-question" onclick="toggleFaq(this)" onkeydown="handleButtonKeydown(event, this)" role="button" tabindex="0">
                         <h3>Можно ли выбрать конкретного мастера?</h3>
                         <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </div>
@@ -1010,7 +1010,7 @@
                 </div>
 
                 <div class="faq-item fade-in">
-                    <div class="faq-question" onclick="toggleFaq(this)">
+                    <div class="faq-question" onclick="toggleFaq(this)" onkeydown="handleButtonKeydown(event, this)" role="button" tabindex="0">
                         <h3>Какие способы оплаты вы принимаете?</h3>
                         <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </div>
@@ -1020,7 +1020,7 @@
                 </div>
 
                 <div class="faq-item fade-in">
-                    <div class="faq-question" onclick="toggleFaq(this)">
+                    <div class="faq-question" onclick="toggleFaq(this)" onkeydown="handleButtonKeydown(event, this)" role="button" tabindex="0">
                         <h3>Что входит в услугу подологии?</h3>
                         <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </div>
@@ -1030,7 +1030,7 @@
                 </div>
 
                 <div class="faq-item fade-in">
-                    <div class="faq-question" onclick="toggleFaq(this)">
+                    <div class="faq-question" onclick="toggleFaq(this)" onkeydown="handleButtonKeydown(event, this)" role="button" tabindex="0">
                         <h3>Есть ли у вас программа лояльности?</h3>
                         <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </div>
@@ -1219,9 +1219,9 @@
                     © 2025 Say's Barbers. Все права защищены.
                 </div>
                 <div class="footer-links">
-                    <a href="/legal/cookies">Политика cookie</a>
-                    <a href="/legal/privacy">Политика конфиденциальности</a>
-                    <a href="/legal/terms">Пользовательское соглашение</a>
+                    <a href="legal.html?page=cookies">Политика cookie</a>
+                    <a href="legal.html?page=privacy">Политика конфиденциальности</a>
+                    <a href="legal.html?page=terms">Пользовательское соглашение</a>
                     <a href="admin.html">Админ-панель</a>
                 </div>
             </div>
@@ -1229,14 +1229,15 @@
     </footer>
 
     <!-- JavaScript Modules -->
-    <script src="src/js/site/utils.js"></script>
-    <script src="src/js/site/sanitizer.js"></script>
-    <script src="src/js/shared/icons.js"></script>
-    <script src="src/js/site/navigation.js"></script>
-    <script src="src/js/site/animations.js"></script>
-    <script src="src/js/site/modals.js"></script>
-    <script src="src/js/site/main.js"></script>
-    <script src="src/js/site/data-loader.js"></script>
-    <script src="src/js/site/analytics.js"></script>
+    <script src="/src/js/shared/helpers.js"></script>
+    <script src="/src/js/site/utils.js"></script>
+    <script src="/src/js/site/sanitizer.js"></script>
+    <script src="/src/js/shared/icons.js"></script>
+    <script src="/src/js/site/navigation.js"></script>
+    <script src="/src/js/site/animations.js"></script>
+    <script src="/src/js/site/modals.js"></script>
+    <script src="/src/js/site/main.js"></script>
+    <script src="/src/js/site/data-loader.js"></script>
+    <script src="/src/js/site/analytics.js"></script>
 </body>
 </html>

@@ -10,12 +10,19 @@
     <meta property="og:description" content="Юридическая информация Say's Barbers — политика конфиденциальности, пользовательское соглашение.">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ru_RU">
+    <meta property="og:image" content="https://saysbarbers.ru/uploads/og-image.jpg">
+    <meta property="og:url" content="https://saysbarbers.ru/legal.html">
+    <link rel="canonical" href="https://saysbarbers.ru/legal.html">
+    <!-- Performance: preload критических ресурсов -->
+    <link rel="preload" href="/src/css/shared/variables.css" as="style">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="src/css/legal/index.css">
+    <!-- CSS Variables + Legal styles -->
+    <link rel="stylesheet" href="/src/css/shared/variables.css">
+    <link rel="stylesheet" href="/src/css/legal/index.css">
     <!-- Security: DOMPurify for XSS protection -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js" integrity="sha512-H+rglffZ6f5gF7UJgvH4Naa+fGCgjrHKMgoFOGmcPTRwR6iAaWkO4bXrpB0aZzIqR0pxKkf8KXJRA2CFNN7TKA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.2.3/purify.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
 
@@ -51,6 +58,9 @@
         </div>
     </footer>
 
-    <script src="src/js/legal/legal-app.js"></script>
+    <!-- Shared Modules -->
+    <script src="/src/js/shared/helpers.js"></script>
+    <!-- Legal App -->
+    <script src="/src/js/legal/legal-app.js"></script>
 </body>
 </html>

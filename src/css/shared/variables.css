@@ -20,8 +20,16 @@
     --accent-green: #00ff88;
     --accent-green-dim: #00cc6a;
     --accent-green-glow: rgba(0, 255, 136, 0.3);
+    --accent-green-glow-strong: rgba(0, 255, 136, 0.4);
+    --accent-green-glow-intense: rgba(0, 255, 136, 0.5);
     --accent-green-subtle: rgba(0, 255, 136, 0.1);
     --accent-green-hover: rgba(0, 255, 136, 0.15);
+    --accent-green-muted: rgba(0, 255, 136, 0.08);
+    --accent-green-faint: rgba(0, 255, 136, 0.05);
+    --accent-green-06: rgba(0, 255, 136, 0.06);
+    --accent-green-ghost: rgba(0, 255, 136, 0.02);
+    --accent-green-03: rgba(0, 255, 136, 0.03);
+    --accent-green-12: rgba(0, 255, 136, 0.12);
 
     /* Текст */
     --text-white: #ffffff;
@@ -39,6 +47,42 @@
     --badge-pink-bg: rgba(255, 107, 157, 0.15);
     --badge-blue-bg: rgba(77, 124, 255, 0.15);
 
+    /* Расширенные версии badge цветов */
+    --badge-pink-subtle: rgba(255, 107, 157, 0.1);
+    --badge-pink-border: rgba(255, 107, 157, 0.2);
+    --badge-pink-glow: rgba(255, 107, 157, 0.3);
+    --badge-blue-subtle: rgba(77, 124, 255, 0.1);
+    --badge-blue-border: rgba(77, 124, 255, 0.2);
+    --badge-blue-glow: rgba(77, 124, 255, 0.3);
+    --badge-blue-light-border: rgba(107, 163, 255, 0.3);
+
+    /* Фоны для карточек мастеров */
+    --badge-green-card-bg: rgba(0, 30, 15, 0.85);
+    --badge-pink-card-bg: rgba(40, 15, 30, 0.85);
+    --badge-blue-card-bg: rgba(10, 20, 40, 0.85);
+
+    /* Магазин - акцентный лайм */
+    --shop-accent: #a3e635;
+    --shop-accent-subtle: rgba(163, 230, 53, 0.1);
+    --shop-accent-medium: rgba(163, 230, 53, 0.2);
+    --shop-accent-glow: rgba(163, 230, 53, 0.3);
+
+    /* Статусы */
+    --status-warning-bg: rgba(251, 191, 36, 0.15);
+    --status-success-bg: rgba(47, 178, 106, 0.15);
+    --status-indigo: #6366f1;
+    --status-indigo-bg: rgba(99, 102, 241, 0.15);
+    --status-pink: #ec4899;
+    --status-pink-bg: rgba(236, 72, 153, 0.15);
+
+    /* Цвета для danger/error состояний */
+    --color-danger: #ff4757;
+    --color-danger-hover: #ff3344;
+    --color-danger-light: #ff6b6b;
+    --color-danger-lighter: #ff8a8a;
+    --color-danger-subtle: rgba(255, 71, 87, 0.15);
+    --color-danger-border: rgba(255, 71, 87, 0.4);
+
     /* =================================================================
        ЦВЕТА - Подологическая секция (светлая тема)
        ================================================================= */
@@ -50,6 +94,52 @@
     --medical-text-medium: #1a472a;
     --medical-text-light: #2d5a3d;
     --medical-text-muted: #5a8a6a;
+
+    /* Медицинский зелёный (подология) */
+    --medical-green: #00cc6a;
+    --medical-green-subtle: rgba(0, 204, 106, 0.1);
+    --medical-green-muted: rgba(0, 204, 106, 0.08);
+    --medical-green-12: rgba(0, 204, 106, 0.12);
+    --medical-green-15: rgba(0, 204, 106, 0.15);
+    --medical-green-20: rgba(0, 204, 106, 0.2);
+    --medical-green-30: rgba(0, 204, 106, 0.3);
+    --medical-green-35: rgba(0, 204, 106, 0.35);
+    --medical-green-03: rgba(0, 200, 100, 0.03);
+
+    /* =================================================================
+       ОВЕРЛЕИ И ФОНЫ С ПРОЗРАЧНОСТЬЮ
+       ================================================================= */
+    /* Чёрные оверлеи */
+    --overlay-dark: rgba(0, 0, 0, 0.5);
+    --overlay-darker: rgba(0, 0, 0, 0.6);
+    --overlay-70: rgba(0, 0, 0, 0.7);
+    --overlay-heavy: rgba(0, 0, 0, 0.8);
+    --overlay-85: rgba(0, 0, 0, 0.85);
+    --overlay-intense: rgba(0, 0, 0, 0.9);
+    --overlay-solid: rgba(0, 0, 0, 0.95);
+    --overlay-98: rgba(0, 0, 0, 0.98);
+
+    /* Навигация (специфичные цвета bg-dark) */
+    --nav-bg: rgba(13, 13, 13, 0.95);
+    --nav-bg-blur: rgba(13, 13, 13, 0.85);
+    --nav-bg-scrolled: rgba(8, 8, 8, 0.98);
+
+    /* Legal header (специфичные) */
+    --legal-header-bg: rgba(10, 10, 10, 0.98);
+    --legal-header-bg-blur: rgba(10, 10, 10, 0.9);
+
+    /* Белые полупрозрачные */
+    --white-ghost: rgba(255, 255, 255, 0.02);
+    --white-faint: rgba(255, 255, 255, 0.04);
+    --white-muted: rgba(255, 255, 255, 0.08);
+    --white-subtle: rgba(255, 255, 255, 0.1);
+    --white-light: rgba(255, 255, 255, 0.15);
+    --white-medium: rgba(255, 255, 255, 0.2);
+    --white-50: rgba(255, 255, 255, 0.5);
+    --white-70: rgba(255, 255, 255, 0.7);
+    --white-80: rgba(255, 255, 255, 0.8);
+    --white-90: rgba(255, 255, 255, 0.9);
+    --white-95: rgba(255, 255, 255, 0.95);
 
     /* =================================================================
        БОРДЕРЫ
@@ -73,10 +163,19 @@
     --shadow-elevated: 0 15px 40px rgba(0, 0, 0, 0.3);
 
     /* Тени для подологии */
-    --shadow-medical-sm: 0 6px 24px rgba(0, 204, 106, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05);
-    --shadow-medical-md: 0 10px 40px rgba(0, 204, 106, 0.12);
-    --shadow-medical-lg: 0 12px 48px rgba(0, 204, 106, 0.2), 0 4px 12px rgba(0, 0, 0, 0.08);
-    --shadow-medical-hover: 0 16px 48px rgba(0, 204, 106, 0.2), 0 6px 16px rgba(0, 0, 0, 0.08);
+    --shadow-medical-sm: 0 6px 24px var(--medical-green-subtle), 0 2px 8px rgba(0, 0, 0, 0.05);
+    --shadow-medical-md: 0 10px 40px var(--medical-green-12);
+    --shadow-medical-lg: 0 12px 48px var(--medical-green-20), 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-medical-hover: 0 16px 48px var(--medical-green-20), 0 6px 16px rgba(0, 0, 0, 0.08);
+
+    /* Тени - чёрные */
+    --shadow-black-05: rgba(0, 0, 0, 0.05);
+    --shadow-black-20: rgba(0, 0, 0, 0.2);
+    --shadow-black-25: rgba(0, 0, 0, 0.25);
+    --shadow-black-30: rgba(0, 0, 0, 0.3);
+    --shadow-black-40: rgba(0, 0, 0, 0.4);
+    --shadow-black-50: rgba(0, 0, 0, 0.5);
+    --shadow-black-60: rgba(0, 0, 0, 0.6);
 
     /* =================================================================
        АНИМАЦИИ И ПЕРЕХОДЫ

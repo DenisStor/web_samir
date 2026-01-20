@@ -13,7 +13,7 @@
     font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all var(--transition-base);
+    transition: background var(--transition-base), border-color var(--transition-base), color var(--transition-base), box-shadow var(--transition-base);
 }
 
 .btn svg {
@@ -43,12 +43,12 @@
 }
 
 .btn-danger {
-    background: #ff4757;
+    background: var(--color-danger);
     color: white;
 }
 
 .btn-danger:hover {
-    background: #ff3344;
+    background: var(--color-danger-hover);
 }
 
 .btn-icon {
@@ -72,16 +72,16 @@
 
 /* Danger button (delete) */
 .btn-icon.danger svg {
-    color: #ff6b6b;
+    color: var(--color-danger-light);
 }
 
 .btn-icon.danger:hover {
-    background: rgba(255, 71, 87, 0.15);
-    border-color: rgba(255, 71, 87, 0.4);
+    background: var(--color-danger-subtle);
+    border-color: var(--color-danger-border);
 }
 
 .btn-icon.danger:hover svg {
-    color: #ff4757;
+    color: var(--color-danger);
 }
 
 /* Button outline */
@@ -142,7 +142,7 @@
     font-size: 0.85rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all var(--transition-base);
+    transition: background var(--transition-base), border-color var(--transition-base), color var(--transition-base);
 }
 
 .export-btn:hover {

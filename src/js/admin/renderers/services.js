@@ -131,7 +131,7 @@ var AdminServicesRenderer = (function() {
         }
 
         var html = category.services.map(function(service, index) {
-            return '<div class="service-item" data-id="' + service.id + '" data-index="' + index + '" data-search="' + escapeHtml(service.name) + '" draggable="true">' +
+            return '<div class="service-item" data-id="' + service.id + '" data-index="' + index + '" data-search="' + escapeAttr(service.name) + '" draggable="true">' +
                 '<div class="drag-handle" title="Перетащите для изменения порядка">' + SharedIcons.get('grip') + '</div>' +
                 '<span class="service-name">' + escapeHtml(service.name) + '</span>' +
                 '<div class="service-prices">' +
@@ -143,7 +143,7 @@ var AdminServicesRenderer = (function() {
                     '<button class="btn btn-icon" data-action="edit-service" data-category="' + currentCategory + '" data-index="' + index + '" title="Редактировать">' +
                         SharedIcons.get('edit') +
                     '</button>' +
-                    '<button class="btn btn-icon danger" data-action="delete-service" data-category="' + currentCategory + '" data-index="' + index + '" data-name="' + escapeHtml(service.name) + '" title="Удалить">' +
+                    '<button class="btn btn-icon danger" data-action="delete-service" data-category="' + currentCategory + '" data-index="' + index + '" data-name="' + escapeAttr(service.name) + '" title="Удалить">' +
                         SharedIcons.get('delete') +
                     '</button>' +
                 '</div>' +
@@ -175,7 +175,7 @@ var AdminServicesRenderer = (function() {
         }
 
         var html = podologyServices.map(function(service, index) {
-            return '<div class="service-item" data-id="' + service.id + '" data-index="' + index + '" data-search="' + escapeHtml(service.name) + '" draggable="true">' +
+            return '<div class="service-item" data-id="' + service.id + '" data-index="' + index + '" data-search="' + escapeAttr(service.name) + '" draggable="true">' +
                 '<div class="drag-handle" title="Перетащите для изменения порядка">' + SharedIcons.get('grip') + '</div>' +
                 '<span class="service-name">' + escapeHtml(service.name) + '</span>' +
                 '<div class="service-prices">' +
@@ -185,7 +185,7 @@ var AdminServicesRenderer = (function() {
                     '<button class="btn btn-icon" data-action="edit-podology" data-index="' + index + '" title="Редактировать">' +
                         SharedIcons.get('edit') +
                     '</button>' +
-                    '<button class="btn btn-icon danger" data-action="delete-podology" data-index="' + index + '" data-name="' + escapeHtml(service.name) + '" title="Удалить">' +
+                    '<button class="btn btn-icon danger" data-action="delete-podology" data-index="' + index + '" data-name="' + escapeAttr(service.name) + '" title="Удалить">' +
                         SharedIcons.get('delete') +
                     '</button>' +
                 '</div>' +

@@ -137,9 +137,9 @@ var AdminServiceForm = (function() {
         var pinkEl = document.getElementById('pricePink');
         var blueEl = document.getElementById('priceBlue');
 
-        var priceGreen = parseInt(greenEl ? greenEl.value : 0) || 0;
-        var pricePink = parseInt(pinkEl ? pinkEl.value : 0) || 0;
-        var priceBlue = parseInt(blueEl ? blueEl.value : 0) || 0;
+        var priceGreen = parseInt(greenEl ? greenEl.value : 0, 10) || 0;
+        var pricePink = parseInt(pinkEl ? pinkEl.value : 0, 10) || 0;
+        var priceBlue = parseInt(blueEl ? blueEl.value : 0, 10) || 0;
 
         var serviceData = {
             id: editing.service ? editing.service.id : Date.now(),

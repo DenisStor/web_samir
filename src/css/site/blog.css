@@ -31,7 +31,10 @@
     border-radius: var(--radius-xl);
     overflow: hidden;
     border: 1px solid var(--border-subtle);
-    transition: all var(--transition-bounce);
+    /* Оптимизировано: конкретные свойства вместо all */
+    transition: transform var(--transition-bounce),
+                border-color var(--transition-bounce),
+                box-shadow var(--transition-bounce);
     cursor: pointer;
 }
 
@@ -154,12 +157,18 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.9);
+    background: var(--overlay-solid);
     z-index: var(--z-modal);
     padding: 40px 20px;
     overflow-y: auto;
-    backdrop-filter: blur(10px);
     animation: fadeIn var(--transition-base);
+}
+
+@supports (backdrop-filter: blur(10px)) {
+    .blog-modal {
+        background: var(--overlay-intense);
+        backdrop-filter: blur(10px);
+    }
 }
 
 .blog-modal.active {
@@ -192,7 +201,9 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all var(--transition-base);
+    transition: background var(--transition-base),
+                border-color var(--transition-base),
+                transform var(--transition-base);
 }
 
 .blog-modal-close:hover {

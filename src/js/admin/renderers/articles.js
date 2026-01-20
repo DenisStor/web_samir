@@ -99,7 +99,7 @@ var AdminArticlesRenderer = (function() {
 
             var searchText = [article.title, article.tag, article.excerpt].join(' ');
 
-            return '<div class="article-card has-drag" data-id="' + article.id + '" data-index="' + index + '" data-search="' + escapeHtml(searchText) + '" draggable="true">' +
+            return '<div class="article-card has-drag" data-id="' + article.id + '" data-index="' + index + '" data-search="' + escapeAttr(searchText) + '" draggable="true">' +
                 '<div class="article-image">' +
                     imageHtml +
                 '</div>' +
@@ -115,7 +115,7 @@ var AdminArticlesRenderer = (function() {
                             SharedIcons.get('edit') +
                             'Редактировать' +
                         '</button>' +
-                        '<button class="btn btn-icon danger" data-action="delete-article" data-id="' + article.id + '" data-name="' + escapeHtml(article.title) + '" title="Удалить">' +
+                        '<button class="btn btn-icon danger" data-action="delete-article" data-id="' + article.id + '" data-name="' + escapeAttr(article.title) + '" title="Удалить">' +
                             SharedIcons.get('delete') +
                         '</button>' +
                     '</div>' +
@@ -131,18 +131,7 @@ var AdminArticlesRenderer = (function() {
         }
     }
 
-    /**
-     * Escape HTML
-     */
-    function escapeHtml(text) {
-        if (!text) return '';
-        if (typeof window.escapeHtml === 'function') {
-            return window.escapeHtml(text);
-        }
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
+    // escapeHtml теперь используется из SharedHelpers (helpers.js)
 
     // Публичный API
     return {

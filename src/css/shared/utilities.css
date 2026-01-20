@@ -88,7 +88,7 @@
 
 /* Карточка с glow эффектом */
 .card--glow:hover {
-    box-shadow: 0 0 40px rgba(0, 255, 136, 0.05);
+    box-shadow: 0 0 40px var(--accent-green-faint);
 }
 
 /* =================================================================
@@ -97,7 +97,7 @@
 
 /* Базовый интерактивный элемент */
 .interactive {
-    transition: all var(--transition-base);
+    transition: transform var(--transition-base);
     cursor: pointer;
 }
 

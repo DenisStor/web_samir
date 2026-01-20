@@ -90,7 +90,7 @@
     color: var(--text-white);
     font-family: inherit;
     font-size: 1rem;
-    transition: all var(--transition-base);
+    transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
 
 .password-input-wrapper input:focus {
@@ -118,7 +118,7 @@
     align-items: center;
     justify-content: center;
     border-radius: var(--radius-sm);
-    transition: all var(--transition-base);
+    transition: color var(--transition-base), background var(--transition-base);
 }
 
 .password-toggle:hover {
@@ -132,7 +132,7 @@
 }
 
 .login-error {
-    color: #ff4757;
+    color: var(--color-danger);
     font-size: 0.85rem;
     min-height: 20px;
     margin: 0;

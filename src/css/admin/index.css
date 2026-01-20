@@ -4,6 +4,9 @@
    Импортирует все модули в правильном порядке.
    ===================================================================== */
 
+/* Shared variables - единый источник CSS переменных */
+@import '../shared/variables.css';
+
 @import 'layout.css';
 @import 'buttons.css';
 @import 'cards.css';

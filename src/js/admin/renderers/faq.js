@@ -78,7 +78,7 @@ var AdminFaqRenderer = (function() {
         var html = faq.map(function(item, index) {
             var searchText = [item.question, item.answer].join(' ');
 
-            return '<div class="faq-admin-item has-drag" data-id="' + item.id + '" data-index="' + index + '" data-search="' + escapeHtml(searchText) + '" draggable="true">' +
+            return '<div class="faq-admin-item has-drag" data-id="' + item.id + '" data-index="' + index + '" data-search="' + escapeAttr(searchText) + '" draggable="true">' +
                 '<div class="drag-handle" title="Перетащите для изменения порядка">' + SharedIcons.get('grip') + '</div>' +
                 '<div class="faq-admin-content">' +
                     '<h3 class="faq-admin-question">' + escapeHtml(item.question) + '</h3>' +
@@ -89,7 +89,7 @@ var AdminFaqRenderer = (function() {
                         SharedIcons.get('edit') +
                         'Редактировать' +
                     '</button>' +
-                    '<button class="btn btn-icon danger" data-action="delete-faq" data-id="' + item.id + '" data-name="' + escapeHtml(item.question) + '" title="Удалить">' +
+                    '<button class="btn btn-icon danger" data-action="delete-faq" data-id="' + item.id + '" data-name="' + escapeAttr(item.question) + '" title="Удалить">' +
                         SharedIcons.get('delete') +
                     '</button>' +
                 '</div>' +
@@ -103,18 +103,7 @@ var AdminFaqRenderer = (function() {
         }
     }
 
-    /**
-     * Escape HTML
-     */
-    function escapeHtml(text) {
-        if (!text) return '';
-        if (typeof window.escapeHtml === 'function') {
-            return window.escapeHtml(text);
-        }
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
+    // escapeHtml теперь используется из SharedHelpers (helpers.js)
 
     // Публичный API
     return {

@@ -5,7 +5,7 @@
  * Управление DOM, scroll, события.
  */
 
-const SaysApp = window.SaysApp || {};
+var SaysApp = window.SaysApp || {};
 
 // =================================================================
 // DOM УТИЛИТЫ
@@ -17,7 +17,8 @@ const SaysApp = window.SaysApp || {};
  * @param {Element} parent - родительский элемент (по умолчанию document)
  * @returns {Element|null}
  */
-SaysApp.$ = function(selector, parent = document) {
+SaysApp.$ = function(selector, parent) {
+    parent = parent || document;
     return parent.querySelector(selector);
 };
 
@@ -27,7 +28,8 @@ SaysApp.$ = function(selector, parent = document) {
  * @param {Element} parent - родительский элемент (по умолчанию document)
  * @returns {NodeList}
  */
-SaysApp.$$ = function(selector, parent = document) {
+SaysApp.$$ = function(selector, parent) {
+    parent = parent || document;
     return parent.querySelectorAll(selector);
 };
 
@@ -63,9 +65,11 @@ SaysApp.lockScroll = function(lock) {
  */
 SaysApp.setAria = function(element, attrs) {
     if (!element) return;
-    Object.entries(attrs).forEach(([key, value]) => {
-        element.setAttribute(`aria-${key}`, value.toString());
-    });
+    for (var key in attrs) {
+        if (attrs.hasOwnProperty(key)) {
+            element.setAttribute('aria-' + key, attrs[key].toString());
+        }
+    }
 };
 
 // =================================================================
@@ -80,9 +84,10 @@ SaysApp.setAria = function(element, attrs) {
  * @param {Object} options - опции addEventListener
  * @returns {Function} - функция для удаления обработчика
  */
-SaysApp.on = function(target, event, handler, options = {}) {
+SaysApp.on = function(target, event, handler, options) {
+    options = options || {};
     target.addEventListener(event, handler, options);
-    return () => target.removeEventListener(event, handler, options);
+    return function() { target.removeEventListener(event, handler, options); };
 };
 
 /**
@@ -134,7 +139,7 @@ SaysApp.hasClass = function(element, className) {
  * @returns {Function} - функция для удаления обработчика
  */
 SaysApp.onEscape = function(callback) {
-    const handler = (e) => {
+    var handler = function(e) {
         if (e.key === 'Escape') {
             callback(e);
         }
@@ -152,7 +157,8 @@ SaysApp.onEscape = function(callback) {
  * @param {Object} options - опции форматирования
  * @returns {string} - отформатированная дата
  */
-SaysApp.formatDate = function(dateStr, options = {}) {
+SaysApp.formatDate = function(dateStr, options) {
+    options = options || {};
     if (!dateStr) return '';
 
     var defaultOptions = {

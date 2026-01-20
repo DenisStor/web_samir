@@ -21,7 +21,7 @@
     text-decoration: none;
     cursor: pointer;
     margin-bottom: 40px;
-    transition: all var(--transition-base);
+    transition: border-color var(--transition-base), color var(--transition-base);
 }
 
 .back-link:hover {
@@ -63,12 +63,43 @@
     }
 }
 
+@media (max-width: 640px) {
+    .product-page {
+        padding: 20px 0 60px;
+    }
+
+    .product-detail-grid {
+        gap: 20px;
+    }
+
+    .product-detail-info {
+        padding: 20px;
+        border-radius: var(--radius-md);
+    }
+
+    .product-detail-name {
+        font-size: 1.25rem;
+        margin-bottom: 12px;
+    }
+
+    .product-detail-price {
+        font-size: 1.75rem;
+        margin-bottom: 16px;
+        padding-bottom: 16px;
+    }
+
+    .breadcrumbs {
+        margin-bottom: 20px;
+        font-size: 0.8rem;
+    }
+}
+
 .product-category-tag {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     padding: 8px 16px;
-    background: rgba(163, 230, 53, 0.1);
+    background: var(--shop-accent-subtle);
     border: 1px solid var(--border-accent);
     border-radius: 100px;
     color: var(--accent-green);
@@ -77,11 +108,11 @@
     font-weight: 600;
     margin-bottom: 20px;
     cursor: pointer;
-    transition: all var(--transition-base);
+    transition: background var(--transition-base), transform var(--transition-base);
 }
 
 .product-category-tag:hover {
-    background: rgba(163, 230, 53, 0.2);
+    background: var(--shop-accent-medium);
     transform: translateY(-1px);
 }
 
@@ -110,6 +141,9 @@
     font-size: 1rem;
     line-height: 1.8;
     white-space: pre-line;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 /* Product CTA Button */
@@ -130,14 +164,14 @@
     font-size: 1rem;
     font-weight: 700;
     cursor: pointer;
-    transition: all var(--transition-base);
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
     text-decoration: none;
     text-align: center;
 }
 
 .product-buy-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(163, 230, 53, 0.3);
+    box-shadow: 0 8px 24px var(--shop-accent-glow);
 }
 
 .product-contact-btn {
@@ -150,7 +184,7 @@
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all var(--transition-base);
+    transition: border-color var(--transition-base), color var(--transition-base);
     text-decoration: none;
 }
 

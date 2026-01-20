@@ -17,7 +17,7 @@
     color: var(--text-white);
     font-size: 0.95rem;
     font-family: 'Manrope', sans-serif;
-    transition: all var(--transition-base);
+    transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
 
 .shop-search input::placeholder {
@@ -27,7 +27,7 @@
 .shop-search input:focus {
     outline: none;
     border-color: var(--accent-green);
-    box-shadow: 0 0 0 4px rgba(163, 230, 53, 0.1);
+    box-shadow: 0 0 0 4px var(--shop-accent-subtle);
 }
 
 .shop-search .search-icon {
@@ -56,7 +56,7 @@
     display: none;
     align-items: center;
     justify-content: center;
-    transition: all var(--transition-base);
+    transition: background var(--transition-base), color var(--transition-base);
 }
 
 .search-clear svg {

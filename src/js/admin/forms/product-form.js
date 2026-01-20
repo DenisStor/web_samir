@@ -135,7 +135,7 @@ var AdminProductForm = (function() {
         grid.addEventListener('click', function(e) {
             var removeBtn = e.target.closest('.remove-image-btn');
             if (removeBtn) {
-                var index = parseInt(removeBtn.dataset.index);
+                var index = parseInt(removeBtn.dataset.index, 10);
                 uploadedImages.splice(index, 1);
                 // Update isMain
                 if (uploadedImages.length > 0) {
@@ -159,7 +159,7 @@ var AdminProductForm = (function() {
         grid.querySelectorAll('.image-preview').forEach(function(preview) {
             preview.addEventListener('dragstart', function(e) {
                 draggedItem = this;
-                draggedIndex = parseInt(this.dataset.index);
+                draggedIndex = parseInt(this.dataset.index, 10);
                 this.classList.add('dragging');
                 e.dataTransfer.effectAllowed = 'move';
             });
@@ -179,7 +179,7 @@ var AdminProductForm = (function() {
                 e.preventDefault();
                 if (!draggedItem || draggedItem === this) return;
 
-                var targetIndex = parseInt(this.dataset.index);
+                var targetIndex = parseInt(this.dataset.index, 10);
 
                 // Reorder array
                 var item = uploadedImages.splice(draggedIndex, 1)[0];
@@ -199,7 +199,7 @@ var AdminProductForm = (function() {
     async function save() {
         var name = document.getElementById('productName').value.trim();
         var categoryId = document.getElementById('productCategory').value;
-        var price = parseInt(document.getElementById('productPrice').value);
+        var price = parseInt(document.getElementById('productPrice').value, 10);
         var description = document.getElementById('productDescription').value.trim();
         var status = document.getElementById('productStatus').value;
 
@@ -258,49 +258,25 @@ var AdminProductForm = (function() {
         var product = AdminState.findProduct(id);
         if (!product) return;
 
-        var message = 'Удалить товар "' + window.escapeHtml(product.name) + '"?';
-        document.getElementById('deleteMessage').textContent = message;
+        if (!confirm('Удалить товар "' + product.name + '"?')) {
+            return;
+        }
 
-        AdminModals.open('deleteModal');
-
-        // Set up confirmation handler
-        var confirmBtn = document.getElementById('deleteConfirm');
-        var newConfirmBtn = confirmBtn.cloneNode(true);
-        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
-
-        newConfirmBtn.addEventListener('click', async function() {
-            var products = AdminState.products.filter(function(p) {
-                return p.id !== id;
-            });
-
-            try {
-                await AdminAPI.save('shop/products', { products: products });
-                AdminState.setProducts(products);
-                showToast('Товар удалён', 'success');
-                AdminModals.close('deleteModal');
-                AdminShopProductsRenderer.render();
-            } catch (error) {
-                showToast('Ошибка: ' + error.message, 'error');
-            }
+        var products = AdminState.products.filter(function(p) {
+            return p.id !== id;
         });
+
+        try {
+            await AdminAPI.save('shop/products', { products: products });
+            AdminState.setProducts(products);
+            showToast('Товар удалён', 'success');
+            AdminShopProductsRenderer.render();
+        } catch (error) {
+            showToast('Ошибка: ' + error.message, 'error');
+        }
     }
 
-    function generateSlug(text) {
-        var translit = {
-            'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo',
-            'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
-            'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
-            'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch', 'ъ': '',
-            'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya'
-        };
-
-        return text.toLowerCase()
-            .split('')
-            .map(function(char) { return translit[char] || char; })
-            .join('')
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-|-$/g, '');
-    }
+    // generateSlug теперь используется из SharedHelpers (helpers.js)
 
     return {
         show: show,

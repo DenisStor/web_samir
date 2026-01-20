@@ -9,23 +9,24 @@
 (function() {
     'use strict';
 
-    const { $$, ready } = SaysApp;
+    var $$ = SaysApp.$$;
+    var ready = SaysApp.ready;
 
     // Конфигурация IntersectionObserver
-    const OBSERVER_CONFIG = {
+    var OBSERVER_CONFIG = {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
     };
 
     // Глобальная ссылка на observer
-    let fadeObserver = null;
+    var fadeObserver = null;
 
     /**
      * Создать и запустить наблюдатель для анимаций
      */
     function initAnimations() {
-        fadeObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
+        fadeObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('visible');
                     // Прекращаем наблюдение после появления (оптимизация)
@@ -45,7 +46,7 @@
     function observeFadeElements() {
         if (!fadeObserver) return;
 
-        $$('.fade-in:not(.visible)').forEach(el => {
+        $$('.fade-in:not(.visible)').forEach(function(el) {
             fadeObserver.observe(el);
         });
     }

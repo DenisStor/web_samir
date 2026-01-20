@@ -26,7 +26,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all var(--transition-base);
+    transition: background var(--transition-base), border-color var(--transition-base), transform var(--transition-base), box-shadow var(--transition-base);
     border: 1px solid var(--border-subtle);
 }
 

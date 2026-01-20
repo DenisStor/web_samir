@@ -28,7 +28,12 @@
     font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all var(--transition-smooth);
+    /* Оптимизировано: конкретные свойства вместо all */
+    transition: background var(--transition-smooth),
+                border-color var(--transition-smooth),
+                color var(--transition-smooth),
+                transform var(--transition-smooth),
+                box-shadow var(--transition-smooth);
     position: relative;
     overflow: hidden;
 }
@@ -52,7 +57,7 @@
     width: 20px;
     height: 20px;
     flex-shrink: 0;
-    transition: all var(--transition-base);
+    transition: color var(--transition-base), transform var(--transition-base);
 }
 
 .service-tab:hover {
@@ -99,12 +104,12 @@
     border-radius: var(--radius-xl);
     padding: 40px;
     border: 1px solid var(--border-subtle);
-    transition: all var(--transition-base);
+    transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
 
 .service-category:hover {
     border-color: var(--border-accent);
-    box-shadow: 0 0 40px rgba(0, 255, 136, 0.05);
+    box-shadow: 0 0 40px var(--accent-green-faint);
 }
 
 .category-title {
@@ -157,7 +162,11 @@
     padding: 20px 24px;
     background: var(--content-bg-light);
     border-radius: var(--radius-md);
-    transition: all var(--transition-bounce);
+    /* Исправлено: убран bounce для устранения двойной анимации */
+    transition: background var(--transition-base),
+                transform var(--transition-base),
+                border-color var(--transition-base),
+                box-shadow var(--transition-base);
     position: relative;
     border: 1px solid transparent;
 }
@@ -176,7 +185,7 @@
 }
 
 .service-item:hover {
-    background: rgba(0, 255, 136, 0.08);
+    background: var(--accent-green-muted);
     transform: translateX(12px);
     border-color: var(--border-accent);
     box-shadow: var(--shadow-card);

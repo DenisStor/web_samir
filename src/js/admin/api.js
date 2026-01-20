@@ -7,6 +7,7 @@ var AdminAPI = (function() {
     'use strict';
 
     var AUTH_TOKEN_KEY = 'says_admin_token';
+    var sessionExpiredHandled = false; // Предотвращает повторную обработку
 
     // =================================================================
     // TOKEN MANAGEMENT
@@ -19,8 +20,33 @@ var AdminAPI = (function() {
     function setToken(token) {
         if (token) {
             sessionStorage.setItem(AUTH_TOKEN_KEY, token);
+            sessionExpiredHandled = false; // Сбрасываем флаг при новом токене
         } else {
             sessionStorage.removeItem(AUTH_TOKEN_KEY);
+        }
+    }
+
+    /**
+     * Обработка истекшей сессии (вызывается однократно)
+     */
+    function handleSessionExpired() {
+        if (sessionExpiredHandled) return;
+        sessionExpiredHandled = true;
+
+        setToken(null);
+        if (typeof showToast === 'function') {
+            showToast('Сессия истекла. Пожалуйста, войдите снова.', 'error');
+        }
+
+        // Показываем форму логина вместо reload
+        if (typeof AdminAuth !== 'undefined' && typeof AdminAuth.showLoginForm === 'function') {
+            AdminAuth.showLoginForm();
+        } else {
+            // Fallback: показываем модальное окно или перезагружаем страницу с задержкой
+            setTimeout(function() {
+                sessionExpiredHandled = false;
+                location.reload();
+            }, 2000);
         }
     }
 
@@ -47,7 +73,7 @@ var AdminAPI = (function() {
             return response.json();
         } catch (error) {
             console.error('API GET ' + endpoint + ' error:', error);
-            return {};
+            return null;
         }
     }
 
@@ -64,11 +90,7 @@ var AdminAPI = (function() {
 
             // Обработка unauthorized
             if (response.status === 401) {
-                setToken(null);
-                if (typeof showToast === 'function') {
-                    showToast('Сессия истекла. Пожалуйста, войдите снова.', 'error');
-                }
-                location.reload();
+                handleSessionExpired();
                 throw new Error('Unauthorized');
             }
 
@@ -95,11 +117,7 @@ var AdminAPI = (function() {
             });
 
             if (response.status === 401) {
-                setToken(null);
-                if (typeof showToast === 'function') {
-                    showToast('Сессия истекла. Пожалуйста, войдите снова.', 'error');
-                }
-                location.reload();
+                handleSessionExpired();
                 throw new Error('Unauthorized');
             }
 
@@ -125,11 +143,7 @@ var AdminAPI = (function() {
             });
 
             if (response.status === 401) {
-                setToken(null);
-                if (typeof showToast === 'function') {
-                    showToast('Сессия истекла. Пожалуйста, войдите снова.', 'error');
-                }
-                location.reload();
+                handleSessionExpired();
                 throw new Error('Unauthorized');
             }
 

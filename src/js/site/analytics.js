@@ -11,11 +11,11 @@
         return;
     }
 
-    const API_URL = '/api/stats/visit';
-    const SESSION_KEY = 'says_session_id';
+    var API_URL = '/api/stats/visit';
+    var SESSION_KEY = 'says_session_id';
 
     // Названия секций
-    const SECTION_NAMES = {
+    var SECTION_NAMES = {
         'hero': 'Главный экран',
         'services': 'Услуги',
         'podology': 'Подология',
@@ -28,15 +28,19 @@
         'booking': 'Запись'
     };
 
-    // Отслеженные секции для текущей сессии
-    const viewedSections = new Set();
+    // Отслеженные секции для текущей сессии (используем объект вместо Set)
+    var viewedSections = {};
 
     // Текущая активная секция (для обновления URL)
-    let currentSection = null;
+    var currentSection = null;
+
+    // Ссылки для cleanup
+    var sectionObserver = null;
+    var hashChangeHandler = null;
 
     // Генерируем или получаем session ID
     function getSessionId() {
-        let sessionId = sessionStorage.getItem(SESSION_KEY);
+        var sessionId = sessionStorage.getItem(SESSION_KEY);
         if (!sessionId) {
             sessionId = 'sess_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
             sessionStorage.setItem(SESSION_KEY, sessionId);
@@ -55,8 +59,8 @@
 
     // Записываем просмотр секции
     function trackSectionView(sectionId) {
-        if (viewedSections.has(sectionId)) return;
-        viewedSections.add(sectionId);
+        if (viewedSections[sectionId]) return;
+        viewedSections[sectionId] = true;
 
         sendData({
             type: 'section',
@@ -67,7 +71,7 @@
 
     // Обработка хэша URL (например, #podology)
     function trackHashSection() {
-        const hash = window.location.hash.slice(1); // убираем #
+        var hash = window.location.hash.slice(1); // убираем #
         if (hash && SECTION_NAMES[hash]) {
             trackSectionView(hash);
         }
@@ -79,8 +83,8 @@
         currentSection = sectionId;
 
         // Для hero убираем хэш, для остальных - добавляем
-        const newHash = sectionId === 'hero' ? '' : '#' + sectionId;
-        const newUrl = window.location.pathname + window.location.search + newHash;
+        var newHash = sectionId === 'hero' ? '' : '#' + sectionId;
+        var newUrl = window.location.pathname + window.location.search + newHash;
 
         // replaceState не добавляет запись в историю
         history.replaceState(null, '', newUrl);
@@ -104,52 +108,80 @@
 
     // Инициализация отслеживания секций
     function initSectionTracking() {
-        const sections = document.querySelectorAll('section[id]');
+        var sections = document.querySelectorAll('section[id]');
         if (sections.length === 0) return;
 
-        // Храним видимость каждой секции
-        const visibleSections = new Map();
+        // Очищаем предыдущий observer если есть
+        if (sectionObserver) {
+            sectionObserver.disconnect();
+        }
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                const sectionId = entry.target.id;
+        // Храним видимость каждой секции (используем объект вместо Map)
+        var visibleSections = {};
+
+        sectionObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                var sectionId = entry.target.id;
                 if (!SECTION_NAMES[sectionId]) return;
 
                 if (entry.isIntersecting) {
-                    visibleSections.set(sectionId, entry.intersectionRatio);
+                    visibleSections[sectionId] = entry.intersectionRatio;
 
                     // Отслеживаем для аналитики
                     if (entry.intersectionRatio >= 0.3) {
                         trackSectionView(sectionId);
                     }
                 } else {
-                    visibleSections.delete(sectionId);
+                    delete visibleSections[sectionId];
                 }
             });
 
             // Определяем самую видимую секцию и обновляем URL
-            let maxRatio = 0;
-            let topSection = null;
+            var maxRatio = 0;
+            var topSection = null;
 
-            visibleSections.forEach((ratio, id) => {
-                if (ratio > maxRatio) {
-                    maxRatio = ratio;
-                    topSection = id;
+            for (var id in visibleSections) {
+                if (visibleSections.hasOwnProperty(id)) {
+                    var ratio = visibleSections[id];
+                    if (ratio > maxRatio) {
+                        maxRatio = ratio;
+                        topSection = id;
+                    }
                 }
-            });
+            }
 
             if (topSection && maxRatio >= 0.3) {
                 updateUrlHash(topSection);
             }
         }, {
-            threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+            // Уменьшено с 11 до 5 threshold для снижения нагрузки
+            threshold: [0, 0.3, 0.5, 0.7, 1.0]
         });
 
-        sections.forEach(section => {
+        sections.forEach(function(section) {
             if (SECTION_NAMES[section.id]) {
-                observer.observe(section);
+                sectionObserver.observe(section);
             }
         });
+    }
+
+    // Функция очистки для предотвращения утечек памяти
+    function cleanup() {
+        if (sectionObserver) {
+            sectionObserver.disconnect();
+            sectionObserver = null;
+        }
+        if (hashChangeHandler) {
+            window.removeEventListener('hashchange', hashChangeHandler);
+            hashChangeHandler = null;
+        }
+        // Очищаем объект viewedSections
+        for (var key in viewedSections) {
+            if (viewedSections.hasOwnProperty(key)) {
+                delete viewedSections[key];
+            }
+        }
+        currentSection = null;
     }
 
     // Инициализация
@@ -160,8 +192,9 @@
         // Отслеживаем начальный хэш
         trackHashSection();
 
-        // Слушаем изменения хэша (навигация по якорям)
-        window.addEventListener('hashchange', trackHashSection);
+        // Сохраняем ссылку на handler для возможности cleanup
+        hashChangeHandler = trackHashSection;
+        window.addEventListener('hashchange', hashChangeHandler);
     }
 
     if (document.readyState === 'loading') {
@@ -169,5 +202,10 @@
     } else {
         init();
     }
+
+    // Экспортируем cleanup для возможности очистки
+    window.SaysAnalytics = {
+        cleanup: cleanup
+    };
 
 })();

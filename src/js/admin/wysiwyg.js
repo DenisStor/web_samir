@@ -1,7 +1,6 @@
 /**
  * Admin WYSIWYG Editor Module
- * Современный редактор для статей с использованием Selection API
- * Заменяет deprecated document.execCommand на Selection/Range API
+ * Улучшенный редактор с удобным интерфейсом
  */
 
 var AdminWYSIWYG = (function() {
@@ -9,25 +8,37 @@ var AdminWYSIWYG = (function() {
 
     var editor = null;
     var toolbar = null;
+    var savedRange = null;
+
+    // Конфигурация DOMPurify для всех операций
+    var PURIFY_CONFIG = {
+        ALLOWED_TAGS: ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'span', 'div', 'font'],
+        ALLOWED_ATTR: ['href', 'target', 'class', 'style', 'color']
+    };
+
+    // Доступные цвета
+    var COLORS = [
+        { name: 'Зелёный', value: '#00ff88' },
+        { name: 'Красный', value: '#ff4757' },
+        { name: 'Синий', value: '#4d7cff' },
+        { name: 'Жёлтый', value: '#ffd93d' },
+        { name: 'Розовый', value: '#ff6b9d' },
+        { name: 'Оранжевый', value: '#ff9f43' },
+        { name: 'Белый', value: '#ffffff' }
+    ];
 
     // =================================================================
     // SELECTION HELPERS
     // =================================================================
 
     /**
-     * Получить текущее выделение
-     */
-    function getSelection() {
-        return window.getSelection();
-    }
-
-    /**
      * Сохранить текущее выделение
      */
     function saveSelection() {
-        var sel = getSelection();
+        var sel = window.getSelection();
         if (sel.rangeCount > 0) {
-            return sel.getRangeAt(0).cloneRange();
+            savedRange = sel.getRangeAt(0).cloneRange();
+            return savedRange;
         }
         return null;
     }
@@ -35,104 +46,91 @@ var AdminWYSIWYG = (function() {
     /**
      * Восстановить выделение
      */
-    function restoreSelection(range) {
-        if (range) {
-            var sel = getSelection();
+    function restoreSelection() {
+        if (savedRange) {
+            var sel = window.getSelection();
             sel.removeAllRanges();
-            sel.addRange(range);
+            sel.addRange(savedRange);
+            return true;
         }
+        return false;
     }
 
     /**
      * Проверить, находится ли выделение внутри редактора
      */
-    function isSelectionInEditor() {
-        if (!editor) return false;
-        var sel = getSelection();
+    function isSelectionInEditor(editorEl) {
+        editorEl = editorEl || editor;
+        if (!editorEl) return false;
+
+        var sel = window.getSelection();
         if (!sel.rangeCount) return false;
 
         var range = sel.getRangeAt(0);
-        return editor.contains(range.commonAncestorContainer);
-    }
-
-    // =================================================================
-    // FORMATTING WITH SELECTION API
-    // =================================================================
-
-    /**
-     * Обернуть выделенный текст в тег
-     */
-    function wrapSelection(tagName, attributes) {
-        var sel = getSelection();
-        if (!sel.rangeCount || !isSelectionInEditor()) return false;
-
-        var range = sel.getRangeAt(0);
-
-        // Если ничего не выделено, не делаем ничего
-        if (range.collapsed) return false;
-
-        // Создаём элемент-обёртку
-        var wrapper = document.createElement(tagName);
-        if (attributes) {
-            for (var attr in attributes) {
-                if (attributes.hasOwnProperty(attr)) {
-                    wrapper.setAttribute(attr, attributes[attr]);
-                }
-            }
-        }
-
-        try {
-            // Извлекаем содержимое и оборачиваем
-            var content = range.extractContents();
-            wrapper.appendChild(content);
-            range.insertNode(wrapper);
-
-            // Выделяем вставленный элемент
-            range.selectNodeContents(wrapper);
-            sel.removeAllRanges();
-            sel.addRange(range);
-
-            return true;
-        } catch (e) {
-            console.warn('wrapSelection failed:', e);
-            return false;
-        }
+        return editorEl.contains(range.commonAncestorContainer);
     }
 
     /**
-     * Удалить форматирование с тегом
+     * Проверить, есть ли выделенный текст
      */
-    function unwrapSelection(tagName) {
-        var sel = getSelection();
-        if (!sel.rangeCount || !isSelectionInEditor()) return false;
+    function hasSelection() {
+        var sel = window.getSelection();
+        return sel.rangeCount > 0 && !sel.getRangeAt(0).collapsed;
+    }
 
-        var range = sel.getRangeAt(0);
-        var container = range.commonAncestorContainer;
+    // =================================================================
+    // FORMATTING
+    // =================================================================
 
-        // Находим родительский элемент с нужным тегом
-        var parent = container.nodeType === Node.TEXT_NODE ? container.parentNode : container;
+    /**
+     * Применить форматирование через execCommand (работает надёжнее)
+     */
+    function execFormat(command, value) {
+        document.execCommand(command, false, value || null);
+    }
 
-        while (parent && parent !== editor) {
-            if (parent.tagName && parent.tagName.toLowerCase() === tagName.toLowerCase()) {
-                // Разворачиваем элемент
-                var fragment = document.createDocumentFragment();
-                while (parent.firstChild) {
-                    fragment.appendChild(parent.firstChild);
-                }
-                parent.parentNode.replaceChild(fragment, parent);
-                return true;
-            }
-            parent = parent.parentNode;
+    /**
+     * Применить цвет к тексту
+     */
+    function applyColor(color) {
+        if (!editor) return;
+
+        restoreSelection();
+
+        if (!hasSelection()) {
+            showToast('Сначала выделите текст', 'warning');
+            return;
         }
 
-        return false;
+        // Используем execCommand для foreColor - самый надёжный способ
+        document.execCommand('foreColor', false, color);
+
+        // Скрываем палитру
+        hideColorPicker();
+
+        editor.focus();
+    }
+
+    /**
+     * Удалить цвет с выделенного текста
+     */
+    function removeColor() {
+        if (!editor) return;
+
+        restoreSelection();
+
+        // Удаляем цвет через removeFormat
+        document.execCommand('removeFormat', false, null);
+
+        hideColorPicker();
+        editor.focus();
     }
 
     /**
      * Проверить, применён ли стиль к выделению
      */
     function isFormatApplied(tagName) {
-        var sel = getSelection();
+        var sel = window.getSelection();
         if (!sel.rangeCount) return false;
 
         var container = sel.getRangeAt(0).commonAncestorContainer;
@@ -149,182 +147,26 @@ var AdminWYSIWYG = (function() {
     }
 
     /**
-     * Переключить форматирование (toggle)
+     * Проверить, есть ли цвет на выделении
      */
-    function toggleFormat(tagName, attributes) {
-        if (isFormatApplied(tagName)) {
-            unwrapSelection(tagName);
-        } else {
-            wrapSelection(tagName, attributes);
-        }
-    }
+    function hasColorApplied() {
+        var sel = window.getSelection();
+        if (!sel.rangeCount) return false;
 
-    // =================================================================
-    // BLOCK FORMATTING
-    // =================================================================
+        var container = sel.getRangeAt(0).commonAncestorContainer;
+        var parent = container.nodeType === Node.TEXT_NODE ? container.parentNode : container;
 
-    /**
-     * Применить блочное форматирование
-     */
-    function formatBlock(tagName) {
-        var sel = getSelection();
-        if (!sel.rangeCount || !isSelectionInEditor()) return;
-
-        var range = sel.getRangeAt(0);
-        var container = range.commonAncestorContainer;
-
-        // Находим блочный родительский элемент
-        var blockParent = container.nodeType === Node.TEXT_NODE ? container.parentNode : container;
-
-        while (blockParent && blockParent !== editor) {
-            var display = window.getComputedStyle(blockParent).display;
-            if (display === 'block' || display === 'list-item') {
-                break;
+        while (parent && parent !== editor) {
+            if (parent.style && parent.style.color) {
+                return parent.style.color;
             }
-            blockParent = blockParent.parentNode;
-        }
-
-        if (blockParent && blockParent !== editor) {
-            // Создаём новый блочный элемент
-            var newBlock = document.createElement(tagName);
-            newBlock.innerHTML = blockParent.innerHTML;
-            blockParent.parentNode.replaceChild(newBlock, blockParent);
-
-            // Восстанавливаем курсор
-            range.selectNodeContents(newBlock);
-            range.collapse(false);
-            sel.removeAllRanges();
-            sel.addRange(range);
-        }
-    }
-
-    // =================================================================
-    // LIST FORMATTING
-    // =================================================================
-
-    /**
-     * Создать или удалить список
-     */
-    function toggleList(listType) {
-        var sel = getSelection();
-        if (!sel.rangeCount || !isSelectionInEditor()) return;
-
-        var range = sel.getRangeAt(0);
-        var container = range.commonAncestorContainer;
-
-        // Проверяем, находимся ли уже в списке
-        var listParent = container;
-        while (listParent && listParent !== editor) {
-            if (listParent.tagName === 'UL' || listParent.tagName === 'OL') {
-                // Удаляем список
-                unwrapList(listParent);
-                return;
+            if (parent.tagName === 'FONT' && parent.getAttribute('color')) {
+                return parent.getAttribute('color');
             }
-            listParent = listParent.parentNode;
+            parent = parent.parentNode;
         }
 
-        // Создаём новый список
-        createList(listType);
-    }
-
-    /**
-     * Создать список из выделенного текста
-     */
-    function createList(listType) {
-        var sel = getSelection();
-        if (!sel.rangeCount) return;
-
-        var range = sel.getRangeAt(0);
-        var content = range.extractContents();
-
-        // Создаём список
-        var list = document.createElement(listType);
-        var li = document.createElement('li');
-
-        // Если есть текст, добавляем его
-        if (content.textContent.trim()) {
-            // Разбиваем по строкам
-            var text = content.textContent;
-            var lines = text.split('\n').filter(function(line) {
-                return line.trim();
-            });
-
-            if (lines.length > 1) {
-                lines.forEach(function(line) {
-                    var item = document.createElement('li');
-                    item.textContent = line.trim();
-                    list.appendChild(item);
-                });
-            } else {
-                li.appendChild(content);
-                list.appendChild(li);
-            }
-        } else {
-            li.innerHTML = '<br>';
-            list.appendChild(li);
-        }
-
-        range.insertNode(list);
-
-        // Ставим курсор в первый элемент
-        var firstLi = list.querySelector('li');
-        if (firstLi) {
-            range.selectNodeContents(firstLi);
-            range.collapse(false);
-            sel.removeAllRanges();
-            sel.addRange(range);
-        }
-    }
-
-    /**
-     * Удалить список
-     */
-    function unwrapList(listElement) {
-        var fragment = document.createDocumentFragment();
-        var items = listElement.querySelectorAll('li');
-
-        items.forEach(function(li, index) {
-            var p = document.createElement('p');
-            p.innerHTML = li.innerHTML;
-            fragment.appendChild(p);
-        });
-
-        listElement.parentNode.replaceChild(fragment, listElement);
-    }
-
-    // =================================================================
-    // LINK HANDLING
-    // =================================================================
-
-    /**
-     * Вставить ссылку
-     */
-    function insertLink() {
-        var url = prompt('Введите URL ссылки:', 'https://');
-        if (!url) return;
-
-        var sel = getSelection();
-        if (!sel.rangeCount || !isSelectionInEditor()) return;
-
-        var range = sel.getRangeAt(0);
-
-        if (range.collapsed) {
-            // Нет выделения - создаём ссылку с URL как текстом
-            var link = document.createElement('a');
-            link.href = url;
-            link.textContent = url;
-            range.insertNode(link);
-        } else {
-            // Оборачиваем выделенный текст
-            wrapSelection('a', { href: url });
-        }
-    }
-
-    /**
-     * Удалить ссылку
-     */
-    function removeLink() {
-        unwrapSelection('a');
+        return false;
     }
 
     // =================================================================
@@ -333,98 +175,161 @@ var AdminWYSIWYG = (function() {
 
     /**
      * Форматирование выделенного текста
-     * Заменяет deprecated document.execCommand
      */
     function formatText(command, value) {
         if (!editor) return;
 
-        // Фокусируем редактор
+        // Фокусируем редактор и восстанавливаем выделение
         editor.focus();
+        restoreSelection();
 
         switch (command) {
-            // Инлайн форматирование
             case 'bold':
-                toggleFormat('strong');
+                execFormat('bold');
                 break;
             case 'italic':
-                toggleFormat('em');
+                execFormat('italic');
                 break;
             case 'underline':
-                toggleFormat('u');
+                execFormat('underline');
                 break;
             case 'strikeThrough':
-                toggleFormat('s');
+                execFormat('strikeThrough');
                 break;
 
-            // Блочное форматирование
             case 'h2':
-            case 'formatBlock':
-                formatBlock(value || 'h2');
+                execFormat('formatBlock', '<h2>');
                 break;
             case 'h3':
-                formatBlock('h3');
+                execFormat('formatBlock', '<h3>');
+                break;
+            case 'p':
+                execFormat('formatBlock', '<p>');
                 break;
             case 'quote':
-                formatBlock('blockquote');
+                execFormat('formatBlock', '<blockquote>');
                 break;
 
-            // Списки
             case 'ul':
-            case 'insertUnorderedList':
-                toggleList('ul');
+                execFormat('insertUnorderedList');
                 break;
             case 'ol':
-            case 'insertOrderedList':
-                toggleList('ol');
+                execFormat('insertOrderedList');
                 break;
 
-            // Ссылки
             case 'link':
-            case 'createLink':
                 insertLink();
                 break;
             case 'unlink':
-                removeLink();
+                execFormat('unlink');
                 break;
 
-            // Очистка форматирования
             case 'removeFormat':
-                removeAllFormatting();
+                execFormat('removeFormat');
                 break;
 
-            // Fallback на execCommand для неподдерживаемых команд
+            case 'color':
+                applyColor(value || '#00ff88');
+                break;
+
             default:
-                try {
-                    document.execCommand(command, false, value || null);
-                } catch (e) {
-                    console.warn('Unsupported command:', command);
-                }
+                execFormat(command, value);
         }
 
-        // Обновляем состояние тулбара
+        // Сохраняем новое выделение и обновляем тулбар
+        saveSelection();
         updateToolbarState();
     }
 
     /**
-     * Удалить всё форматирование
+     * Вставить ссылку
      */
-    function removeAllFormatting() {
-        var sel = getSelection();
-        if (!sel.rangeCount || !isSelectionInEditor()) return;
+    function insertLink() {
+        var sel = window.getSelection();
+        var selectedText = sel.toString();
 
-        var range = sel.getRangeAt(0);
-        var text = range.toString();
+        var url = prompt('Введите URL ссылки:', 'https://');
+        if (!url || url === 'https://') return;
 
-        if (text) {
-            range.deleteContents();
-            var textNode = document.createTextNode(text);
-            range.insertNode(textNode);
+        restoreSelection();
 
-            range.selectNodeContents(textNode);
-            sel.removeAllRanges();
-            sel.addRange(range);
+        if (selectedText) {
+            execFormat('createLink', url);
+        } else {
+            // Нет выделения - вставляем ссылку с URL как текстом
+            var linkHtml = '<a href="' + url + '">' + url + '</a>';
+            execFormat('insertHTML', linkHtml);
         }
     }
+
+    // =================================================================
+    // COLOR PICKER
+    // =================================================================
+
+    /**
+     * Показать/скрыть палитру цветов
+     */
+    function toggleColorPicker(btn) {
+        var picker = btn.querySelector('.color-picker-dropdown');
+
+        if (picker) {
+            // Уже есть - переключаем видимость
+            picker.classList.toggle('visible');
+        } else {
+            // Создаём палитру
+            picker = document.createElement('div');
+            picker.className = 'color-picker-dropdown visible';
+
+            var html = '<div class="color-picker-colors">';
+            COLORS.forEach(function(c) {
+                html += '<button type="button" class="color-swatch" data-color="' + c.value + '" title="' + c.name + '" style="background-color: ' + c.value + '"></button>';
+            });
+            html += '</div>';
+            html += '<button type="button" class="color-remove-btn" data-color-remove>Убрать цвет</button>';
+
+            picker.innerHTML = html;
+            btn.appendChild(picker);
+
+            // Обработчики клика на цвет
+            picker.querySelectorAll('.color-swatch').forEach(function(swatch) {
+                swatch.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+                swatch.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var color = this.getAttribute('data-color');
+                    applyColor(color);
+                });
+            });
+
+            // Убрать цвет
+            picker.querySelector('[data-color-remove]').addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                removeColor();
+            });
+        }
+
+        // Закрываем другие палитры
+        document.querySelectorAll('.color-picker-dropdown.visible').forEach(function(p) {
+            if (p !== picker) p.classList.remove('visible');
+        });
+    }
+
+    /**
+     * Скрыть все палитры цветов
+     */
+    function hideColorPicker() {
+        document.querySelectorAll('.color-picker-dropdown').forEach(function(p) {
+            p.classList.remove('visible');
+        });
+    }
+
+    // =================================================================
+    // TOOLBAR
+    // =================================================================
 
     /**
      * Обновить состояние кнопок тулбара
@@ -438,72 +343,109 @@ var AdminWYSIWYG = (function() {
         });
 
         // Проверяем активные стили
-        if (isFormatApplied('strong') || isFormatApplied('b')) {
-            var boldBtn = toolbar.querySelector('[data-command="bold"]');
-            if (boldBtn) boldBtn.classList.add('active');
+        try {
+            if (document.queryCommandState('bold')) {
+                activateButton('bold');
+            }
+            if (document.queryCommandState('italic')) {
+                activateButton('italic');
+            }
+            if (document.queryCommandState('underline')) {
+                activateButton('underline');
+            }
+            if (document.queryCommandState('insertUnorderedList')) {
+                activateButton('ul');
+            }
+            if (document.queryCommandState('insertOrderedList')) {
+                activateButton('ol');
+            }
+        } catch (e) {
+            // Fallback для браузеров без поддержки queryCommandState
         }
-        if (isFormatApplied('em') || isFormatApplied('i')) {
-            var italicBtn = toolbar.querySelector('[data-command="italic"]');
-            if (italicBtn) italicBtn.classList.add('active');
+
+        // Проверяем блочное форматирование
+        if (isFormatApplied('h2')) {
+            activateButton('h2');
         }
-        if (isFormatApplied('u')) {
-            var underlineBtn = toolbar.querySelector('[data-command="underline"]');
-            if (underlineBtn) underlineBtn.classList.add('active');
+        if (isFormatApplied('h3')) {
+            activateButton('h3');
+        }
+        if (isFormatApplied('blockquote')) {
+            activateButton('quote');
+        }
+        if (isFormatApplied('a')) {
+            activateButton('link');
+        }
+
+        // Проверяем цвет
+        var color = hasColorApplied();
+        if (color) {
+            var colorBtn = toolbar.querySelector('[data-command="showColorPicker"]');
+            if (colorBtn) {
+                colorBtn.classList.add('active');
+            }
         }
     }
 
-    // =================================================================
-    // INITIALIZATION
-    // =================================================================
-
     /**
-     * Инициализация редактора
+     * Активировать кнопку в тулбаре
      */
-    function init(editorId, toolbarId) {
-        editor = typeof editorId === 'string' ? document.getElementById(editorId) : editorId;
-        toolbar = typeof toolbarId === 'string' ? document.getElementById(toolbarId) : toolbarId;
-
-        if (!editor) {
-            console.error('WYSIWYG editor not found:', editorId);
-            return;
-        }
-
-        // Делаем редактор редактируемым
-        editor.setAttribute('contenteditable', 'true');
-
-        // Инициализация кнопок тулбара
-        if (toolbar) {
-            initToolbar();
-        }
-
-        // Обработчики событий
-        editor.addEventListener('paste', handlePaste);
-        editor.addEventListener('keyup', updateToolbarState);
-        editor.addEventListener('mouseup', updateToolbarState);
+    function activateButton(command) {
+        if (!toolbar) return;
+        var btn = toolbar.querySelector('[data-command="' + command + '"]');
+        if (btn) btn.classList.add('active');
     }
 
     /**
      * Инициализация тулбара
      */
     function initToolbar() {
+        if (!toolbar) return;
+
+        // Предотвращаем повторную инициализацию
+        if (toolbar.dataset.initialized === 'true') {
+            return;
+        }
+        toolbar.dataset.initialized = 'true';
+
         var buttons = toolbar.querySelectorAll('[data-command]');
         buttons.forEach(function(btn) {
+            // Предотвращаем потерю фокуса при нажатии
             btn.addEventListener('mousedown', function(e) {
-                e.preventDefault(); // Предотвращаем потерю фокуса
+                e.preventDefault();
             });
 
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
+                e.stopPropagation();
+
                 var command = this.getAttribute('data-command');
                 var value = this.getAttribute('data-value');
 
-                formatText(command, value);
+                if (!editor) return;
 
-                // Фокус обратно на редактор
+                // Спецобработка для палитры цветов
+                if (command === 'showColorPicker') {
+                    toggleColorPicker(this);
+                    return;
+                }
+
+                formatText(command, value);
                 editor.focus();
             });
         });
+
+        // Закрытие палитры при клике вне
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.toolbar-btn-color')) {
+                hideColorPicker();
+            }
+        });
     }
+
+    // =================================================================
+    // INITIALIZATION
+    // =================================================================
 
     /**
      * Обработка вставки - очистка форматирования
@@ -513,49 +455,103 @@ var AdminWYSIWYG = (function() {
 
         var text = '';
         if (e.clipboardData || window.clipboardData) {
-            // Пытаемся получить HTML
             var html = (e.clipboardData || window.clipboardData).getData('text/html');
             if (html && typeof DOMPurify !== 'undefined') {
-                // Очищаем HTML через DOMPurify
-                text = DOMPurify.sanitize(html, {
-                    ALLOWED_TAGS: ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'span', 'div'],
-                    ALLOWED_ATTR: ['href', 'target', 'class', 'style']
-                });
+                text = DOMPurify.sanitize(html, PURIFY_CONFIG);
             } else {
-                // Fallback - только текст
                 text = (e.clipboardData || window.clipboardData).getData('text/plain');
-                // Заменяем переносы строк на <br>
                 text = text.replace(/\n/g, '<br>');
             }
         }
 
-        // Вставляем очищенный контент
-        var sel = getSelection();
-        if (sel.rangeCount) {
-            var range = sel.getRangeAt(0);
-            range.deleteContents();
+        document.execCommand('insertHTML', false, text);
+    }
 
-            var fragment = document.createRange().createContextualFragment(text);
-            range.insertNode(fragment);
+    /**
+     * Инициализация редактора с тулбаром
+     */
+    function initWithToolbar(editorId) {
+        var editorEl = typeof editorId === 'string' ? document.getElementById(editorId) : editorId;
+        if (!editorEl) return;
 
-            // Перемещаем курсор в конец
-            range.collapse(false);
-            sel.removeAllRanges();
-            sel.addRange(range);
+        editor = editorEl;
+        editorEl.setAttribute('contenteditable', 'true');
+
+        // Находим тулбар
+        var toolbarEl = editorEl.previousElementSibling;
+        if (toolbarEl && toolbarEl.classList.contains('editor-toolbar')) {
+            toolbar = toolbarEl;
+            initToolbar();
         }
+
+        // Сохраняем выделение при потере фокуса
+        editorEl.addEventListener('blur', function() {
+            saveSelection();
+        });
+
+        // При фокусе обновляем активный редактор
+        editorEl.addEventListener('focus', function() {
+            editor = editorEl;
+            var nearToolbar = editorEl.previousElementSibling;
+            if (nearToolbar && nearToolbar.classList.contains('editor-toolbar')) {
+                toolbar = nearToolbar;
+            }
+        });
+
+        // Обновляем состояние при изменениях
+        editorEl.addEventListener('keyup', function() {
+            saveSelection();
+            updateToolbarState();
+        });
+
+        editorEl.addEventListener('mouseup', function() {
+            saveSelection();
+            updateToolbarState();
+        });
+
+        // Горячие клавиши
+        editorEl.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key.toLowerCase()) {
+                    case 'b':
+                        e.preventDefault();
+                        formatText('bold');
+                        break;
+                    case 'i':
+                        e.preventDefault();
+                        formatText('italic');
+                        break;
+                    case 'u':
+                        e.preventDefault();
+                        formatText('underline');
+                        break;
+                }
+            }
+        });
+
+        // Обработка вставки
+        editorEl.addEventListener('paste', handlePaste);
     }
 
     /**
      * Получить HTML контент редактора
      */
-    function getContent() {
-        if (!editor) return '';
+    function getContent(editorId) {
+        var editorEl;
 
-        var content = editor.innerHTML;
+        if (editorId) {
+            editorEl = typeof editorId === 'string' ? document.getElementById(editorId) : editorId;
+        } else {
+            editorEl = editor;
+        }
+
+        if (!editorEl) return '';
+
+        var content = editorEl.innerHTML;
 
         // Очищаем через DOMPurify если доступен
         if (typeof DOMPurify !== 'undefined') {
-            content = DOMPurify.sanitize(content);
+            content = DOMPurify.sanitize(content, PURIFY_CONFIG);
         }
 
         return content;
@@ -564,15 +560,23 @@ var AdminWYSIWYG = (function() {
     /**
      * Установить HTML контент редактора
      */
-    function setContent(html) {
-        if (!editor) return;
+    function setContent(html, editorId) {
+        var editorEl;
+
+        if (editorId) {
+            editorEl = typeof editorId === 'string' ? document.getElementById(editorId) : editorId;
+        } else {
+            editorEl = editor;
+        }
+
+        if (!editorEl) return;
 
         // Очищаем через DOMPurify если доступен
         if (typeof DOMPurify !== 'undefined') {
-            html = DOMPurify.sanitize(html);
+            html = DOMPurify.sanitize(html, PURIFY_CONFIG);
         }
 
-        editor.innerHTML = html || '';
+        editorEl.innerHTML = html || '';
     }
 
     /**
@@ -591,18 +595,95 @@ var AdminWYSIWYG = (function() {
         return editor;
     }
 
+    // =================================================================
+    // HTML GENERATORS
+    // =================================================================
+
+    /**
+     * Генерировать HTML тулбара
+     */
+    function getToolbarHTML() {
+        return '<div class="editor-toolbar">' +
+            '<button type="button" class="toolbar-btn" data-command="bold" title="Жирный (Ctrl+B)"><strong>B</strong></button>' +
+            '<button type="button" class="toolbar-btn" data-command="italic" title="Курсив (Ctrl+I)"><em>I</em></button>' +
+            '<button type="button" class="toolbar-btn" data-command="underline" title="Подчёркнутый (Ctrl+U)"><u>U</u></button>' +
+            '<span class="toolbar-divider"></span>' +
+            '<button type="button" class="toolbar-btn" data-command="h2" title="Заголовок H2">H2</button>' +
+            '<button type="button" class="toolbar-btn" data-command="h3" title="Подзаголовок H3">H3</button>' +
+            '<button type="button" class="toolbar-btn" data-command="p" title="Обычный текст">P</button>' +
+            '<span class="toolbar-divider"></span>' +
+            '<button type="button" class="toolbar-btn" data-command="ul" title="Маркированный список">' +
+                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.5" fill="currentColor"/><circle cx="4" cy="12" r="1.5" fill="currentColor"/><circle cx="4" cy="18" r="1.5" fill="currentColor"/></svg>' +
+            '</button>' +
+            '<button type="button" class="toolbar-btn" data-command="ol" title="Нумерованный список">' +
+                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="10" y1="6" x2="20" y2="6"/><line x1="10" y1="12" x2="20" y2="12"/><line x1="10" y1="18" x2="20" y2="18"/><text x="4" y="8" font-size="8" fill="currentColor">1</text><text x="4" y="14" font-size="8" fill="currentColor">2</text><text x="4" y="20" font-size="8" fill="currentColor">3</text></svg>' +
+            '</button>' +
+            '<span class="toolbar-divider"></span>' +
+            '<button type="button" class="toolbar-btn" data-command="link" title="Вставить ссылку">' +
+                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>' +
+            '</button>' +
+            '<button type="button" class="toolbar-btn" data-command="quote" title="Цитата">' +
+                '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>' +
+            '</button>' +
+            '<span class="toolbar-divider"></span>' +
+            '<button type="button" class="toolbar-btn toolbar-btn-color" data-command="showColorPicker" title="Цвет текста">' +
+                '<span class="color-indicator">A</span>' +
+            '</button>' +
+            '<button type="button" class="toolbar-btn" data-command="removeFormat" title="Очистить форматирование">' +
+                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+            '</button>' +
+        '</div>';
+    }
+
+    /**
+     * Генерировать HTML редактора с тулбаром
+     */
+    function getEditorHTML(id, content, placeholder) {
+        return getToolbarHTML() +
+            '<div class="wysiwyg-editor" id="' + id + '" contenteditable="true" data-placeholder="' + (placeholder || 'Начните писать...') + '">' +
+                (content || '') +
+            '</div>';
+    }
+
+    // Legacy init function
+    function init(editorId, toolbarId) {
+        editor = typeof editorId === 'string' ? document.getElementById(editorId) : editorId;
+        toolbar = typeof toolbarId === 'string' ? document.getElementById(toolbarId) : toolbarId;
+
+        if (!editor) {
+            return;
+        }
+
+        editor.setAttribute('contenteditable', 'true');
+
+        if (toolbar) {
+            initToolbar();
+        }
+
+        editor.addEventListener('paste', handlePaste);
+        editor.addEventListener('keyup', function() {
+            saveSelection();
+            updateToolbarState();
+        });
+        editor.addEventListener('mouseup', function() {
+            saveSelection();
+            updateToolbarState();
+        });
+    }
+
     // Публичный API
     return {
         init: init,
+        initWithToolbar: initWithToolbar,
         formatText: formatText,
         insertLink: insertLink,
-        removeLink: removeLink,
         getContent: getContent,
         setContent: setContent,
         clear: clear,
         getEditor: getEditor,
         updateToolbarState: updateToolbarState,
-        // Для тестирования
+        getToolbarHTML: getToolbarHTML,
+        getEditorHTML: getEditorHTML,
         isFormatApplied: isFormatApplied,
         saveSelection: saveSelection,
         restoreSelection: restoreSelection

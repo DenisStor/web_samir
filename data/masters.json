@@ -1,30 +1,40 @@
 {
   "masters": [
     {
-      "id": "master_1764865856858",
-      "name": "Елена",
-      "initial": "Е",
+      "id": "master_1766420488137",
+      "name": "Самир",
+      "initial": "С",
       "badge": "blue",
-      "role": "Патолог",
+      "role": "Мастер и основатель",
       "specialization": "",
       "principles": [],
-      "photo": "/uploads/f08de508993c4483848067b928be6e16.jpg",
+      "photo": "/uploads/b9b5dfdadc734ff3b7fb17c5c2e86bb8.jpg",
       "active": true,
       "order": 0
     },
     {
-      "id": "master_1764865876624",
-      "name": "Елена",
-      "initial": "Е",
-      "badge": "pink",
-      "role": "патолог",
+      "id": "master_1766420517290",
+      "name": "Раф",
+      "initial": "Р",
+      "badge": "blue",
+      "role": "Барбер",
       "specialization": "",
-      "principles": [
-        "ооо"
-      ],
-      "photo": "/uploads/2e7e94def7ba4e078411bc69d7faae8b.jpg",
+      "principles": [],
+      "photo": "/uploads/f620a535cdb445ee9419421a9e1d438a.jpg",
       "active": true,
       "order": 1
+    },
+    {
+      "id": "master_1766420546140",
+      "name": "Даниэль",
+      "initial": "Д",
+      "badge": "blue",
+      "role": "Барбер",
+      "specialization": "",
+      "principles": [],
+      "photo": "/uploads/862105dc0839422ab89db2c4c50a2076.jpg",
+      "active": true,
+      "order": 2
     }
   ]
 }

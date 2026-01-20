@@ -6,6 +6,396 @@
 
 
 
+// ============= shared/config.js =============
+
+/**
+ * Config Module - Централизованный доступ к конфигурации
+ * @module AppConfig
+ */
+(function() {
+    'use strict';
+
+    // Дефолтные значения (fallback если config.json не загружен)
+    var defaults = {
+        site: {
+            name: "Say's Barbers",
+            domain: 'saysbarbers.ru',
+            phone: '+7 (911) 070-11-07',
+            telegram: 'https://t.me/saysbarbers'
+        },
+        api: {
+            baseUrl: '/api',
+            timeout: 30000
+        },
+        auth: {
+            sessionTimeoutHours: 24,
+            maxLoginAttempts: 5,
+            lockoutMinutes: 15
+        },
+        ui: {
+            toastDuration: 3000,
+            debounceDelay: 300,
+            animationDuration: 300,
+            maxImageSize: 5242880,
+            maxUploadImages: 10
+        },
+        colors: {
+            danger: '#ff4757',
+            dangerHover: '#ff3344',
+            dangerLight: '#ff6b6b',
+            dangerSubtle: 'rgba(255, 71, 87, 0.15)'
+        },
+        idPrefixes: {
+            master: 'master_',
+            article: 'article_',
+            product: 'product_',
+            category: 'category_',
+            legal: 'legal_',
+            faq: 'faq_'
+        }
+    };
+
+    var config = null;
+    var loaded = false;
+    var loadPromise = null;
+
+    /**
+     * Получить значение из вложенного объекта по пути
+     * @param {Object} obj - Объект для поиска
+     * @param {string} path - Путь вида 'site.name' или 'ui.toastDuration'
+     * @returns {*} Найденное значение или undefined
+     */
+    function getNestedValue(obj, path) {
+        if (!obj || !path) return undefined;
+
+        var parts = path.split('.');
+        var value = obj;
+
+        for (var i = 0; i < parts.length; i++) {
+            if (value && typeof value === 'object' && parts[i] in value) {
+                value = value[parts[i]];
+            } else {
+                return undefined;
+            }
+        }
+        return value;
+    }
+
+    /**
+     * Получить значение конфигурации по пути
+     * @param {string} path - Путь к значению (например 'site.name', 'ui.toastDuration')
+     * @param {*} [defaultValue] - Значение по умолчанию если не найдено
+     * @returns {*} Значение конфигурации
+     * @example
+     * AppConfig.get('site.name') // "Say's Barbers"
+     * AppConfig.get('ui.toastDuration', 3000) // 3000
+     */
+    function get(path, defaultValue) {
+        // Сначала ищем в загруженном конфиге
+        var value = getNestedValue(config, path);
+        if (value !== undefined) return value;
+
+        // Затем в дефолтах
+        value = getNestedValue(defaults, path);
+        if (value !== undefined) return value;
+
+        // Возвращаем переданный default
+        return defaultValue;
+    }
+
+    /**
+     * Асинхронная загрузка конфигурации
+     * @returns {Promise<Object>} Загруженная конфигурация
+     */
+    function load() {
+        if (loaded) return Promise.resolve(config);
+        if (loadPromise) return loadPromise;
+
+        loadPromise = fetch('/config.json')
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error('Config not found');
+                }
+                return response.json();
+            })
+            .then(function(data) {
+                config = data;
+                loaded = true;
+                return config;
+            })
+            .catch(function(error) {
+                console.warn('AppConfig: Using defaults, config.json not loaded:', error.message);
+                config = defaults;
+                loaded = true;
+                return config;
+            });
+
+        return loadPromise;
+    }
+
+    /**
+     * Проверить, загружен ли конфиг
+     * @returns {boolean}
+     */
+    function isLoaded() {
+        return loaded;
+    }
+
+    /**
+     * Получить все дефолтные значения
+     * @returns {Object}
+     */
+    function getDefaults() {
+        return defaults;
+    }
+
+    // Экспорт
+    window.AppConfig = {
+        get: get,
+        load: load,
+        isLoaded: isLoaded,
+        getDefaults: getDefaults
+    };
+
+})();
+
+
+// ============= shared/helpers.js =============
+
+/**
+ * Shared Helpers Module
+ * Общие утилиты для всех частей приложения
+ * @module SharedHelpers
+ */
+(function() {
+    'use strict';
+
+    // =================================================================
+    // XSS PROTECTION
+    // =================================================================
+
+    /**
+     * Escape HTML entities для защиты от XSS
+     * @param {string|null|undefined} text - Текст для экранирования
+     * @returns {string} Экранированный текст
+     * @example
+     * escapeHtml('<script>alert("xss")</script>') // '&lt;script&gt;alert("xss")&lt;/script&gt;'
+     */
+    function escapeHtml(text) {
+        if (text === null || text === undefined) return '';
+        var str = String(text);
+        var div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    /**
+     * Escape для HTML атрибутов (включая одинарные кавычки)
+     * Используется в onclick и других атрибутах с одинарными кавычками
+     * @param {string|null|undefined} text - Текст для экранирования
+     * @returns {string} Экранированный текст
+     * @example
+     * escapeAttr("test'value") // 'test&#39;value'
+     */
+    function escapeAttr(text) {
+        if (text === null || text === undefined) return '';
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    // =================================================================
+    // ID GENERATION
+    // =================================================================
+
+    /**
+     * Генерация уникального ID с префиксом
+     * @param {string} [prefix='item'] - Префикс ID (например 'master', 'product')
+     * @returns {string} Уникальный ID вида prefix_timestamp_random
+     * @example
+     * generateId('master') // 'master_1705312847123_k8j2m9n3x'
+     */
+    function generateId(prefix) {
+        var p = prefix || 'item';
+        return p + '_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    // =================================================================
+    // SLUG GENERATION
+    // =================================================================
+
+    var cyrillicToLatin = {
+        'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo',
+        'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
+        'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
+        'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch', 'ъ': '',
+        'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya'
+    };
+
+    /**
+     * Генерация URL-безопасного slug из текста
+     * @param {string} text - Текст для преобразования
+     * @returns {string} URL-safe slug
+     * @example
+     * generateSlug('Привет Мир!') // 'privet-mir'
+     */
+    function generateSlug(text) {
+        if (!text) return '';
+        return text.toLowerCase()
+            .split('')
+            .map(function(char) { return cyrillicToLatin[char] || char; })
+            .join('')
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-|-$/g, '');
+    }
+
+    // =================================================================
+    // DEBOUNCE / THROTTLE
+    // =================================================================
+
+    /**
+     * Debounce - отложенный вызов функции
+     * @param {Function} func - Функция для отложенного вызова
+     * @param {number} wait - Время ожидания в мс
+     * @returns {Function} Debounced функция
+     * @example
+     * var debouncedSearch = debounce(search, 300);
+     * input.addEventListener('input', debouncedSearch);
+     */
+    function debounce(func, wait) {
+        var timeout;
+        return function() {
+            var context = this;
+            var args = arguments;
+            clearTimeout(timeout);
+            timeout = setTimeout(function() {
+                func.apply(context, args);
+            }, wait);
+        };
+    }
+
+    /**
+     * Throttle через requestAnimationFrame
+     * @param {Function} func - Функция для throttle
+     * @returns {Function} Throttled функция
+     * @example
+     * var throttledScroll = throttleRAF(onScroll);
+     * window.addEventListener('scroll', throttledScroll, { passive: true });
+     */
+    function throttleRAF(func) {
+        var rafId = null;
+        return function() {
+            var context = this;
+            var args = arguments;
+            if (rafId) return;
+            rafId = requestAnimationFrame(function() {
+                func.apply(context, args);
+                rafId = null;
+            });
+        };
+    }
+
+    // =================================================================
+    // REORDER ITEMS
+    // =================================================================
+
+    /**
+     * Переупорядочить массив элементов по новому порядку ID
+     * @param {Array} items - Массив объектов с полем id
+     * @param {Array} newOrder - Массив ID в новом порядке
+     * @returns {Array} Переупорядоченный массив с обновлённым полем order
+     * @example
+     * var items = [{id: 'a', order: 0}, {id: 'b', order: 1}];
+     * var reordered = reorderItems(items, ['b', 'a']);
+     * // [{id: 'b', order: 0}, {id: 'a', order: 1}]
+     */
+    function reorderItems(items, newOrder) {
+        var reordered = newOrder.map(function(id) {
+            return items.find(function(item) { return item.id === id; });
+        }).filter(Boolean);
+
+        reordered.forEach(function(item, index) {
+            item.order = index;
+        });
+
+        return reordered;
+    }
+
+    // =================================================================
+    // FORMAT UTILITIES
+    // =================================================================
+
+    /**
+     * Форматирование цены в рубли
+     * @param {number|string} price - Цена
+     * @returns {string} Отформатированная цена
+     * @example
+     * formatPrice(1500) // '1 500 ₽'
+     */
+    function formatPrice(price) {
+        var num = parseInt(price, 10);
+        if (isNaN(num)) return '0 ₽';
+        return num.toLocaleString('ru-RU') + ' ₽';
+    }
+
+    /**
+     * Форматирование даты
+     * @param {string|Date} date - Дата
+     * @param {Object} [options] - Опции форматирования
+     * @returns {string} Отформатированная дата
+     */
+    function formatDate(date, options) {
+        if (!date) return '';
+        var d = typeof date === 'string' ? new Date(date) : date;
+        if (isNaN(d.getTime())) return '';
+
+        var defaultOptions = {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        };
+
+        return d.toLocaleDateString('ru-RU', options || defaultOptions);
+    }
+
+    // =================================================================
+    // EXPORT
+    // =================================================================
+
+    window.SharedHelpers = {
+        // XSS
+        escapeHtml: escapeHtml,
+        escapeAttr: escapeAttr,
+
+        // ID & Slug
+        generateId: generateId,
+        generateSlug: generateSlug,
+
+        // Timing
+        debounce: debounce,
+        throttleRAF: throttleRAF,
+
+        // Collections
+        reorderItems: reorderItems,
+
+        // Formatting
+        formatPrice: formatPrice,
+        formatDate: formatDate
+    };
+
+    // Глобальные алиасы для обратной совместимости
+    window.escapeHtml = escapeHtml;
+    window.escapeAttr = escapeAttr;
+    window.generateId = generateId;
+    window.generateSlug = generateSlug;
+    window.debounce = debounce;
+
+})();
+
+
 // ============= state.js =============
 
 /**
@@ -249,6 +639,7 @@ var AdminAPI = (function() {
     'use strict';
 
     var AUTH_TOKEN_KEY = 'says_admin_token';
+    var sessionExpiredHandled = false; // Предотвращает повторную обработку
 
     // =================================================================
     // TOKEN MANAGEMENT
@@ -261,8 +652,33 @@ var AdminAPI = (function() {
     function setToken(token) {
         if (token) {
             sessionStorage.setItem(AUTH_TOKEN_KEY, token);
+            sessionExpiredHandled = false; // Сбрасываем флаг при новом токене
         } else {
             sessionStorage.removeItem(AUTH_TOKEN_KEY);
+        }
+    }
+
+    /**
+     * Обработка истекшей сессии (вызывается однократно)
+     */
+    function handleSessionExpired() {
+        if (sessionExpiredHandled) return;
+        sessionExpiredHandled = true;
+
+        setToken(null);
+        if (typeof showToast === 'function') {
+            showToast('Сессия истекла. Пожалуйста, войдите снова.', 'error');
+        }
+
+        // Показываем форму логина вместо reload
+        if (typeof AdminAuth !== 'undefined' && typeof AdminAuth.showLoginForm === 'function') {
+            AdminAuth.showLoginForm();
+        } else {
+            // Fallback: показываем модальное окно или перезагружаем страницу с задержкой
+            setTimeout(function() {
+                sessionExpiredHandled = false;
+                location.reload();
+            }, 2000);
         }
     }
 
@@ -289,7 +705,7 @@ var AdminAPI = (function() {
             return response.json();
         } catch (error) {
             console.error('API GET ' + endpoint + ' error:', error);
-            return {};
+            return null;
         }
     }
 
@@ -306,11 +722,7 @@ var AdminAPI = (function() {
 
             // Обработка unauthorized
             if (response.status === 401) {
-                setToken(null);
-                if (typeof showToast === 'function') {
-                    showToast('Сессия истекла. Пожалуйста, войдите снова.', 'error');
-                }
-                location.reload();
+                handleSessionExpired();
                 throw new Error('Unauthorized');
             }
 
@@ -337,11 +749,7 @@ var AdminAPI = (function() {
             });
 
             if (response.status === 401) {
-                setToken(null);
-                if (typeof showToast === 'function') {
-                    showToast('Сессия истекла. Пожалуйста, войдите снова.', 'error');
-                }
-                location.reload();
+                handleSessionExpired();
                 throw new Error('Unauthorized');
             }
 
@@ -367,11 +775,7 @@ var AdminAPI = (function() {
             });
 
             if (response.status === 401) {
-                setToken(null);
-                if (typeof showToast === 'function') {
-                    showToast('Сессия истекла. Пожалуйста, войдите снова.', 'error');
-                }
-                location.reload();
+                handleSessionExpired();
                 throw new Error('Unauthorized');
             }
 
@@ -780,6 +1184,10 @@ var AdminModals = (function() {
     'use strict';
 
     var currentModal = null;
+    var escapeHandlerBound = false;
+    var overlayClickHandlerBound = false;
+    var boundCloseHandlers = []; // Хранение ссылок на обработчики для cleanup
+    var boundOpenHandlers = [];  // Хранение ссылок на обработчики для cleanup
 
     /**
      * Открыть модальное окно
@@ -798,11 +1206,17 @@ var AdminModals = (function() {
         document.body.style.overflow = 'hidden';
         currentModal = overlay;
 
-        // Обработчик закрытия по Escape
-        document.addEventListener('keydown', handleEscape);
+        // Обработчик закрытия по Escape (только если ещё не добавлен)
+        if (!escapeHandlerBound) {
+            document.addEventListener('keydown', handleEscape);
+            escapeHandlerBound = true;
+        }
 
-        // Обработчик закрытия по клику на оверлей
-        overlay.addEventListener('click', handleOverlayClick);
+        // Обработчик закрытия по клику на оверлей (только если ещё не добавлен)
+        if (!overlayClickHandlerBound) {
+            overlay.addEventListener('click', handleOverlayClick);
+            overlayClickHandlerBound = true;
+        }
     }
 
     /**
@@ -823,8 +1237,14 @@ var AdminModals = (function() {
         document.body.style.overflow = '';
 
         // Удаляем обработчики
-        document.removeEventListener('keydown', handleEscape);
-        overlay.removeEventListener('click', handleOverlayClick);
+        if (escapeHandlerBound) {
+            document.removeEventListener('keydown', handleEscape);
+            escapeHandlerBound = false;
+        }
+        if (overlayClickHandlerBound) {
+            overlay.removeEventListener('click', handleOverlayClick);
+            overlayClickHandlerBound = false;
+        }
 
         currentModal = null;
 
@@ -966,31 +1386,67 @@ var AdminModals = (function() {
      * Инициализация кнопок закрытия
      */
     function init() {
+        // Сначала очищаем предыдущие обработчики (если init вызван повторно)
+        destroy();
+
         // Инициализация кнопок закрытия
         var closeButtons = document.querySelectorAll('.modal-close, [data-modal-close]');
         closeButtons.forEach(function(btn) {
-            btn.addEventListener('click', function(e) {
+            var handler = function(e) {
                 e.preventDefault();
                 closeCurrent();
-            });
+            };
+            btn.addEventListener('click', handler);
+            boundCloseHandlers.push({ element: btn, handler: handler });
         });
 
         // Инициализация кнопок открытия
         var openButtons = document.querySelectorAll('[data-modal-open]');
         openButtons.forEach(function(btn) {
-            btn.addEventListener('click', function(e) {
+            var handler = function(e) {
                 e.preventDefault();
-                var modalId = this.getAttribute('data-modal-open');
+                var modalId = btn.getAttribute('data-modal-open');
                 if (modalId) {
                     open(modalId);
                 }
-            });
+            };
+            btn.addEventListener('click', handler);
+            boundOpenHandlers.push({ element: btn, handler: handler });
         });
+    }
+
+    /**
+     * Очистка всех обработчиков событий (предотвращение утечек памяти)
+     */
+    function destroy() {
+        // Закрываем текущий модал если открыт
+        if (currentModal) {
+            close();
+        }
+
+        // Удаляем обработчики кнопок закрытия
+        boundCloseHandlers.forEach(function(item) {
+            item.element.removeEventListener('click', item.handler);
+        });
+        boundCloseHandlers = [];
+
+        // Удаляем обработчики кнопок открытия
+        boundOpenHandlers.forEach(function(item) {
+            item.element.removeEventListener('click', item.handler);
+        });
+        boundOpenHandlers = [];
+
+        // Удаляем глобальные обработчики
+        if (escapeHandlerBound) {
+            document.removeEventListener('keydown', handleEscape);
+            escapeHandlerBound = false;
+        }
     }
 
     // Публичный API
     return {
         init: init,
+        destroy: destroy,
         open: open,
         close: close,
         closeCurrent: closeCurrent,
@@ -1190,8 +1646,7 @@ window.AdminImageUpload = AdminImageUpload;
 
 /**
  * Admin WYSIWYG Editor Module
- * Современный редактор для статей с использованием Selection API
- * Заменяет deprecated document.execCommand на Selection/Range API
+ * Улучшенный редактор с удобным интерфейсом
  */
 
 var AdminWYSIWYG = (function() {
@@ -1199,25 +1654,37 @@ var AdminWYSIWYG = (function() {
 
     var editor = null;
     var toolbar = null;
+    var savedRange = null;
+
+    // Конфигурация DOMPurify для всех операций
+    var PURIFY_CONFIG = {
+        ALLOWED_TAGS: ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'span', 'div', 'font'],
+        ALLOWED_ATTR: ['href', 'target', 'class', 'style', 'color']
+    };
+
+    // Доступные цвета
+    var COLORS = [
+        { name: 'Зелёный', value: '#00ff88' },
+        { name: 'Красный', value: '#ff4757' },
+        { name: 'Синий', value: '#4d7cff' },
+        { name: 'Жёлтый', value: '#ffd93d' },
+        { name: 'Розовый', value: '#ff6b9d' },
+        { name: 'Оранжевый', value: '#ff9f43' },
+        { name: 'Белый', value: '#ffffff' }
+    ];
 
     // =================================================================
     // SELECTION HELPERS
     // =================================================================
 
     /**
-     * Получить текущее выделение
-     */
-    function getSelection() {
-        return window.getSelection();
-    }
-
-    /**
      * Сохранить текущее выделение
      */
     function saveSelection() {
-        var sel = getSelection();
+        var sel = window.getSelection();
         if (sel.rangeCount > 0) {
-            return sel.getRangeAt(0).cloneRange();
+            savedRange = sel.getRangeAt(0).cloneRange();
+            return savedRange;
         }
         return null;
     }
@@ -1225,104 +1692,91 @@ var AdminWYSIWYG = (function() {
     /**
      * Восстановить выделение
      */
-    function restoreSelection(range) {
-        if (range) {
-            var sel = getSelection();
+    function restoreSelection() {
+        if (savedRange) {
+            var sel = window.getSelection();
             sel.removeAllRanges();
-            sel.addRange(range);
+            sel.addRange(savedRange);
+            return true;
         }
+        return false;
     }
 
     /**
      * Проверить, находится ли выделение внутри редактора
      */
-    function isSelectionInEditor() {
-        if (!editor) return false;
-        var sel = getSelection();
+    function isSelectionInEditor(editorEl) {
+        editorEl = editorEl || editor;
+        if (!editorEl) return false;
+
+        var sel = window.getSelection();
         if (!sel.rangeCount) return false;
 
         var range = sel.getRangeAt(0);
-        return editor.contains(range.commonAncestorContainer);
-    }
-
-    // =================================================================
-    // FORMATTING WITH SELECTION API
-    // =================================================================
-
-    /**
-     * Обернуть выделенный текст в тег
-     */
-    function wrapSelection(tagName, attributes) {
-        var sel = getSelection();
-        if (!sel.rangeCount || !isSelectionInEditor()) return false;
-
-        var range = sel.getRangeAt(0);
-
-        // Если ничего не выделено, не делаем ничего
-        if (range.collapsed) return false;
-
-        // Создаём элемент-обёртку
-        var wrapper = document.createElement(tagName);
-        if (attributes) {
-            for (var attr in attributes) {
-                if (attributes.hasOwnProperty(attr)) {
-                    wrapper.setAttribute(attr, attributes[attr]);
-                }
-            }
-        }
-
-        try {
-            // Извлекаем содержимое и оборачиваем
-            var content = range.extractContents();
-            wrapper.appendChild(content);
-            range.insertNode(wrapper);
-
-            // Выделяем вставленный элемент
-            range.selectNodeContents(wrapper);
-            sel.removeAllRanges();
-            sel.addRange(range);
-
-            return true;
-        } catch (e) {
-            console.warn('wrapSelection failed:', e);
-            return false;
-        }
+        return editorEl.contains(range.commonAncestorContainer);
     }
 
     /**
-     * Удалить форматирование с тегом
+     * Проверить, есть ли выделенный текст
      */
-    function unwrapSelection(tagName) {
-        var sel = getSelection();
-        if (!sel.rangeCount || !isSelectionInEditor()) return false;
+    function hasSelection() {
+        var sel = window.getSelection();
+        return sel.rangeCount > 0 && !sel.getRangeAt(0).collapsed;
+    }
 
-        var range = sel.getRangeAt(0);
-        var container = range.commonAncestorContainer;
+    // =================================================================
+    // FORMATTING
+    // =================================================================
 
-        // Находим родительский элемент с нужным тегом
-        var parent = container.nodeType === Node.TEXT_NODE ? container.parentNode : container;
+    /**
+     * Применить форматирование через execCommand (работает надёжнее)
+     */
+    function execFormat(command, value) {
+        document.execCommand(command, false, value || null);
+    }
 
-        while (parent && parent !== editor) {
-            if (parent.tagName && parent.tagName.toLowerCase() === tagName.toLowerCase()) {
-                // Разворачиваем элемент
-                var fragment = document.createDocumentFragment();
-                while (parent.firstChild) {
-                    fragment.appendChild(parent.firstChild);
-                }
-                parent.parentNode.replaceChild(fragment, parent);
-                return true;
-            }
-            parent = parent.parentNode;
+    /**
+     * Применить цвет к тексту
+     */
+    function applyColor(color) {
+        if (!editor) return;
+
+        restoreSelection();
+
+        if (!hasSelection()) {
+            showToast('Сначала выделите текст', 'warning');
+            return;
         }
 
-        return false;
+        // Используем execCommand для foreColor - самый надёжный способ
+        document.execCommand('foreColor', false, color);
+
+        // Скрываем палитру
+        hideColorPicker();
+
+        editor.focus();
+    }
+
+    /**
+     * Удалить цвет с выделенного текста
+     */
+    function removeColor() {
+        if (!editor) return;
+
+        restoreSelection();
+
+        // Удаляем цвет через removeFormat
+        document.execCommand('removeFormat', false, null);
+
+        hideColorPicker();
+        editor.focus();
     }
 
     /**
      * Проверить, применён ли стиль к выделению
      */
     function isFormatApplied(tagName) {
-        var sel = getSelection();
+        var sel = window.getSelection();
         if (!sel.rangeCount) return false;
 
         var container = sel.getRangeAt(0).commonAncestorContainer;
@@ -1339,182 +1793,26 @@ var AdminWYSIWYG = (function() {
     }
 
     /**
-     * Переключить форматирование (toggle)
+     * Проверить, есть ли цвет на выделении
      */
-    function toggleFormat(tagName, attributes) {
-        if (isFormatApplied(tagName)) {
-            unwrapSelection(tagName);
-        } else {
-            wrapSelection(tagName, attributes);
-        }
-    }
+    function hasColorApplied() {
+        var sel = window.getSelection();
+        if (!sel.rangeCount) return false;
 
-    // =================================================================
-    // BLOCK FORMATTING
-    // =================================================================
+        var container = sel.getRangeAt(0).commonAncestorContainer;
+        var parent = container.nodeType === Node.TEXT_NODE ? container.parentNode : container;
 
-    /**
-     * Применить блочное форматирование
-     */
-    function formatBlock(tagName) {
-        var sel = getSelection();
-        if (!sel.rangeCount || !isSelectionInEditor()) return;
-
-        var range = sel.getRangeAt(0);
-        var container = range.commonAncestorContainer;
-
-        // Находим блочный родительский элемент
-        var blockParent = container.nodeType === Node.TEXT_NODE ? container.parentNode : container;
-
-        while (blockParent && blockParent !== editor) {
-            var display = window.getComputedStyle(blockParent).display;
-            if (display === 'block' || display === 'list-item') {
-                break;
+        while (parent && parent !== editor) {
+            if (parent.style && parent.style.color) {
+                return parent.style.color;
             }
-            blockParent = blockParent.parentNode;
-        }
-
-        if (blockParent && blockParent !== editor) {
-            // Создаём новый блочный элемент
-            var newBlock = document.createElement(tagName);
-            newBlock.innerHTML = blockParent.innerHTML;
-            blockParent.parentNode.replaceChild(newBlock, blockParent);
-
-            // Восстанавливаем курсор
-            range.selectNodeContents(newBlock);
-            range.collapse(false);
-            sel.removeAllRanges();
-            sel.addRange(range);
-        }
-    }
-
-    // =================================================================
-    // LIST FORMATTING
-    // =================================================================
-
-    /**
-     * Создать или удалить список
-     */
-    function toggleList(listType) {
-        var sel = getSelection();
-        if (!sel.rangeCount || !isSelectionInEditor()) return;
-
-        var range = sel.getRangeAt(0);
-        var container = range.commonAncestorContainer;
-
-        // Проверяем, находимся ли уже в списке
-        var listParent = container;
-        while (listParent && listParent !== editor) {
-            if (listParent.tagName === 'UL' || listParent.tagName === 'OL') {
-                // Удаляем список
-                unwrapList(listParent);
-                return;
+            if (parent.tagName === 'FONT' && parent.getAttribute('color')) {
+                return parent.getAttribute('color');
             }
-            listParent = listParent.parentNode;
+            parent = parent.parentNode;
         }
 
-        // Создаём новый список
-        createList(listType);
-    }
-
-    /**
-     * Создать список из выделенного текста
-     */
-    function createList(listType) {
-        var sel = getSelection();
-        if (!sel.rangeCount) return;
-
-        var range = sel.getRangeAt(0);
-        var content = range.extractContents();
-
-        // Создаём список
-        var list = document.createElement(listType);
-        var li = document.createElement('li');
-
-        // Если есть текст, добавляем его
-        if (content.textContent.trim()) {
-            // Разбиваем по строкам
-            var text = content.textContent;
-            var lines = text.split('\n').filter(function(line) {
-                return line.trim();
-            });
-
-            if (lines.length > 1) {
-                lines.forEach(function(line) {
-                    var item = document.createElement('li');
-                    item.textContent = line.trim();
-                    list.appendChild(item);
-                });
-            } else {
-                li.appendChild(content);
-                list.appendChild(li);
-            }
-        } else {
-            li.innerHTML = '<br>';
-            list.appendChild(li);
-        }
-
-        range.insertNode(list);
-
-        // Ставим курсор в первый элемент
-        var firstLi = list.querySelector('li');
-        if (firstLi) {
-            range.selectNodeContents(firstLi);
-            range.collapse(false);
-            sel.removeAllRanges();
-            sel.addRange(range);
-        }
-    }
-
-    /**
-     * Удалить список
-     */
-    function unwrapList(listElement) {
-        var fragment = document.createDocumentFragment();
-        var items = listElement.querySelectorAll('li');
-
-        items.forEach(function(li, index) {
-            var p = document.createElement('p');
-            p.innerHTML = li.innerHTML;
-            fragment.appendChild(p);
-        });
-
-        listElement.parentNode.replaceChild(fragment, listElement);
-    }
-
-    // =================================================================
-    // LINK HANDLING
-    // =================================================================
-
-    /**
-     * Вставить ссылку
-     */
-    function insertLink() {
-        var url = prompt('Введите URL ссылки:', 'https://');
-        if (!url) return;
-
-        var sel = getSelection();
-        if (!sel.rangeCount || !isSelectionInEditor()) return;
-
-        var range = sel.getRangeAt(0);
-
-        if (range.collapsed) {
-            // Нет выделения - создаём ссылку с URL как текстом
-            var link = document.createElement('a');
-            link.href = url;
-            link.textContent = url;
-            range.insertNode(link);
-        } else {
-            // Оборачиваем выделенный текст
-            wrapSelection('a', { href: url });
-        }
-    }
-
-    /**
-     * Удалить ссылку
-     */
-    function removeLink() {
-        unwrapSelection('a');
+        return false;
     }
 
     // =================================================================
@@ -1523,98 +1821,161 @@ var AdminWYSIWYG = (function() {
 
     /**
      * Форматирование выделенного текста
-     * Заменяет deprecated document.execCommand
      */
     function formatText(command, value) {
         if (!editor) return;
 
-        // Фокусируем редактор
+        // Фокусируем редактор и восстанавливаем выделение
         editor.focus();
+        restoreSelection();
 
         switch (command) {
-            // Инлайн форматирование
             case 'bold':
-                toggleFormat('strong');
+                execFormat('bold');
                 break;
             case 'italic':
-                toggleFormat('em');
+                execFormat('italic');
                 break;
             case 'underline':
-                toggleFormat('u');
+                execFormat('underline');
                 break;
             case 'strikeThrough':
-                toggleFormat('s');
+                execFormat('strikeThrough');
                 break;
 
-            // Блочное форматирование
             case 'h2':
-            case 'formatBlock':
-                formatBlock(value || 'h2');
+                execFormat('formatBlock', '<h2>');
                 break;
             case 'h3':
-                formatBlock('h3');
+                execFormat('formatBlock', '<h3>');
+                break;
+            case 'p':
+                execFormat('formatBlock', '<p>');
                 break;
             case 'quote':
-                formatBlock('blockquote');
+                execFormat('formatBlock', '<blockquote>');
                 break;
 
-            // Списки
             case 'ul':
-            case 'insertUnorderedList':
-                toggleList('ul');
+                execFormat('insertUnorderedList');
                 break;
             case 'ol':
-            case 'insertOrderedList':
-                toggleList('ol');
+                execFormat('insertOrderedList');
                 break;
 
-            // Ссылки
             case 'link':
-            case 'createLink':
                 insertLink();
                 break;
             case 'unlink':
-                removeLink();
+                execFormat('unlink');
                 break;
 
-            // Очистка форматирования
             case 'removeFormat':
-                removeAllFormatting();
+                execFormat('removeFormat');
                 break;
 
-            // Fallback на execCommand для неподдерживаемых команд
+            case 'color':
+                applyColor(value || '#00ff88');
+                break;
+
             default:
-                try {
-                    document.execCommand(command, false, value || null);
-                } catch (e) {
-                    console.warn('Unsupported command:', command);
-                }
+                execFormat(command, value);
         }
 
-        // Обновляем состояние тулбара
+        // Сохраняем новое выделение и обновляем тулбар
+        saveSelection();
         updateToolbarState();
     }
 
     /**
-     * Удалить всё форматирование
+     * Вставить ссылку
      */
-    function removeAllFormatting() {
-        var sel = getSelection();
-        if (!sel.rangeCount || !isSelectionInEditor()) return;
+    function insertLink() {
+        var sel = window.getSelection();
+        var selectedText = sel.toString();
 
-        var range = sel.getRangeAt(0);
-        var text = range.toString();
+        var url = prompt('Введите URL ссылки:', 'https://');
+        if (!url || url === 'https://') return;
 
-        if (text) {
-            range.deleteContents();
-            var textNode = document.createTextNode(text);
-            range.insertNode(textNode);
+        restoreSelection();
 
-            range.selectNodeContents(textNode);
-            sel.removeAllRanges();
-            sel.addRange(range);
+        if (selectedText) {
+            execFormat('createLink', url);
+        } else {
+            // Нет выделения - вставляем ссылку с URL как текстом
+            var linkHtml = '<a href="' + url + '">' + url + '</a>';
+            execFormat('insertHTML', linkHtml);
         }
     }
+
+    // =================================================================
+    // COLOR PICKER
+    // =================================================================
+
+    /**
+     * Показать/скрыть палитру цветов
+     */
+    function toggleColorPicker(btn) {
+        var picker = btn.querySelector('.color-picker-dropdown');
+
+        if (picker) {
+            // Уже есть - переключаем видимость
+            picker.classList.toggle('visible');
+        } else {
+            // Создаём палитру
+            picker = document.createElement('div');
+            picker.className = 'color-picker-dropdown visible';
+
+            var html = '<div class="color-picker-colors">';
+            COLORS.forEach(function(c) {
+                html += '<button type="button" class="color-swatch" data-color="' + c.value + '" title="' + c.name + '" style="background-color: ' + c.value + '"></button>';
+            });
+            html += '</div>';
+            html += '<button type="button" class="color-remove-btn" data-color-remove>Убрать цвет</button>';
+
+            picker.innerHTML = html;
+            btn.appendChild(picker);
+
+            // Обработчики клика на цвет
+            picker.querySelectorAll('.color-swatch').forEach(function(swatch) {
+                swatch.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+                swatch.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var color = this.getAttribute('data-color');
+                    applyColor(color);
+                });
+            });
+
+            // Убрать цвет
+            picker.querySelector('[data-color-remove]').addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                removeColor();
+            });
+        }
+
+        // Закрываем другие палитры
+        document.querySelectorAll('.color-picker-dropdown.visible').forEach(function(p) {
+            if (p !== picker) p.classList.remove('visible');
+        });
+    }
+
+    /**
+     * Скрыть все палитры цветов
+     */
+    function hideColorPicker() {
+        document.querySelectorAll('.color-picker-dropdown').forEach(function(p) {
+            p.classList.remove('visible');
+        });
+    }
+
+    // =================================================================
+    // TOOLBAR
+    // =================================================================
 
     /**
      * Обновить состояние кнопок тулбара
@@ -1628,72 +1989,109 @@ var AdminWYSIWYG = (function() {
         });
 
         // Проверяем активные стили
-        if (isFormatApplied('strong') || isFormatApplied('b')) {
-            var boldBtn = toolbar.querySelector('[data-command="bold"]');
-            if (boldBtn) boldBtn.classList.add('active');
+        try {
+            if (document.queryCommandState('bold')) {
+                activateButton('bold');
+            }
+            if (document.queryCommandState('italic')) {
+                activateButton('italic');
+            }
+            if (document.queryCommandState('underline')) {
+                activateButton('underline');
+            }
+            if (document.queryCommandState('insertUnorderedList')) {
+                activateButton('ul');
+            }
+            if (document.queryCommandState('insertOrderedList')) {
+                activateButton('ol');
+            }
+        } catch (e) {
+            // Fallback для браузеров без поддержки queryCommandState
         }
-        if (isFormatApplied('em') || isFormatApplied('i')) {
-            var italicBtn = toolbar.querySelector('[data-command="italic"]');
-            if (italicBtn) italicBtn.classList.add('active');
+
+        // Проверяем блочное форматирование
+        if (isFormatApplied('h2')) {
+            activateButton('h2');
         }
-        if (isFormatApplied('u')) {
-            var underlineBtn = toolbar.querySelector('[data-command="underline"]');
-            if (underlineBtn) underlineBtn.classList.add('active');
+        if (isFormatApplied('h3')) {
+            activateButton('h3');
+        }
+        if (isFormatApplied('blockquote')) {
+            activateButton('quote');
+        }
+        if (isFormatApplied('a')) {
+            activateButton('link');
+        }
+
+        // Проверяем цвет
+        var color = hasColorApplied();
+        if (color) {
+            var colorBtn = toolbar.querySelector('[data-command="showColorPicker"]');
+            if (colorBtn) {
+                colorBtn.classList.add('active');
+            }
         }
     }
 
-    // =================================================================
-    // INITIALIZATION
-    // =================================================================
-
     /**
-     * Инициализация редактора
+     * Активировать кнопку в тулбаре
      */
-    function init(editorId, toolbarId) {
-        editor = typeof editorId === 'string' ? document.getElementById(editorId) : editorId;
-        toolbar = typeof toolbarId === 'string' ? document.getElementById(toolbarId) : toolbarId;
-
-        if (!editor) {
-            console.error('WYSIWYG editor not found:', editorId);
-            return;
-        }
-
-        // Делаем редактор редактируемым
-        editor.setAttribute('contenteditable', 'true');
-
-        // Инициализация кнопок тулбара
-        if (toolbar) {
-            initToolbar();
-        }
-
-        // Обработчики событий
-        editor.addEventListener('paste', handlePaste);
-        editor.addEventListener('keyup', updateToolbarState);
-        editor.addEventListener('mouseup', updateToolbarState);
+    function activateButton(command) {
+        if (!toolbar) return;
+        var btn = toolbar.querySelector('[data-command="' + command + '"]');
+        if (btn) btn.classList.add('active');
     }
 
     /**
      * Инициализация тулбара
      */
     function initToolbar() {
+        if (!toolbar) return;
+
+        // Предотвращаем повторную инициализацию
+        if (toolbar.dataset.initialized === 'true') {
+            return;
+        }
+        toolbar.dataset.initialized = 'true';
+
         var buttons = toolbar.querySelectorAll('[data-command]');
         buttons.forEach(function(btn) {
+            // Предотвращаем потерю фокуса при нажатии
             btn.addEventListener('mousedown', function(e) {
-                e.preventDefault(); // Предотвращаем потерю фокуса
+                e.preventDefault();
             });
 
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
+                e.stopPropagation();
+
                 var command = this.getAttribute('data-command');
                 var value = this.getAttribute('data-value');
 
-                formatText(command, value);
+                if (!editor) return;
 
-                // Фокус обратно на редактор
+                // Спецобработка для палитры цветов
+                if (command === 'showColorPicker') {
+                    toggleColorPicker(this);
+                    return;
+                }
+
+                formatText(command, value);
                 editor.focus();
             });
         });
+
+        // Закрытие палитры при клике вне
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.toolbar-btn-color')) {
+                hideColorPicker();
+            }
+        });
     }
+
+    // =================================================================
+    // INITIALIZATION
+    // =================================================================
 
     /**
      * Обработка вставки - очистка форматирования
@@ -1703,49 +2101,103 @@ var AdminWYSIWYG = (function() {
 
         var text = '';
         if (e.clipboardData || window.clipboardData) {
-            // Пытаемся получить HTML
             var html = (e.clipboardData || window.clipboardData).getData('text/html');
             if (html && typeof DOMPurify !== 'undefined') {
-                // Очищаем HTML через DOMPurify
-                text = DOMPurify.sanitize(html, {
-                    ALLOWED_TAGS: ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'span', 'div'],
-                    ALLOWED_ATTR: ['href', 'target', 'class', 'style']
-                });
+                text = DOMPurify.sanitize(html, PURIFY_CONFIG);
             } else {
-                // Fallback - только текст
                 text = (e.clipboardData || window.clipboardData).getData('text/plain');
-                // Заменяем переносы строк на <br>
                 text = text.replace(/\n/g, '<br>');
             }
         }
 
-        // Вставляем очищенный контент
-        var sel = getSelection();
-        if (sel.rangeCount) {
-            var range = sel.getRangeAt(0);
-            range.deleteContents();
+        document.execCommand('insertHTML', false, text);
+    }
 
-            var fragment = document.createRange().createContextualFragment(text);
-            range.insertNode(fragment);
+    /**
+     * Инициализация редактора с тулбаром
+     */
+    function initWithToolbar(editorId) {
+        var editorEl = typeof editorId === 'string' ? document.getElementById(editorId) : editorId;
+        if (!editorEl) return;
 
-            // Перемещаем курсор в конец
-            range.collapse(false);
-            sel.removeAllRanges();
-            sel.addRange(range);
+        editor = editorEl;
+        editorEl.setAttribute('contenteditable', 'true');
+
+        // Находим тулбар
+        var toolbarEl = editorEl.previousElementSibling;
+        if (toolbarEl && toolbarEl.classList.contains('editor-toolbar')) {
+            toolbar = toolbarEl;
+            initToolbar();
         }
+
+        // Сохраняем выделение при потере фокуса
+        editorEl.addEventListener('blur', function() {
+            saveSelection();
+        });
+
+        // При фокусе обновляем активный редактор
+        editorEl.addEventListener('focus', function() {
+            editor = editorEl;
+            var nearToolbar = editorEl.previousElementSibling;
+            if (nearToolbar && nearToolbar.classList.contains('editor-toolbar')) {
+                toolbar = nearToolbar;
+            }
+        });
+
+        // Обновляем состояние при изменениях
+        editorEl.addEventListener('keyup', function() {
+            saveSelection();
+            updateToolbarState();
+        });
+
+        editorEl.addEventListener('mouseup', function() {
+            saveSelection();
+            updateToolbarState();
+        });
+
+        // Горячие клавиши
+        editorEl.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key.toLowerCase()) {
+                    case 'b':
+                        e.preventDefault();
+                        formatText('bold');
+                        break;
+                    case 'i':
+                        e.preventDefault();
+                        formatText('italic');
+                        break;
+                    case 'u':
+                        e.preventDefault();
+                        formatText('underline');
+                        break;
+                }
+            }
+        });
+
+        // Обработка вставки
+        editorEl.addEventListener('paste', handlePaste);
     }
 
     /**
      * Получить HTML контент редактора
      */
-    function getContent() {
-        if (!editor) return '';
+    function getContent(editorId) {
+        var editorEl;
 
-        var content = editor.innerHTML;
+        if (editorId) {
+            editorEl = typeof editorId === 'string' ? document.getElementById(editorId) : editorId;
+        } else {
+            editorEl = editor;
+        }
+
+        if (!editorEl) return '';
+
+        var content = editorEl.innerHTML;
 
         // Очищаем через DOMPurify если доступен
         if (typeof DOMPurify !== 'undefined') {
-            content = DOMPurify.sanitize(content);
+            content = DOMPurify.sanitize(content, PURIFY_CONFIG);
         }
 
         return content;
@@ -1754,15 +2206,23 @@ var AdminWYSIWYG = (function() {
     /**
      * Установить HTML контент редактора
      */
-    function setContent(html) {
-        if (!editor) return;
+    function setContent(html, editorId) {
+        var editorEl;
+
+        if (editorId) {
+            editorEl = typeof editorId === 'string' ? document.getElementById(editorId) : editorId;
+        } else {
+            editorEl = editor;
+        }
+
+        if (!editorEl) return;
 
         // Очищаем через DOMPurify если доступен
         if (typeof DOMPurify !== 'undefined') {
-            html = DOMPurify.sanitize(html);
+            html = DOMPurify.sanitize(html, PURIFY_CONFIG);
         }
 
-        editor.innerHTML = html || '';
+        editorEl.innerHTML = html || '';
     }
 
     /**
@@ -1781,18 +2241,95 @@ var AdminWYSIWYG = (function() {
         return editor;
     }
 
+    // =================================================================
+    // HTML GENERATORS
+    // =================================================================
+
+    /**
+     * Генерировать HTML тулбара
+     */
+    function getToolbarHTML() {
+        return '<div class="editor-toolbar">' +
+            '<button type="button" class="toolbar-btn" data-command="bold" title="Жирный (Ctrl+B)"><strong>B</strong></button>' +
+            '<button type="button" class="toolbar-btn" data-command="italic" title="Курсив (Ctrl+I)"><em>I</em></button>' +
+            '<button type="button" class="toolbar-btn" data-command="underline" title="Подчёркнутый (Ctrl+U)"><u>U</u></button>' +
+            '<span class="toolbar-divider"></span>' +
+            '<button type="button" class="toolbar-btn" data-command="h2" title="Заголовок H2">H2</button>' +
+            '<button type="button" class="toolbar-btn" data-command="h3" title="Подзаголовок H3">H3</button>' +
+            '<button type="button" class="toolbar-btn" data-command="p" title="Обычный текст">P</button>' +
+            '<span class="toolbar-divider"></span>' +
+            '<button type="button" class="toolbar-btn" data-command="ul" title="Маркированный список">' +
+                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.5" fill="currentColor"/><circle cx="4" cy="12" r="1.5" fill="currentColor"/><circle cx="4" cy="18" r="1.5" fill="currentColor"/></svg>' +
+            '</button>' +
+            '<button type="button" class="toolbar-btn" data-command="ol" title="Нумерованный список">' +
+                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="10" y1="6" x2="20" y2="6"/><line x1="10" y1="12" x2="20" y2="12"/><line x1="10" y1="18" x2="20" y2="18"/><text x="4" y="8" font-size="8" fill="currentColor">1</text><text x="4" y="14" font-size="8" fill="currentColor">2</text><text x="4" y="20" font-size="8" fill="currentColor">3</text></svg>' +
+            '</button>' +
+            '<span class="toolbar-divider"></span>' +
+            '<button type="button" class="toolbar-btn" data-command="link" title="Вставить ссылку">' +
+                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>' +
+            '</button>' +
+            '<button type="button" class="toolbar-btn" data-command="quote" title="Цитата">' +
+                '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>' +
+            '</button>' +
+            '<span class="toolbar-divider"></span>' +
+            '<button type="button" class="toolbar-btn toolbar-btn-color" data-command="showColorPicker" title="Цвет текста">' +
+                '<span class="color-indicator">A</span>' +
+            '</button>' +
+            '<button type="button" class="toolbar-btn" data-command="removeFormat" title="Очистить форматирование">' +
+                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+            '</button>' +
+        '</div>';
+    }
+
+    /**
+     * Генерировать HTML редактора с тулбаром
+     */
+    function getEditorHTML(id, content, placeholder) {
+        return getToolbarHTML() +
+            '<div class="wysiwyg-editor" id="' + id + '" contenteditable="true" data-placeholder="' + (placeholder || 'Начните писать...') + '">' +
+                (content || '') +
+            '</div>';
+    }
+
+    // Legacy init function
+    function init(editorId, toolbarId) {
+        editor = typeof editorId === 'string' ? document.getElementById(editorId) : editorId;
+        toolbar = typeof toolbarId === 'string' ? document.getElementById(toolbarId) : toolbarId;
+
+        if (!editor) {
+            return;
+        }
+
+        editor.setAttribute('contenteditable', 'true');
+
+        if (toolbar) {
+            initToolbar();
+        }
+
+        editor.addEventListener('paste', handlePaste);
+        editor.addEventListener('keyup', function() {
+            saveSelection();
+            updateToolbarState();
+        });
+        editor.addEventListener('mouseup', function() {
+            saveSelection();
+            updateToolbarState();
+        });
+    }
+
     // Публичный API
     return {
         init: init,
+        initWithToolbar: initWithToolbar,
         formatText: formatText,
         insertLink: insertLink,
-        removeLink: removeLink,
         getContent: getContent,
         setContent: setContent,
         clear: clear,
         getEditor: getEditor,
         updateToolbarState: updateToolbarState,
-        // Для тестирования
+        getToolbarHTML: getToolbarHTML,
+        getEditorHTML: getEditorHTML,
         isFormatApplied: isFormatApplied,
         saveSelection: saveSelection,
         restoreSelection: restoreSelection
@@ -1815,6 +2352,7 @@ var AdminDragDrop = (function() {
     var draggedItem = null;
     var draggedIndex = -1;
     var containers = {};
+    var currentDragOver = null; // Кэш текущего drag-over элемента для производительности
 
     /**
      * Инициализация drag & drop для контейнера
@@ -1896,10 +2434,11 @@ var AdminDragDrop = (function() {
             draggedItem.classList.remove('dragging');
         }
 
-        // Убираем все drag-over классы
-        document.querySelectorAll('.drag-over').forEach(function(el) {
-            el.classList.remove('drag-over');
-        });
+        // Очищаем кэшированный drag-over элемент (без querySelectorAll)
+        if (currentDragOver) {
+            currentDragOver.classList.remove('drag-over');
+            currentDragOver = null;
+        }
 
         draggedItem = null;
         draggedIndex = -1;
@@ -1912,13 +2451,15 @@ var AdminDragDrop = (function() {
         var item = e.target.closest('[draggable="true"]');
         if (!item || item === draggedItem) return;
 
-        // Убираем класс со всех элементов в этом контейнере
-        var container = item.parentElement;
-        container.querySelectorAll('.drag-over').forEach(function(el) {
-            el.classList.remove('drag-over');
-        });
+        // Используем кэш вместо querySelectorAll для производительности
+        if (currentDragOver && currentDragOver !== item) {
+            currentDragOver.classList.remove('drag-over');
+        }
 
-        item.classList.add('drag-over');
+        if (item !== currentDragOver) {
+            item.classList.add('drag-over');
+            currentDragOver = item;
+        }
     }
 
     function handleDragLeave(e) {
@@ -1964,8 +2505,9 @@ var AdminDragDrop = (function() {
             }
         });
 
-        // Убираем класс drag-over
+        // Убираем класс drag-over и очищаем кэш
         targetItem.classList.remove('drag-over');
+        currentDragOver = null;
 
         // Вызываем callback
         if (config.onReorder && newOrder.length > 0) {
@@ -2999,7 +3541,7 @@ var AdminServicesRenderer = (function() {
         }
 
         var html = category.services.map(function(service, index) {
-            return '<div class="service-item" data-id="' + service.id + '" data-index="' + index + '" data-search="' + escapeHtml(service.name) + '" draggable="true">' +
+            return '<div class="service-item" data-id="' + service.id + '" data-index="' + index + '" data-search="' + escapeAttr(service.name) + '" draggable="true">' +
                 '<div class="drag-handle" title="Перетащите для изменения порядка">' + SharedIcons.get('grip') + '</div>' +
                 '<span class="service-name">' + escapeHtml(service.name) + '</span>' +
                 '<div class="service-prices">' +
@@ -3011,7 +3553,7 @@ var AdminServicesRenderer = (function() {
                     '<button class="btn btn-icon" data-action="edit-service" data-category="' + currentCategory + '" data-index="' + index + '" title="Редактировать">' +
                         SharedIcons.get('edit') +
                     '</button>' +
-                    '<button class="btn btn-icon danger" data-action="delete-service" data-category="' + currentCategory + '" data-index="' + index + '" data-name="' + escapeHtml(service.name) + '" title="Удалить">' +
+                    '<button class="btn btn-icon danger" data-action="delete-service" data-category="' + currentCategory + '" data-index="' + index + '" data-name="' + escapeAttr(service.name) + '" title="Удалить">' +
                         SharedIcons.get('delete') +
                     '</button>' +
                 '</div>' +
@@ -3043,7 +3585,7 @@ var AdminServicesRenderer = (function() {
         }
 
         var html = podologyServices.map(function(service, index) {
-            return '<div class="service-item" data-id="' + service.id + '" data-index="' + index + '" data-search="' + escapeHtml(service.name) + '" draggable="true">' +
+            return '<div class="service-item" data-id="' + service.id + '" data-index="' + index + '" data-search="' + escapeAttr(service.name) + '" draggable="true">' +
                 '<div class="drag-handle" title="Перетащите для изменения порядка">' + SharedIcons.get('grip') + '</div>' +
                 '<span class="service-name">' + escapeHtml(service.name) + '</span>' +
                 '<div class="service-prices">' +
@@ -3053,7 +3595,7 @@ var AdminServicesRenderer = (function() {
                     '<button class="btn btn-icon" data-action="edit-podology" data-index="' + index + '" title="Редактировать">' +
                         SharedIcons.get('edit') +
                     '</button>' +
-                    '<button class="btn btn-icon danger" data-action="delete-podology" data-index="' + index + '" data-name="' + escapeHtml(service.name) + '" title="Удалить">' +
+                    '<button class="btn btn-icon danger" data-action="delete-podology" data-index="' + index + '" data-name="' + escapeAttr(service.name) + '" title="Удалить">' +
                         SharedIcons.get('delete') +
                     '</button>' +
                 '</div>' +
@@ -3197,7 +3739,7 @@ var AdminArticlesRenderer = (function() {
 
             var searchText = [article.title, article.tag, article.excerpt].join(' ');
 
-            return '<div class="article-card has-drag" data-id="' + article.id + '" data-index="' + index + '" data-search="' + escapeHtml(searchText) + '" draggable="true">' +
+            return '<div class="article-card has-drag" data-id="' + article.id + '" data-index="' + index + '" data-search="' + escapeAttr(searchText) + '" draggable="true">' +
                 '<div class="article-image">' +
                     imageHtml +
                 '</div>' +
@@ -3213,7 +3755,7 @@ var AdminArticlesRenderer = (function() {
                             SharedIcons.get('edit') +
                             'Редактировать' +
                         '</button>' +
-                        '<button class="btn btn-icon danger" data-action="delete-article" data-id="' + article.id + '" data-name="' + escapeHtml(article.title) + '" title="Удалить">' +
+                        '<button class="btn btn-icon danger" data-action="delete-article" data-id="' + article.id + '" data-name="' + escapeAttr(article.title) + '" title="Удалить">' +
                             SharedIcons.get('delete') +
                         '</button>' +
                     '</div>' +
@@ -3229,18 +3771,7 @@ var AdminArticlesRenderer = (function() {
         }
     }
 
-    /**
-     * Escape HTML
-     */
-    function escapeHtml(text) {
-        if (!text) return '';
-        if (typeof window.escapeHtml === 'function') {
-            return window.escapeHtml(text);
-        }
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
+    // escapeHtml теперь используется из SharedHelpers (helpers.js)
 
     // Публичный API
     return {
@@ -3337,7 +3868,7 @@ var AdminFaqRenderer = (function() {
         var html = faq.map(function(item, index) {
             var searchText = [item.question, item.answer].join(' ');
 
-            return '<div class="faq-admin-item has-drag" data-id="' + item.id + '" data-index="' + index + '" data-search="' + escapeHtml(searchText) + '" draggable="true">' +
+            return '<div class="faq-admin-item has-drag" data-id="' + item.id + '" data-index="' + index + '" data-search="' + escapeAttr(searchText) + '" draggable="true">' +
                 '<div class="drag-handle" title="Перетащите для изменения порядка">' + SharedIcons.get('grip') + '</div>' +
                 '<div class="faq-admin-content">' +
                     '<h3 class="faq-admin-question">' + escapeHtml(item.question) + '</h3>' +
@@ -3348,7 +3879,7 @@ var AdminFaqRenderer = (function() {
                         SharedIcons.get('edit') +
                         'Редактировать' +
                     '</button>' +
-                    '<button class="btn btn-icon danger" data-action="delete-faq" data-id="' + item.id + '" data-name="' + escapeHtml(item.question) + '" title="Удалить">' +
+                    '<button class="btn btn-icon danger" data-action="delete-faq" data-id="' + item.id + '" data-name="' + escapeAttr(item.question) + '" title="Удалить">' +
                         SharedIcons.get('delete') +
                     '</button>' +
                 '</div>' +
@@ -3362,18 +3893,7 @@ var AdminFaqRenderer = (function() {
         }
     }
 
-    /**
-     * Escape HTML
-     */
-    function escapeHtml(text) {
-        if (!text) return '';
-        if (typeof window.escapeHtml === 'function') {
-            return window.escapeHtml(text);
-        }
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
+    // escapeHtml теперь используется из SharedHelpers (helpers.js)
 
     // Публичный API
     return {
@@ -3588,7 +4108,7 @@ var AdminShopCategoriesRenderer = (function() {
                     ? '<p class="category-card-description">' + escapeHtml(cat.description) + '</p>'
                     : '';
 
-                return '<div class="shop-category-card' + (isInactive ? ' inactive' : '') + '" data-id="' + escapeHtml(cat.id) + '">' +
+                return '<div class="shop-category-card' + (isInactive ? ' inactive' : '') + '" data-id="' + escapeAttr(cat.id) + '">' +
                     '<div class="category-card-icon">' + iconHtml + '</div>' +
                     '<div class="category-card-info">' +
                         '<h3 class="category-card-name">' +
@@ -3602,10 +4122,10 @@ var AdminShopCategoriesRenderer = (function() {
                         '</span>' +
                     '</div>' +
                     '<div class="category-card-actions">' +
-                        '<button class="btn btn-icon" data-action="edit-shop-category" data-id="' + escapeHtml(cat.id) + '" title="Редактировать">' +
+                        '<button class="btn btn-icon" data-action="edit-shop-category" data-id="' + escapeAttr(cat.id) + '" title="Редактировать">' +
                             SharedIcons.get('edit') +
                         '</button>' +
-                        '<button class="btn btn-icon danger" data-action="delete-shop-category" data-id="' + escapeHtml(cat.id) + '" title="Удалить">' +
+                        '<button class="btn btn-icon danger" data-action="delete-shop-category" data-id="' + escapeAttr(cat.id) + '" title="Удалить">' +
                             SharedIcons.get('delete') +
                         '</button>' +
                     '</div>' +
@@ -3615,12 +4135,7 @@ var AdminShopCategoriesRenderer = (function() {
         container.innerHTML = html;
     }
 
-    function escapeHtml(text) {
-        if (!text) return '';
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
+    // escapeHtml теперь используется из SharedHelpers (helpers.js)
 
     function getProductWord(count) {
         var n = Math.abs(count) % 100;
@@ -3738,10 +4253,10 @@ var AdminShopProductsRenderer = (function() {
                 '<td class="price-cell">' + formatPrice(product.price) + '</td>' +
                 '<td><span class="status-badge ' + statusClass + '">' + statusText + '</span></td>' +
                 '<td class="actions-cell">' +
-                    '<button class="btn btn-icon" data-action="edit-product" data-id="' + escapeHtml(product.id) + '" title="Редактировать">' +
+                    '<button class="btn btn-icon" data-action="edit-product" data-id="' + escapeAttr(product.id) + '" title="Редактировать">' +
                         SharedIcons.get('edit') +
                     '</button>' +
-                    '<button class="btn btn-icon danger" data-action="delete-product" data-id="' + escapeHtml(product.id) + '" title="Удалить">' +
+                    '<button class="btn btn-icon danger" data-action="delete-product" data-id="' + escapeAttr(product.id) + '" title="Удалить">' +
                         SharedIcons.get('delete') +
                     '</button>' +
                 '</td>' +
@@ -4304,9 +4819,9 @@ var AdminServiceForm = (function() {
         var pinkEl = document.getElementById('pricePink');
         var blueEl = document.getElementById('priceBlue');
 
-        var priceGreen = parseInt(greenEl ? greenEl.value : 0) || 0;
-        var pricePink = parseInt(pinkEl ? pinkEl.value : 0) || 0;
-        var priceBlue = parseInt(blueEl ? blueEl.value : 0) || 0;
+        var priceGreen = parseInt(greenEl ? greenEl.value : 0, 10) || 0;
+        var pricePink = parseInt(pinkEl ? pinkEl.value : 0, 10) || 0;
+        var priceBlue = parseInt(blueEl ? blueEl.value : 0, 10) || 0;
 
         var serviceData = {
             id: editing.service ? editing.service.id : Date.now(),
@@ -4524,21 +5039,7 @@ var AdminArticleForm = (function() {
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-label">Полный текст статьи</label>' +
-                '<div class="editor-toolbar">' +
-                    '<button type="button" class="toolbar-btn" data-command="bold" title="Жирный (Ctrl+B)"><strong>B</strong></button>' +
-                    '<button type="button" class="toolbar-btn" data-command="italic" title="Курсив (Ctrl+I)"><em>I</em></button>' +
-                    '<button type="button" class="toolbar-btn" data-command="underline" title="Подчёркнутый (Ctrl+U)"><u>U</u></button>' +
-                    '<span class="toolbar-divider"></span>' +
-                    '<button type="button" class="toolbar-btn" data-command="h2" title="Заголовок">H2</button>' +
-                    '<button type="button" class="toolbar-btn" data-command="h3" title="Подзаголовок">H3</button>' +
-                    '<span class="toolbar-divider"></span>' +
-                    '<button type="button" class="toolbar-btn" data-command="ul" title="Маркированный список">•</button>' +
-                    '<button type="button" class="toolbar-btn" data-command="ol" title="Нумерованный список">1.</button>' +
-                    '<span class="toolbar-divider"></span>' +
-                    '<button type="button" class="toolbar-btn" data-command="link" title="Ссылка">🔗</button>' +
-                    '<button type="button" class="toolbar-btn" data-command="removeFormat" title="Очистить форматирование">✕</button>' +
-                '</div>' +
-                '<div class="wysiwyg-editor" id="articleContent" contenteditable="true" data-placeholder="Начните писать текст статьи...">' + (article && article.content || '') + '</div>' +
+                AdminWYSIWYG.getEditorHTML('articleContent', article && article.content || '', 'Начните писать текст статьи...') +
             '</div>' +
         '</form>';
 
@@ -4549,73 +5050,9 @@ var AdminArticleForm = (function() {
         }
         AdminModals.open('modal');
 
-        // Инициализация редактора
-        initEditor();
-    }
-
-    /**
-     * Инициализация WYSIWYG редактора
-     */
-    function initEditor() {
-        var editor = document.getElementById('articleContent');
-        if (!editor) return;
-
-        // Инициализация тулбара
-        var toolbar = document.querySelector('.editor-toolbar');
-        if (toolbar) {
-            toolbar.addEventListener('mousedown', function(e) {
-                var btn = e.target.closest('.toolbar-btn');
-                if (btn) {
-                    e.preventDefault();
-                    var command = btn.dataset.command;
-                    if (command) {
-                        AdminWYSIWYG.formatText(command);
-                    }
-                }
-            });
-        }
-
-        // Горячие клавиши
-        editor.addEventListener('keydown', function(e) {
-            if (e.ctrlKey || e.metaKey) {
-                switch (e.key.toLowerCase()) {
-                    case 'b':
-                        e.preventDefault();
-                        AdminWYSIWYG.formatText('bold');
-                        break;
-                    case 'i':
-                        e.preventDefault();
-                        AdminWYSIWYG.formatText('italic');
-                        break;
-                    case 'u':
-                        e.preventDefault();
-                        AdminWYSIWYG.formatText('underline');
-                        break;
-                }
-            }
-        });
-
-        // Очистка форматирования при вставке
-        editor.addEventListener('paste', function(e) {
-            e.preventDefault();
-            var text = (e.clipboardData || window.clipboardData).getData('text/plain');
-            var selection = window.getSelection();
-            if (!selection.rangeCount) return;
-
-            selection.deleteFromDocument();
-
-            var lines = text.split('\n');
-            var fragment = document.createDocumentFragment();
-
-            lines.forEach(function(line, index) {
-                fragment.appendChild(document.createTextNode(line));
-                if (index < lines.length - 1) {
-                    fragment.appendChild(document.createElement('br'));
-                }
-            });
-
-            selection.getRangeAt(0).insertNode(fragment);
-            selection.collapseToEnd();
+        // Инициализация редактора после рендеринга DOM
+        requestAnimationFrame(function() {
+            AdminWYSIWYG.initWithToolbar('articleContent');
         });
     }
 
@@ -4634,13 +5071,12 @@ var AdminArticleForm = (function() {
         var tagEl = document.getElementById('articleTag');
         var dateEl = document.getElementById('articleDate');
         var excerptEl = document.getElementById('articleExcerpt');
-        var contentEl = document.getElementById('articleContent');
         var imageEl = document.getElementById('articleImage');
 
         var tag = tagEl ? tagEl.value.trim() : 'Статья';
         var date = dateEl ? dateEl.value : new Date().toISOString().split('T')[0];
         var excerpt = excerptEl ? excerptEl.value.trim() : '';
-        var content = contentEl ? contentEl.innerHTML.trim() : '';
+        var content = AdminWYSIWYG.getContent('articleContent');
         var image = imageEl ? imageEl.value : null;
 
         var articleData = {
@@ -5019,49 +5455,25 @@ var AdminCategoryForm = (function() {
         var category = AdminState.findShopCategory(id);
         if (!category) return;
 
-        var message = 'Удалить категорию "' + window.escapeHtml(category.name) + '"?';
-        document.getElementById('deleteMessage').textContent = message;
+        if (!confirm('Удалить категорию "' + category.name + '"?')) {
+            return;
+        }
 
-        AdminModals.open('deleteModal');
-
-        // Set up confirmation handler
-        var confirmBtn = document.getElementById('deleteConfirm');
-        var newConfirmBtn = confirmBtn.cloneNode(true);
-        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
-
-        newConfirmBtn.addEventListener('click', async function() {
-            var categories = AdminState.shopCategories.filter(function(c) {
-                return c.id !== id;
-            });
-
-            try {
-                await AdminAPI.save('shop/categories', { categories: categories });
-                AdminState.setShopCategories(categories);
-                showToast('Категория удалена', 'success');
-                AdminModals.close('deleteModal');
-                AdminShopCategoriesRenderer.render();
-            } catch (error) {
-                showToast('Ошибка: ' + error.message, 'error');
-            }
+        var categories = AdminState.shopCategories.filter(function(c) {
+            return c.id !== id;
         });
+
+        try {
+            await AdminAPI.save('shop/categories', { categories: categories });
+            AdminState.setShopCategories(categories);
+            showToast('Категория удалена', 'success');
+            AdminShopCategoriesRenderer.render();
+        } catch (error) {
+            showToast('Ошибка: ' + error.message, 'error');
+        }
     }
 
-    function generateSlug(text) {
-        var translit = {
-            'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo',
-            'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
-            'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
-            'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch', 'ъ': '',
-            'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya'
-        };
-
-        return text.toLowerCase()
-            .split('')
-            .map(function(char) { return translit[char] || char; })
-            .join('')
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-|-$/g, '');
-    }
+    // generateSlug теперь используется из SharedHelpers (helpers.js)
 
     return {
         show: show,
@@ -5212,7 +5624,7 @@ var AdminProductForm = (function() {
         grid.addEventListener('click', function(e) {
             var removeBtn = e.target.closest('.remove-image-btn');
             if (removeBtn) {
-                var index = parseInt(removeBtn.dataset.index);
+                var index = parseInt(removeBtn.dataset.index, 10);
                 uploadedImages.splice(index, 1);
                 // Update isMain
                 if (uploadedImages.length > 0) {
@@ -5236,7 +5648,7 @@ var AdminProductForm = (function() {
         grid.querySelectorAll('.image-preview').forEach(function(preview) {
             preview.addEventListener('dragstart', function(e) {
                 draggedItem = this;
-                draggedIndex = parseInt(this.dataset.index);
+                draggedIndex = parseInt(this.dataset.index, 10);
                 this.classList.add('dragging');
                 e.dataTransfer.effectAllowed = 'move';
             });
@@ -5256,7 +5668,7 @@ var AdminProductForm = (function() {
                 e.preventDefault();
                 if (!draggedItem || draggedItem === this) return;
 
-                var targetIndex = parseInt(this.dataset.index);
+                var targetIndex = parseInt(this.dataset.index, 10);
 
                 // Reorder array
                 var item = uploadedImages.splice(draggedIndex, 1)[0];
@@ -5276,7 +5688,7 @@ var AdminProductForm = (function() {
     async function save() {
         var name = document.getElementById('productName').value.trim();
         var categoryId = document.getElementById('productCategory').value;
-        var price = parseInt(document.getElementById('productPrice').value);
+        var price = parseInt(document.getElementById('productPrice').value, 10);
         var description = document.getElementById('productDescription').value.trim();
         var status = document.getElementById('productStatus').value;
 
@@ -5335,49 +5747,25 @@ var AdminProductForm = (function() {
         var product = AdminState.findProduct(id);
         if (!product) return;
 
-        var message = 'Удалить товар "' + window.escapeHtml(product.name) + '"?';
-        document.getElementById('deleteMessage').textContent = message;
+        if (!confirm('Удалить товар "' + product.name + '"?')) {
+            return;
+        }
 
-        AdminModals.open('deleteModal');
-
-        // Set up confirmation handler
-        var confirmBtn = document.getElementById('deleteConfirm');
-        var newConfirmBtn = confirmBtn.cloneNode(true);
-        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
-
-        newConfirmBtn.addEventListener('click', async function() {
-            var products = AdminState.products.filter(function(p) {
-                return p.id !== id;
-            });
-
-            try {
-                await AdminAPI.save('shop/products', { products: products });
-                AdminState.setProducts(products);
-                showToast('Товар удалён', 'success');
-                AdminModals.close('deleteModal');
-                AdminShopProductsRenderer.render();
-            } catch (error) {
-                showToast('Ошибка: ' + error.message, 'error');
-            }
+        var products = AdminState.products.filter(function(p) {
+            return p.id !== id;
         });
+
+        try {
+            await AdminAPI.save('shop/products', { products: products });
+            AdminState.setProducts(products);
+            showToast('Товар удалён', 'success');
+            AdminShopProductsRenderer.render();
+        } catch (error) {
+            showToast('Ошибка: ' + error.message, 'error');
+        }
     }
 
-    function generateSlug(text) {
-        var translit = {
-            'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo',
-            'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
-            'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
-            'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch', 'ъ': '',
-            'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya'
-        };
-
-        return text.toLowerCase()
-            .split('')
-            .map(function(char) { return translit[char] || char; })
-            .join('')
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-|-$/g, '');
-    }
+    // generateSlug теперь используется из SharedHelpers (helpers.js)
 
     return {
         show: show,
@@ -5421,30 +5809,7 @@ var AdminLegalForm = (function() {
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-label">Содержимое документа *</label>' +
-                '<div class="wysiwyg-toolbar">' +
-                    '<button type="button" class="wysiwyg-btn" onclick="AdminWYSIWYG.formatText(\'bold\')" title="Жирный">' +
-                        '<strong>B</strong>' +
-                    '</button>' +
-                    '<button type="button" class="wysiwyg-btn" onclick="AdminWYSIWYG.formatText(\'italic\')" title="Курсив">' +
-                        '<em>I</em>' +
-                    '</button>' +
-                    '<button type="button" class="wysiwyg-btn" onclick="AdminWYSIWYG.formatText(\'insertUnorderedList\')" title="Маркированный список">' +
-                        SharedIcons.get('list') +
-                    '</button>' +
-                    '<button type="button" class="wysiwyg-btn" onclick="AdminWYSIWYG.formatText(\'insertOrderedList\')" title="Нумерованный список">' +
-                        SharedIcons.get('listOrdered') +
-                    '</button>' +
-                    '<span class="wysiwyg-separator"></span>' +
-                    '<button type="button" class="wysiwyg-btn" onclick="AdminWYSIWYG.formatText(\'h2\')" title="Заголовок H2">' +
-                        'H2' +
-                    '</button>' +
-                    '<button type="button" class="wysiwyg-btn" onclick="AdminWYSIWYG.formatText(\'h3\')" title="Заголовок H3">' +
-                        'H3' +
-                    '</button>' +
-                '</div>' +
-                '<div class="wysiwyg-editor" id="legalContent" contenteditable="true">' +
-                    (legalDoc ? legalDoc.content : '') +
-                '</div>' +
+                AdminWYSIWYG.getEditorHTML('legalContent', legalDoc ? legalDoc.content : '', 'Введите текст документа...') +
             '</div>' +
             '<div class="form-group">' +
                 '<label class="form-checkbox">' +
@@ -5461,10 +5826,11 @@ var AdminLegalForm = (function() {
         }
         AdminModals.open('modal');
 
-        // Инициализация WYSIWYG редактора
-        setTimeout(function() {
-            AdminWYSIWYG.init('legalContent');
-        }, 100);
+        // Инициализация WYSIWYG редактора с тулбаром
+        // Используем requestAnimationFrame для гарантии что DOM обновился
+        requestAnimationFrame(function() {
+            AdminWYSIWYG.initWithToolbar('legalContent');
+        });
     }
 
     /**
@@ -5473,7 +5839,7 @@ var AdminLegalForm = (function() {
     async function save() {
         var title = document.getElementById('legalTitle').value.trim();
         var slug = document.getElementById('legalSlug').value.trim().toLowerCase();
-        var content = document.getElementById('legalContent').innerHTML;
+        var content = AdminWYSIWYG.getContent('legalContent');
         var active = document.getElementById('legalActive').checked;
 
         // Валидация
@@ -5522,7 +5888,7 @@ var AdminLegalForm = (function() {
         } else {
             // Создание нового
             var newDocument = {
-                id: generateId(),
+                id: SharedHelpers.generateId('legal'),
                 slug: slug,
                 title: title,
                 content: content,
@@ -5551,7 +5917,7 @@ var AdminLegalForm = (function() {
         var legalDoc = AdminState.findLegalDocument(id);
         if (!legalDoc) return;
 
-        AdminModals.openDeleteConfirm(
+        AdminModals.confirmDelete(
             legalDoc.title,
             async function() {
                 var documents = AdminState.legalDocuments.filter(function(d) {
@@ -5571,12 +5937,7 @@ var AdminLegalForm = (function() {
         );
     }
 
-    /**
-     * Генерация ID
-     */
-    function generateId() {
-        return 'legal_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    }
+    // generateId теперь используется из SharedHelpers (helpers.js)
 
     // Публичный API
     return {
@@ -5602,6 +5963,13 @@ var AdminPanel = (function() {
 
     // DOM элементы
     var elements = {};
+
+    // Ссылки на document handlers для cleanup
+    var boundDocumentHandlers = {
+        click: null,
+        change: null,
+        keydown: null
+    };
 
     /**
      * Инициализация DOM элементов
@@ -5651,15 +6019,15 @@ var AdminPanel = (function() {
         try {
             var data = await AdminAPI.loadAllData();
 
-            // Обновляем состояние
-            AdminState.setMasters(data.masters.masters || []);
+            // Обновляем состояние (с проверкой на null от API)
+            AdminState.setMasters((data.masters && data.masters.masters) || []);
             AdminState.setServices(data.services || {});
-            AdminState.setArticles(data.articles.articles || []);
-            AdminState.setFaq(data.faq.faq || []);
+            AdminState.setArticles((data.articles && data.articles.articles) || []);
+            AdminState.setFaq((data.faq && data.faq.faq) || []);
             AdminState.setSocial(data.social || {});
-            AdminState.setShopCategories(data.shopCategories.categories || []);
-            AdminState.setProducts(data.products.products || []);
-            AdminState.setLegalDocuments(data.legal.documents || []);
+            AdminState.setShopCategories((data.shopCategories && data.shopCategories.categories) || []);
+            AdminState.setProducts((data.products && data.products.products) || []);
+            AdminState.setLegalDocuments((data.legal && data.legal.documents) || []);
 
             // Рендеринг
             renderCurrentSection();
@@ -5861,8 +6229,8 @@ var AdminPanel = (function() {
      * Инициализация делегирования событий
      */
     function initEventDelegation() {
-        // Глобальный обработчик кликов
-        document.addEventListener('click', function(e) {
+        // Глобальный обработчик кликов (сохраняем ссылку для cleanup)
+        boundDocumentHandlers.click = function(e) {
             var target = e.target.closest('[data-action]');
             if (!target) return;
 
@@ -5882,18 +6250,18 @@ var AdminPanel = (function() {
 
                 // Services
                 case 'edit-service':
-                    AdminServiceForm.show(category, parseInt(index));
+                    AdminServiceForm.show(category, parseInt(index, 10));
                     break;
                 case 'delete-service':
-                    AdminServiceForm.remove(category, parseInt(index));
+                    AdminServiceForm.remove(category, parseInt(index, 10));
                     break;
 
                 // Podology
                 case 'edit-podology':
-                    AdminServiceForm.showPodology(parseInt(index));
+                    AdminServiceForm.showPodology(parseInt(index, 10));
                     break;
                 case 'delete-podology':
-                    AdminServiceForm.removePodology(parseInt(index));
+                    AdminServiceForm.removePodology(parseInt(index, 10));
                     break;
 
                 // Articles
@@ -5959,16 +6327,18 @@ var AdminPanel = (function() {
                     AdminLegalRenderer.toggleActive(id);
                     break;
             }
-        });
+        };
+        document.addEventListener('click', boundDocumentHandlers.click);
 
-        // Обработчик загрузки изображений
-        document.addEventListener('change', function(e) {
+        // Обработчик загрузки изображений (сохраняем ссылку для cleanup)
+        boundDocumentHandlers.change = function(e) {
             var target = e.target;
             if (target.matches('[data-upload-target]')) {
                 var inputId = target.getAttribute('data-upload-target');
                 handleImageUpload(e, inputId);
             }
-        });
+        };
+        document.addEventListener('change', boundDocumentHandlers.change);
     }
 
     // =================================================================
@@ -6064,7 +6434,7 @@ var AdminPanel = (function() {
                         removeBtn.className = 'remove-image';
                         removeBtn.setAttribute('data-action', 'remove-image');
                         removeBtn.setAttribute('data-target', inputId);
-                        removeBtn.innerHTML = SharedIcons.get('close');
+                        removeBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
                         uploadDiv.appendChild(removeBtn);
                     }
                 }
@@ -6201,12 +6571,13 @@ var AdminPanel = (function() {
             });
         }
 
-        // Escape key
-        document.addEventListener('keydown', function(e) {
+        // Escape key (сохраняем ссылку для cleanup)
+        boundDocumentHandlers.keydown = function(e) {
             if (e.key === 'Escape') {
                 AdminModals.closeCurrent();
             }
-        });
+        };
+        document.addEventListener('keydown', boundDocumentHandlers.keydown);
 
         // Save social button
         if (elements.saveSocialBtn) {
@@ -6277,6 +6648,43 @@ var AdminPanel = (function() {
                 });
             }
         );
+    }
+
+    /**
+     * Очистка ресурсов и event listeners
+     */
+    function destroy() {
+        // Удаляем document listeners
+        if (boundDocumentHandlers.click) {
+            document.removeEventListener('click', boundDocumentHandlers.click);
+            boundDocumentHandlers.click = null;
+        }
+        if (boundDocumentHandlers.change) {
+            document.removeEventListener('change', boundDocumentHandlers.change);
+            boundDocumentHandlers.change = null;
+        }
+        if (boundDocumentHandlers.keydown) {
+            document.removeEventListener('keydown', boundDocumentHandlers.keydown);
+            boundDocumentHandlers.keydown = null;
+        }
+
+        // Уничтожаем drag-drop если доступен
+        if (window.AdminDragDrop && AdminDragDrop.destroy) {
+            AdminDragDrop.destroy('mastersGrid');
+            AdminDragDrop.destroy('faqList');
+            AdminDragDrop.destroy('shopCategoriesGrid');
+            AdminDragDrop.destroy('shopProductsGrid');
+        }
+
+        // Сбрасываем состояние
+        if (window.AdminState && AdminState.reset) {
+            AdminState.reset();
+        }
+
+        // Очищаем кэш элементов
+        elements = {};
+
+        console.log('Admin Panel destroyed');
     }
 
     // Запуск при готовности DOM
@@ -6368,7 +6776,10 @@ var AdminPanel = (function() {
         },
 
         // Reload
-        loadData: loadData
+        loadData: loadData,
+
+        // Cleanup
+        destroy: destroy
     };
 })();
 

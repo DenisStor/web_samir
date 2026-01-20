@@ -8,6 +8,7 @@ var AdminDragDrop = (function() {
     var draggedItem = null;
     var draggedIndex = -1;
     var containers = {};
+    var currentDragOver = null; // Кэш текущего drag-over элемента для производительности
 
     /**
      * Инициализация drag & drop для контейнера
@@ -89,10 +90,11 @@ var AdminDragDrop = (function() {
             draggedItem.classList.remove('dragging');
         }
 
-        // Убираем все drag-over классы
-        document.querySelectorAll('.drag-over').forEach(function(el) {
-            el.classList.remove('drag-over');
-        });
+        // Очищаем кэшированный drag-over элемент (без querySelectorAll)
+        if (currentDragOver) {
+            currentDragOver.classList.remove('drag-over');
+            currentDragOver = null;
+        }
 
         draggedItem = null;
         draggedIndex = -1;
@@ -105,13 +107,15 @@ var AdminDragDrop = (function() {
         var item = e.target.closest('[draggable="true"]');
         if (!item || item === draggedItem) return;
 
-        // Убираем класс со всех элементов в этом контейнере
-        var container = item.parentElement;
-        container.querySelectorAll('.drag-over').forEach(function(el) {
-            el.classList.remove('drag-over');
-        });
+        // Используем кэш вместо querySelectorAll для производительности
+        if (currentDragOver && currentDragOver !== item) {
+            currentDragOver.classList.remove('drag-over');
+        }
 
-        item.classList.add('drag-over');
+        if (item !== currentDragOver) {
+            item.classList.add('drag-over');
+            currentDragOver = item;
+        }
     }
 
     function handleDragLeave(e) {
@@ -157,8 +161,9 @@ var AdminDragDrop = (function() {
             }
         });
 
-        // Убираем класс drag-over
+        // Убираем класс drag-over и очищаем кэш
         targetItem.classList.remove('drag-over');
+        currentDragOver = null;
 
         // Вызываем callback
         if (config.onReorder && newOrder.length > 0) {

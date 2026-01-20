@@ -13,7 +13,7 @@
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-lg);
     padding: 20px;
-    transition: all var(--transition-base);
+    transition: border-color var(--transition-base);
 }
 
 .legal-document-card:hover {

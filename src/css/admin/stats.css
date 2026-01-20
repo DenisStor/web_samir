@@ -22,12 +22,12 @@
     display: flex;
     align-items: center;
     gap: 20px;
-    transition: all var(--transition-base);
+    transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
 
 .stat-card:hover {
     border-color: var(--accent-green);
-    box-shadow: 0 4px 20px rgba(0, 255, 136, 0.1);
+    box-shadow: 0 4px 20px var(--accent-green-subtle);
 }
 
 .stat-icon {
@@ -48,19 +48,19 @@
 }
 
 .stat-icon.today {
-    background: rgba(99, 102, 241, 0.15);
+    background: var(--status-indigo-bg);
 }
 
 .stat-icon.today svg {
-    color: #6366f1;
+    color: var(--status-indigo);
 }
 
 .stat-icon.week {
-    background: rgba(236, 72, 153, 0.15);
+    background: var(--status-pink-bg);
 }
 
 .stat-icon.week svg {
-    color: #ec4899;
+    color: var(--status-pink);
 }
 
 .stat-info {
@@ -126,7 +126,7 @@
 
 .chart-bar-wrapper.today .chart-bar {
     background: var(--accent-green);
-    box-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
+    box-shadow: 0 0 10px var(--accent-green-glow-strong);
 }
 
 .chart-bar-wrapper.today .chart-label {
@@ -147,7 +147,7 @@
 
 .chart-bar {
     width: 100%;
-    background: linear-gradient(to top, var(--accent-green), rgba(0, 255, 136, 0.6));
+    background: linear-gradient(to top, var(--accent-green), var(--accent-green-glow-strong));
     border-radius: 4px 4px 0 0;
     transition: height 0.4s ease;
 }
@@ -226,7 +226,7 @@
 
 .page-stat-bar {
     height: 100%;
-    background: var(--accent);
+    background: var(--accent-green);
     border-radius: 4px;
     transition: width 0.3s ease;
 }

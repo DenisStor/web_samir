@@ -20,18 +20,28 @@
     border-radius: var(--radius-xl);
     overflow: hidden;
     border: 1px solid var(--border-subtle);
-    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    /* Оптимизировано: конкретные свойства вместо all */
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+                border-color 0.4s ease,
+                box-shadow 0.4s ease;
     position: relative;
-    will-change: transform, box-shadow;
+    /* will-change перемещён в :hover для экономии GPU памяти */
 }
 
 .master-card:hover {
+    will-change: transform, box-shadow;
     transform: translateY(-8px) scale(1.02);
     border-color: var(--accent-green);
+    /* Оптимизировано: уменьшен spread теней */
     box-shadow:
         0 0 0 1px var(--accent-green),
-        0 20px 40px rgba(0, 0, 0, 0.3),
-        0 0 60px rgba(0, 255, 136, 0.15);
+        0 15px 30px var(--shadow-black-25),
+        0 0 30px var(--accent-green-subtle);
+}
+
+/* Сброс will-change после hover для освобождения GPU */
+.master-card:not(:hover) {
+    will-change: auto;
 }
 
 /* Square photo */
@@ -106,13 +116,13 @@
     color: white;
     position: relative;
     z-index: var(--z-base);
-    box-shadow: 0 8px 32px rgba(0, 255, 136, 0.3);
+    box-shadow: 0 8px 32px var(--accent-green-glow);
     transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
 
 .master-card:hover .master-avatar {
     transform: scale(1.1);
-    box-shadow: 0 12px 40px rgba(0, 255, 136, 0.4);
+    box-shadow: 0 12px 40px var(--accent-green-glow-strong);
 }
 
 .master-badge {
@@ -126,34 +136,39 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     z-index: 3;
-    backdrop-filter: blur(12px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 16px var(--shadow-black-40), inset 0 1px 0 var(--white-subtle);
+    border: 1px solid var(--white-light);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+@supports (backdrop-filter: blur(8px)) {
+    .master-badge {
+        backdrop-filter: blur(8px);
+    }
 }
 
 .master-card:hover .master-badge {
     transform: scale(1.05);
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    box-shadow: 0 6px 24px var(--shadow-black-60), inset 0 1px 0 var(--white-light);
 }
 
 /* Badge colors for readability on photos */
 .master-badge.badge-green {
-    background: rgba(0, 30, 15, 0.85);
-    color: #00ff88;
-    border-color: rgba(0, 255, 136, 0.3);
+    background: var(--badge-green-card-bg);
+    color: var(--badge-green);
+    border-color: var(--border-accent-hover);
 }
 
 .master-badge.badge-pink {
-    background: rgba(40, 15, 30, 0.85);
-    color: #ff6b9d;
-    border-color: rgba(255, 107, 157, 0.3);
+    background: var(--badge-pink-card-bg);
+    color: var(--badge-pink);
+    border-color: var(--badge-pink-glow);
 }
 
 .master-badge.badge-blue {
-    background: rgba(10, 20, 40, 0.85);
+    background: var(--badge-blue-card-bg);
     color: #6ba3ff;
-    border-color: rgba(107, 163, 255, 0.3);
+    border-color: var(--badge-blue-light-border);
 }
 
 .master-content {
@@ -205,10 +220,14 @@
     color: var(--text-gray-light);
     line-height: 1.5;
     padding: 8px 12px;
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--white-ghost);
     border-radius: 8px;
     border-left: 2px solid transparent;
-    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    /* Оптимизировано: конкретные свойства вместо all */
+    transition: color 0.3s ease,
+                background 0.3s ease,
+                border-color 0.3s ease,
+                transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
     position: relative;
     overflow: hidden;
 }
@@ -217,7 +236,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg, rgba(0, 255, 136, 0.08), transparent);
+    background: linear-gradient(90deg, var(--accent-green-muted), transparent);
     opacity: 0;
     transition: opacity 0.3s ease;
 }
@@ -233,7 +252,7 @@
 
 .master-card:hover .master-principle {
     color: var(--text-white);
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--white-faint);
     border-left-color: var(--accent-green);
     transform: translateX(4px);
 }
@@ -253,7 +272,8 @@
     color: var(--accent-green);
     flex-shrink: 0;
     margin-top: 1px;
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* Оптимизировано: упрощён easing и конкретные свойства */
+    transition: transform 0.3s ease-out, filter 0.3s ease;
     position: relative;
     z-index: 1;
     filter: drop-shadow(0 0 0 transparent);
@@ -261,7 +281,7 @@
 
 .master-card:hover .master-principle svg {
     transform: scale(1.2) rotate(5deg);
-    filter: drop-shadow(0 0 6px rgba(0, 255, 136, 0.5));
+    filter: drop-shadow(0 0 6px var(--accent-green-glow-intense));
 }
 
 /* Master Extra (reveal on hover) */
@@ -284,7 +304,9 @@
 .master-extra .master-principle {
     transform: translateX(-20px);
     opacity: 0;
-    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    /* Оптимизировано: конкретные свойства */
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+                opacity 0.4s ease;
 }
 
 .master-card:hover .master-extra .master-principle {

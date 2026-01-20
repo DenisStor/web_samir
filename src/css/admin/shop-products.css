@@ -108,7 +108,7 @@
 }
 
 .status-badge.warning {
-    background: rgba(251, 191, 36, 0.15);
+    background: var(--status-warning-bg);
     color: #fbbf24;
 }
 
@@ -118,12 +118,12 @@
 }
 
 .status-badge.active {
-    background: rgba(47, 178, 106, 0.15);
+    background: var(--status-success-bg);
     color: var(--accent-green);
 }
 
 .status-badge.inactive {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--white-muted);
     color: var(--text-gray);
 }
 
@@ -135,9 +135,9 @@
     margin-left: 4px;
 }
 
-.empty-cell {
+.products-table td.empty-cell {
     text-align: center;
-    padding: 48px 24px !important;
+    padding: 48px 24px;
 }
 
 /* =================================================================
@@ -179,7 +179,7 @@
     font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all var(--transition-base);
+    transition: background var(--transition-base), border-color var(--transition-base), color var(--transition-base);
 }
 
 .pagination-btn:hover {

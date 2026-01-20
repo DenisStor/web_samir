@@ -4,23 +4,53 @@
 (function() {
     'use strict';
 
+    /**
+     * Парсинг query параметров (полифилл для IE11)
+     * @param {string} search - строка поиска (location.search)
+     * @returns {Object} объект с методом get
+     */
+    function parseQueryParams(search) {
+        var params = {};
+        var query = search.replace(/^\?/, '');
+        if (query) {
+            query.split('&').forEach(function(part) {
+                var pair = part.split('=');
+                var key = decodeURIComponent(pair[0]);
+                var value = pair.length > 1 ? decodeURIComponent(pair[1]) : '';
+                params[key] = value;
+            });
+        }
+        return {
+            get: function(key) {
+                return params[key] || null;
+            }
+        };
+    }
+
     function init() {
         loadDocument();
     }
 
     async function loadDocument() {
         var container = document.getElementById('legalContainer');
-        var path = window.location.pathname;
-        var slug = path.replace('/legal/', '').replace('/legal', '');
+        if (!container) {
+            console.error('Legal container element not found');
+            return;
+        }
+
+        // URL формат: /legal.html?page=privacy
+        // Используем полифилл для совместимости со старыми браузерами
+        var params = parseQueryParams(window.location.search);
+        var slug = params.get('page');
 
         // If no slug, show list of all documents
-        if (!slug || slug === '/') {
+        if (!slug) {
             await loadDocumentsList();
             return;
         }
 
         try {
-            var response = await fetch('/api/legal/' + slug);
+            var response = await fetch('/api/legal/' + encodeURIComponent(slug));
 
             if (!response.ok) {
                 throw new Error('Document not found');
@@ -38,6 +68,10 @@
 
     async function loadDocumentsList() {
         var container = document.getElementById('legalContainer');
+        if (!container) {
+            console.error('Legal container element not found');
+            return;
+        }
 
         try {
             var response = await fetch('/api/legal');
@@ -54,7 +88,7 @@
                 '<div class="legal-documents-list">';
 
             documents.forEach(function(doc) {
-                html += '<a href="/legal/' + doc.slug + '" class="legal-doc-card">' +
+                html += '<a href="/legal.html?page=' + encodeURIComponent(doc.slug) + '" class="legal-doc-card">' +
                     '<svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
                     '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>' +
                     '<polyline points="14 2 14 8 20 8"/>' +
@@ -81,6 +115,10 @@
 
     function renderDocument(doc) {
         var container = document.getElementById('legalContainer');
+        if (!container) {
+            console.error('Legal container element not found');
+            return;
+        }
         var updatedAt = doc.updatedAt ? new Date(doc.updatedAt).toLocaleDateString('ru-RU', {
             year: 'numeric',
             month: 'long',
@@ -96,6 +134,10 @@
 
     function renderError() {
         var container = document.getElementById('legalContainer');
+        if (!container) {
+            console.error('Legal container element not found');
+            return;
+        }
         container.innerHTML = '<div class="legal-error">' +
             '<svg class="legal-error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">' +
             '<circle cx="12" cy="12" r="10"/>' +
@@ -104,29 +146,44 @@
             '</svg>' +
             '<h2 class="legal-error-title">Документ не найден</h2>' +
             '<p class="legal-error-text">Запрашиваемый документ не существует или был удалён.</p>' +
-            '<a href="/legal" class="btn-primary">' +
+            '<a href="/legal.html" class="btn-primary">' +
             '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' +
             'Все документы' +
             '</a>' +
         '</div>';
     }
 
-    function escapeHtml(text) {
-        if (!text) return '';
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
+    // escapeHtml теперь используется из SharedHelpers (helpers.js)
 
     function sanitizeHtml(html) {
         if (!html) return '';
         if (typeof DOMPurify !== 'undefined') {
             return DOMPurify.sanitize(html, {
-                ALLOWED_TAGS: ['h2', 'h3', 'h4', 'p', 'ul', 'ol', 'li', 'strong', 'em', 'a', 'br'],
-                ALLOWED_ATTR: ['href', 'target', 'rel']
+                ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'p', 'ul', 'ol', 'li', 'strong', 'em', 'b', 'i', 'u', 'a', 'br', 'div', 'span', 'font', 'blockquote'],
+                ALLOWED_ATTR: ['href', 'target', 'rel', 'class', 'style', 'color']
             });
         }
-        return html;
+        // Fallback: расширенная санитизация для контента из нашего API
+        // Удаляем опасные теги
+        var clean = html
+            .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+            .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+            .replace(/<iframe[^>]*>[\s\S]*?<\/iframe>/gi, '')
+            .replace(/<object[^>]*>[\s\S]*?<\/object>/gi, '')
+            .replace(/<embed[^>]*\/?>/gi, '')
+            .replace(/<svg[^>]*>[\s\S]*?<\/svg>/gi, '')
+            .replace(/<math[^>]*>[\s\S]*?<\/math>/gi, '')
+            .replace(/<base[^>]*\/?>/gi, '');
+        // Удаляем опасные атрибуты (on* события)
+        clean = clean
+            .replace(/\s+on\w+\s*=\s*["'][^"']*["']/gi, '')
+            .replace(/\s+on\w+\s*=\s*[^\s>]+/gi, '');
+        // Удаляем javascript:, data:, vbscript: в href/src
+        clean = clean
+            .replace(/(href|src)\s*=\s*["']?\s*javascript:[^"'>\s]*/gi, '$1=""')
+            .replace(/(href|src)\s*=\s*["']?\s*data:[^"'>\s]*/gi, '$1=""')
+            .replace(/(href|src)\s*=\s*["']?\s*vbscript:[^"'>\s]*/gi, '$1=""');
+        return clean;
     }
 
     // Init on DOM ready

@@ -14,6 +14,21 @@
     }
 }
 
+@media (max-width: 640px) {
+    .gallery-main,
+    .product-single-image {
+        aspect-ratio: 4 / 3;
+        max-height: 60vh;
+        border-radius: var(--radius-lg);
+    }
+
+    .gallery-main img,
+    .product-single-image img {
+        object-fit: contain;
+        background: var(--content-bg);
+    }
+}
+
 .gallery-main {
     aspect-ratio: 1 / 1;
     border-radius: var(--radius-xl);
@@ -45,7 +60,7 @@
     overflow: hidden;
     border: 2px solid var(--border-subtle);
     cursor: pointer;
-    transition: all var(--transition-base);
+    transition: border-color var(--transition-base);
     flex-shrink: 0;
     padding: 0;
     background: none;
@@ -84,8 +99,7 @@
     right: 16px;
     width: 40px;
     height: 40px;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(8px);
+    background: var(--overlay-heavy);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -93,6 +107,13 @@
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: none;
+}
+
+@supports (backdrop-filter: blur(8px)) {
+    .gallery-zoom-hint {
+        background: var(--overlay-darker);
+        backdrop-filter: blur(8px);
+    }
 }
 
 .gallery-zoom-hint svg {
@@ -112,8 +133,8 @@
 .lightbox {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.95);
-    z-index: 9999;
+    background: var(--overlay-solid);
+    z-index: var(--z-modal);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -132,7 +153,7 @@
     right: 20px;
     width: 48px;
     height: 48px;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--white-subtle);
     border: none;
     border-radius: 50%;
     color: white;
@@ -144,7 +165,7 @@
 }
 
 .lightbox-close:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--white-medium);
 }
 
 .lightbox-close svg {
@@ -159,7 +180,7 @@
     transform: translateY(-50%);
     width: 56px;
     height: 56px;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--white-subtle);
     border: none;
     border-radius: 50%;
     color: white;
@@ -172,7 +193,7 @@
 
 .lightbox-prev:hover,
 .lightbox-next:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--white-medium);
 }
 
 .lightbox-prev {

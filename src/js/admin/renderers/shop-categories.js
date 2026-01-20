@@ -46,7 +46,7 @@ var AdminShopCategoriesRenderer = (function() {
                     ? '<p class="category-card-description">' + escapeHtml(cat.description) + '</p>'
                     : '';
 
-                return '<div class="shop-category-card' + (isInactive ? ' inactive' : '') + '" data-id="' + escapeHtml(cat.id) + '">' +
+                return '<div class="shop-category-card' + (isInactive ? ' inactive' : '') + '" data-id="' + escapeAttr(cat.id) + '">' +
                     '<div class="category-card-icon">' + iconHtml + '</div>' +
                     '<div class="category-card-info">' +
                         '<h3 class="category-card-name">' +
@@ -60,10 +60,10 @@ var AdminShopCategoriesRenderer = (function() {
                         '</span>' +
                     '</div>' +
                     '<div class="category-card-actions">' +
-                        '<button class="btn btn-icon" data-action="edit-shop-category" data-id="' + escapeHtml(cat.id) + '" title="Редактировать">' +
+                        '<button class="btn btn-icon" data-action="edit-shop-category" data-id="' + escapeAttr(cat.id) + '" title="Редактировать">' +
                             SharedIcons.get('edit') +
                         '</button>' +
-                        '<button class="btn btn-icon danger" data-action="delete-shop-category" data-id="' + escapeHtml(cat.id) + '" title="Удалить">' +
+                        '<button class="btn btn-icon danger" data-action="delete-shop-category" data-id="' + escapeAttr(cat.id) + '" title="Удалить">' +
                             SharedIcons.get('delete') +
                         '</button>' +
                     '</div>' +
@@ -73,12 +73,7 @@ var AdminShopCategoriesRenderer = (function() {
         container.innerHTML = html;
     }
 
-    function escapeHtml(text) {
-        if (!text) return '';
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
+    // escapeHtml теперь используется из SharedHelpers (helpers.js)
 
     function getProductWord(count) {
         var n = Math.abs(count) % 100;

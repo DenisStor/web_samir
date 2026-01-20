@@ -26,7 +26,7 @@
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
-    transition: all var(--transition-base);
+    transition: background var(--transition-base), border-color var(--transition-base), color var(--transition-base);
 }
 
 .toolbar-btn:hover {
@@ -81,6 +81,21 @@
     border-color: var(--accent-green);
 }
 
+/* Beautiful text selection */
+.wysiwyg-editor::selection,
+.wysiwyg-editor *::selection {
+    background: var(--accent-green);
+    color: var(--bg-dark);
+    text-shadow: none;
+}
+
+.wysiwyg-editor::-moz-selection,
+.wysiwyg-editor *::-moz-selection {
+    background: var(--accent-green);
+    color: var(--bg-dark);
+    text-shadow: none;
+}
+
 .wysiwyg-editor:empty::before {
     content: attr(data-placeholder);
     color: var(--text-gray);
@@ -120,7 +135,7 @@
     margin: 1em 0;
     padding: 12px 20px;
     border-left: 4px solid var(--accent-green);
-    background: rgba(0, 255, 136, 0.05);
+    background: var(--accent-green-faint);
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
     font-style: italic;
     color: var(--text-gray);
@@ -150,8 +165,103 @@
     font-family: inherit !important;
 }
 
-.wysiwyg-editor span {
+/* span с inline стилями сохраняет свой цвет */
+.wysiwyg-editor span:not([style]) {
     color: inherit;
+}
+
+/* Color picker button */
+.toolbar-btn-color {
+    position: relative;
+}
+
+.toolbar-btn-color .color-indicator {
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--badge-green), var(--badge-blue), var(--badge-pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.toolbar-btn-color.active .color-indicator {
+    background: var(--accent-green);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+/* Color picker dropdown */
+.color-picker-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 8px;
+    padding: 12px;
+    background: var(--content-bg);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    box-shadow: 0 8px 32px var(--shadow-black-40);
+    z-index: var(--z-dropdown);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-fast), visibility var(--transition-fast);
+}
+
+.color-picker-dropdown.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.color-picker-dropdown::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 10px;
+    height: 10px;
+    background: var(--content-bg);
+    border-left: 1px solid var(--border-light);
+    border-top: 1px solid var(--border-light);
+}
+
+.color-picker-colors {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.color-swatch {
+    width: 28px;
+    height: 28px;
+    border: 2px solid transparent;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.color-swatch:hover {
+    transform: scale(1.15);
+    border-color: var(--text-white);
+}
+
+.color-remove-btn {
+    width: 100%;
+    padding: 6px 10px;
+    background: transparent;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    color: var(--text-gray);
+    font-size: 12px;
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.color-remove-btn:hover {
+    background: var(--color-danger-subtle);
+    border-color: var(--color-danger);
+    color: var(--color-danger);
 }
 
 /* Icon preview */

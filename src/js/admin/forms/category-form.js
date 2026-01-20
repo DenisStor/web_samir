@@ -182,49 +182,25 @@ var AdminCategoryForm = (function() {
         var category = AdminState.findShopCategory(id);
         if (!category) return;
 
-        var message = 'Удалить категорию "' + window.escapeHtml(category.name) + '"?';
-        document.getElementById('deleteMessage').textContent = message;
+        if (!confirm('Удалить категорию "' + category.name + '"?')) {
+            return;
+        }
 
-        AdminModals.open('deleteModal');
-
-        // Set up confirmation handler
-        var confirmBtn = document.getElementById('deleteConfirm');
-        var newConfirmBtn = confirmBtn.cloneNode(true);
-        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
-
-        newConfirmBtn.addEventListener('click', async function() {
-            var categories = AdminState.shopCategories.filter(function(c) {
-                return c.id !== id;
-            });
-
-            try {
-                await AdminAPI.save('shop/categories', { categories: categories });
-                AdminState.setShopCategories(categories);
-                showToast('Категория удалена', 'success');
-                AdminModals.close('deleteModal');
-                AdminShopCategoriesRenderer.render();
-            } catch (error) {
-                showToast('Ошибка: ' + error.message, 'error');
-            }
+        var categories = AdminState.shopCategories.filter(function(c) {
+            return c.id !== id;
         });
+
+        try {
+            await AdminAPI.save('shop/categories', { categories: categories });
+            AdminState.setShopCategories(categories);
+            showToast('Категория удалена', 'success');
+            AdminShopCategoriesRenderer.render();
+        } catch (error) {
+            showToast('Ошибка: ' + error.message, 'error');
+        }
     }
 
-    function generateSlug(text) {
-        var translit = {
-            'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo',
-            'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
-            'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
-            'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch', 'ъ': '',
-            'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya'
-        };
-
-        return text.toLowerCase()
-            .split('')
-            .map(function(char) { return translit[char] || char; })
-            .join('')
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-|-$/g, '');
-    }
+    // generateSlug теперь используется из SharedHelpers (helpers.js)
 
     return {
         show: show,

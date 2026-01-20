@@ -5,11 +5,11 @@
 .filter-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: var(--overlay-darker);
     z-index: 998;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s ease;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .filter-backdrop.active {
@@ -66,7 +66,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all var(--transition-base);
+    transition: background var(--transition-base), color var(--transition-base);
 }
 
 .filter-sheet-close:hover {
