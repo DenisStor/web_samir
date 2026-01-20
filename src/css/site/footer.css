@@ -53,13 +53,15 @@
 @media (max-width: 768px) {
     .footer-content {
         flex-direction: column;
-        text-align: center;
+        text-align: left;
+        align-items: flex-start;
     }
 
     .footer-links {
         flex-direction: column;
         gap: 12px;
         width: 100%;
+        align-items: flex-start;
     }
 
     .footer-legal {
