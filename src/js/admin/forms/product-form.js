@@ -219,7 +219,7 @@ var AdminProductForm = (function() {
         var now = new Date().toISOString();
 
         var productData = {
-            id: AdminState.editingItem ? AdminState.editingItem.id : 'product_' + Date.now(),
+            id: AdminState.editingItem ? AdminState.editingItem.id : SharedHelpers.generateId('product'),
             name: name,
             slug: generateSlug(name),
             description: description,

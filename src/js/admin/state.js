@@ -22,6 +22,10 @@ var AdminState = {
     editingItem: null,
 
     // Методы для работы с состоянием
+
+    /**
+     * Сброс состояния к начальным значениям
+     */
     reset: function() {
         this.masters = [];
         this.services = { categories: [], podology: { services: [] } };
@@ -34,7 +38,12 @@ var AdminState = {
         this.editingItem = null;
     },
 
-    // Вспомогательная функция сортировки по order
+    /**
+     * Вспомогательная функция сортировки по полю order
+     * @param {Array} items - Массив элементов для сортировки
+     * @returns {Array} Отсортированный массив
+     * @private
+     */
     _sortByOrder: function(items) {
         if (!items || !Array.isArray(items)) return items;
         return items.slice().sort(function(a, b) {
@@ -64,7 +73,11 @@ var AdminState = {
         this.social = data || { social: [], phone: '', email: '', address: '' };
     },
 
-    // Найти элемент по ID
+    /**
+     * Найти мастера по ID
+     * @param {string} id - ID мастера
+     * @returns {Object|undefined} Найденный мастер или undefined
+     */
     findMaster: function(id) {
         return this.masters.find(function(m) { return m.id === id; });
     },

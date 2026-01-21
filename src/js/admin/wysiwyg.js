@@ -174,7 +174,38 @@ var AdminWYSIWYG = (function() {
     // =================================================================
 
     /**
+     * Конфигурация команд форматирования
+     */
+    var FORMAT_COMMANDS = {
+        // Inline styles
+        bold: { exec: 'bold' },
+        italic: { exec: 'italic' },
+        underline: { exec: 'underline' },
+        strikeThrough: { exec: 'strikeThrough' },
+
+        // Block formats
+        h2: { exec: 'formatBlock', value: '<h2>' },
+        h3: { exec: 'formatBlock', value: '<h3>' },
+        p: { exec: 'formatBlock', value: '<p>' },
+        quote: { exec: 'formatBlock', value: '<blockquote>' },
+
+        // Lists
+        ul: { exec: 'insertUnorderedList' },
+        ol: { exec: 'insertOrderedList' },
+
+        // Links
+        link: { handler: 'insertLink' },
+        unlink: { exec: 'unlink' },
+
+        // Other
+        removeFormat: { exec: 'removeFormat' },
+        color: { handler: 'applyColor', defaultValue: '#00ff88' }
+    };
+
+    /**
      * Форматирование выделенного текста
+     * @param {string} command - Команда форматирования
+     * @param {string} [value] - Значение для команды
      */
     function formatText(command, value) {
         if (!editor) return;
@@ -183,57 +214,19 @@ var AdminWYSIWYG = (function() {
         editor.focus();
         restoreSelection();
 
-        switch (command) {
-            case 'bold':
-                execFormat('bold');
-                break;
-            case 'italic':
-                execFormat('italic');
-                break;
-            case 'underline':
-                execFormat('underline');
-                break;
-            case 'strikeThrough':
-                execFormat('strikeThrough');
-                break;
+        var config = FORMAT_COMMANDS[command];
 
-            case 'h2':
-                execFormat('formatBlock', '<h2>');
-                break;
-            case 'h3':
-                execFormat('formatBlock', '<h3>');
-                break;
-            case 'p':
-                execFormat('formatBlock', '<p>');
-                break;
-            case 'quote':
-                execFormat('formatBlock', '<blockquote>');
-                break;
-
-            case 'ul':
-                execFormat('insertUnorderedList');
-                break;
-            case 'ol':
-                execFormat('insertOrderedList');
-                break;
-
-            case 'link':
+        if (config) {
+            if (config.handler === 'insertLink') {
                 insertLink();
-                break;
-            case 'unlink':
-                execFormat('unlink');
-                break;
-
-            case 'removeFormat':
-                execFormat('removeFormat');
-                break;
-
-            case 'color':
-                applyColor(value || '#00ff88');
-                break;
-
-            default:
-                execFormat(command, value);
+            } else if (config.handler === 'applyColor') {
+                applyColor(value || config.defaultValue);
+            } else {
+                execFormat(config.exec, config.value || value || null);
+            }
+        } else {
+            // Fallback для неизвестных команд
+            execFormat(command, value);
         }
 
         // Сохраняем новое выделение и обновляем тулбар

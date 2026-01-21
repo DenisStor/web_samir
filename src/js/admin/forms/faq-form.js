@@ -54,7 +54,7 @@ var AdminFaqForm = (function() {
         }
 
         var faqData = {
-            id: AdminState.editingItem ? AdminState.editingItem.id : 'faq_' + Date.now(),
+            id: AdminState.editingItem ? AdminState.editingItem.id : SharedHelpers.generateId('faq'),
             question: question,
             answer: answer
         };

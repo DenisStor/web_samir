@@ -158,13 +158,6 @@ var AdminShopProductsRenderer = (function() {
         render();
     }
 
-    function escapeHtml(text) {
-        if (!text) return '';
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
     return {
         init: init,
         render: render,

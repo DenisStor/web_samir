@@ -101,12 +101,16 @@ ADMIN_MODULES = [
     'navigation.js',
     'modals.js',
     'image-upload.js',
+    'image-handler.js',  # Новый модуль для обработки изображений
     'wysiwyg.js',
     'dragdrop.js',
     'validation.js',
     'search.js',
+    'router.js',  # Роутинг админки
+    'event-handlers.js',  # Обработчики событий
 
     # Renderers
+    'renderers/base-renderer.js',  # Базовый модуль для renderers
     'renderers/stats.js',
     'renderers/masters.js',
     'renderers/services.js',

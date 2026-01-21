@@ -116,7 +116,7 @@ var AdminMasterForm = (function() {
         });
 
         var masterData = {
-            id: AdminState.editingItem ? AdminState.editingItem.id : 'master_' + Date.now(),
+            id: AdminState.editingItem ? AdminState.editingItem.id : SharedHelpers.generateId('master'),
             name: name,
             initial: initial || name.charAt(0),
             badge: badge,

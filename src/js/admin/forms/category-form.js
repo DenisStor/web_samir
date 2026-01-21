@@ -137,7 +137,7 @@ var AdminCategoryForm = (function() {
         var active = document.getElementById('categoryActive').checked;
 
         var categoryData = {
-            id: AdminState.editingItem ? AdminState.editingItem.id : 'category_' + Date.now(),
+            id: AdminState.editingItem ? AdminState.editingItem.id : SharedHelpers.generateId('category'),
             name: name,
             slug: slug,
             description: description,

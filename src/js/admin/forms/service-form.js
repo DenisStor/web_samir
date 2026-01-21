@@ -142,7 +142,7 @@ var AdminServiceForm = (function() {
         var priceBlue = parseInt(blueEl ? blueEl.value : 0, 10) || 0;
 
         var serviceData = {
-            id: editing.service ? editing.service.id : Date.now(),
+            id: editing.service ? editing.service.id : SharedHelpers.generateId('service'),
             name: name,
             priceGreen: priceGreen,
             pricePink: pricePink,
@@ -209,7 +209,7 @@ var AdminServiceForm = (function() {
         var price = priceEl ? priceEl.value.trim() : 'Уточняйте';
 
         var serviceData = {
-            id: editing.service ? editing.service.id : Date.now(),
+            id: editing.service ? editing.service.id : SharedHelpers.generateId('service'),
             name: name,
             price: price || 'Уточняйте'
         };

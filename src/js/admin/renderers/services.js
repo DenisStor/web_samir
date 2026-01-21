@@ -199,19 +199,6 @@ var AdminServicesRenderer = (function() {
         }
     }
 
-    /**
-     * Escape HTML
-     */
-    function escapeHtml(text) {
-        if (!text) return '';
-        if (typeof window.escapeHtml === 'function') {
-            return window.escapeHtml(text);
-        }
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
     // Публичный API
     return {
         init: init,

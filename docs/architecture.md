@@ -70,5 +70,73 @@ public/                 # Статические SEO файлы
 | `ShopApp` | shop.html | SPA магазина |
 | `AdminPanel` | admin.html | Главный модуль админки |
 | `AdminState` | admin.html | Централизованное состояние |
+| `AdminRouter` | admin.html | Навигация между секциями |
+| `AdminEventHandlers` | admin.html | Обработчики событий |
+| `AdminImageHandler` | admin.html | Загрузка изображений |
+| `BaseRenderer` | admin.html | Базовая логика renderers |
+| `SiteTemplates` | index.html | HTML шаблоны контента |
+| `BlogModal` | index.html | Модалка блога |
 | `AppConfig` | все | Доступ к config.json |
 | `SharedHelpers` | все | Общие утилиты |
+
+## Модули админки (admin.bundle.js)
+
+Порядок сборки важен — зависимости должны идти раньше:
+
+```
+Core modules (без зависимостей):
+├── state.js          # Централизованное состояние
+├── toast.js          # Уведомления
+├── api.js            # HTTP клиент с checkUnauthorized()
+├── auth.js           # Аутентификация
+├── navigation.js     # Навигация
+├── modals.js         # Модальные окна
+├── image-upload.js   # Загрузка base64
+├── image-handler.js  # Обработка загрузки
+├── wysiwyg.js        # WYSIWYG редактор
+├── dragdrop.js       # Drag & drop
+├── validation.js     # Валидация форм
+├── search.js         # Поиск в списках
+├── router.js         # Роутинг секций
+└── event-handlers.js # Обработчики событий
+
+Renderers:
+├── renderers/base-renderer.js  # Базовая логика (reorderItems)
+├── renderers/stats.js          # Статистика (drawChartGrid/Bars/Labels)
+├── renderers/masters.js
+├── renderers/services.js
+├── renderers/articles.js
+├── renderers/faq.js
+├── renderers/social.js
+├── renderers/shop-categories.js
+├── renderers/shop-products.js
+└── renderers/legal.js
+
+Forms:
+├── forms/master-form.js
+├── forms/service-form.js
+├── forms/article-form.js
+├── forms/faq-form.js
+├── forms/category-form.js
+├── forms/product-form.js
+└── forms/legal-form.js
+
+Entry point:
+└── index.js          # Инициализация
+```
+
+## Модули главной страницы (site)
+
+```
+src/js/site/
+├── utils.js          # Утилиты SaysApp
+├── sanitizer.js      # XSS защита
+├── navigation.js     # Меню, scroll
+├── animations.js     # Fade-in анимации
+├── modals.js         # FAQ accordion, blog modal
+├── templates.js      # HTML шаблоны (createMasterCard, createBlogCard, etc.)
+├── blog-modal.js     # Динамическая модалка блога
+├── data-loader.js    # Загрузка данных из API
+├── main.js           # Инициализация
+└── analytics.js      # Отслеживание секций
+```

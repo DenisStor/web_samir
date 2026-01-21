@@ -59,12 +59,38 @@ var AdminAPI = (function() {
         return headers;
     }
 
+    /**
+     * Проверка на 401 Unauthorized и обработка истекшей сессии
+     * @param {Response} response - Объект ответа fetch
+     * @throws {Error} Если статус 401
+     */
+    function checkUnauthorized(response) {
+        if (response.status === 401) {
+            handleSessionExpired();
+            throw new Error('Unauthorized');
+        }
+    }
+
+    /**
+     * Обработка ошибок HTTP
+     * @param {Response} response - Объект ответа fetch
+     * @throws {Error} Если ответ не ok
+     */
+    async function handleHttpError(response) {
+        if (!response.ok) {
+            var errorData = await response.json().catch(function() { return {}; });
+            throw new Error(errorData.error || 'HTTP ' + response.status);
+        }
+    }
+
     // =================================================================
     // HTTP METHODS
     // =================================================================
 
     /**
      * GET запрос
+     * @param {string} endpoint - API эндпоинт
+     * @returns {Promise<Object|null>} Данные или null при ошибке
      */
     async function get(endpoint) {
         try {
@@ -79,6 +105,10 @@ var AdminAPI = (function() {
 
     /**
      * POST запрос (требует авторизации)
+     * @param {string} endpoint - API эндпоинт
+     * @param {Object} data - Данные для отправки
+     * @returns {Promise<Object>} Ответ сервера
+     * @throws {Error} При ошибке запроса
      */
     async function save(endpoint, data) {
         try {
@@ -88,16 +118,9 @@ var AdminAPI = (function() {
                 body: JSON.stringify(data)
             });
 
-            // Обработка unauthorized
-            if (response.status === 401) {
-                handleSessionExpired();
-                throw new Error('Unauthorized');
-            }
+            checkUnauthorized(response);
+            await handleHttpError(response);
 
-            if (!response.ok) {
-                var errorData = await response.json().catch(function() { return {}; });
-                throw new Error(errorData.error || 'HTTP ' + response.status);
-            }
             return response.json();
         } catch (error) {
             console.error('API POST ' + endpoint + ' error:', error);
@@ -107,6 +130,9 @@ var AdminAPI = (function() {
 
     /**
      * Загрузка изображения (base64)
+     * @param {string} imageData - Base64 данные изображения
+     * @returns {Promise<Object>} Результат загрузки с URL
+     * @throws {Error} При ошибке загрузки
      */
     async function upload(imageData) {
         try {
@@ -116,15 +142,9 @@ var AdminAPI = (function() {
                 body: JSON.stringify({ image: imageData })
             });
 
-            if (response.status === 401) {
-                handleSessionExpired();
-                throw new Error('Unauthorized');
-            }
+            checkUnauthorized(response);
+            await handleHttpError(response);
 
-            if (!response.ok) {
-                var errorData = await response.json().catch(function() { return {}; });
-                throw new Error(errorData.error || 'HTTP ' + response.status);
-            }
             return response.json();
         } catch (error) {
             console.error('Upload error:', error);
@@ -134,6 +154,9 @@ var AdminAPI = (function() {
 
     /**
      * Удаление файла
+     * @param {string} filename - Имя файла для удаления
+     * @returns {Promise<Object>} Результат удаления
+     * @throws {Error} При ошибке удаления
      */
     async function deleteFile(filename) {
         try {
@@ -142,15 +165,9 @@ var AdminAPI = (function() {
                 headers: getAuthHeaders()
             });
 
-            if (response.status === 401) {
-                handleSessionExpired();
-                throw new Error('Unauthorized');
-            }
+            checkUnauthorized(response);
+            await handleHttpError(response);
 
-            if (!response.ok) {
-                var errorData = await response.json().catch(function() { return {}; });
-                throw new Error(errorData.error || 'HTTP ' + response.status);
-            }
             return response.json();
         } catch (error) {
             console.error('Delete file error:', error);

@@ -105,9 +105,9 @@
 
     /**
      * Обработчик клавиатуры для элементов с role="button"
-     * Активирует onclick при нажатии Enter или Space
-     * @param {KeyboardEvent} event
-     * @param {Element} element
+     * Активирует onclick при нажатии Enter или Space для accessibility
+     * @param {KeyboardEvent} event - Событие клавиатуры
+     * @param {Element} element - DOM элемент
      */
     function handleButtonKeydown(event, element) {
         if (event.key === 'Enter' || event.key === ' ') {

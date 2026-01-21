@@ -88,7 +88,7 @@ var AdminArticleForm = (function() {
         var image = imageEl ? imageEl.value : null;
 
         var articleData = {
-            id: AdminState.editingItem ? AdminState.editingItem.id : 'article_' + Date.now(),
+            id: AdminState.editingItem ? AdminState.editingItem.id : SharedHelpers.generateId('article'),
             title: title,
             tag: tag || 'Статья',
             date: date,
