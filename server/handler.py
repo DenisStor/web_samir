@@ -17,11 +17,11 @@ from datetime import datetime, timedelta
 import subprocess
 import sys
 
-# Импорт модулей
-from validators import is_valid_slug, is_valid_filename, validate_image_bytes
-from storage import JSONStorage
-from auth import SessionManager, RateLimiter, UploadRateLimiter, verify_password
-from routes import get_router
+# Импорт модулей из пакета
+from .validators import is_valid_slug, is_valid_filename, validate_image_bytes
+from .storage import JSONStorage
+from .auth import SessionManager, RateLimiter, UploadRateLimiter, verify_password
+from .routes import get_router
 
 
 def load_env_file():

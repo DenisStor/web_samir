@@ -22,11 +22,11 @@ try:
         record_login_attempt,
         sessions,
         login_attempts,
-        CONFIG
+        CONFIG,
     )
     SERVER_IMPORTS_OK = True
 except ImportError as e:
-    print(f"Warning: Could not import from server.py: {e}")
+    print(f"Warning: Could not import from server: {e}")
     SERVER_IMPORTS_OK = False
 
 

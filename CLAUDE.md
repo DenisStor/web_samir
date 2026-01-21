@@ -5,7 +5,7 @@ Say's Barbers — барбершоп с CMS админкой и интернет
 ## Команды
 
 ```bash
-python3 server.py                      # Запуск сервера (localhost:8000)
+python3 run.py                         # Запуск сервера (localhost:8000)
 python3 scripts/build.py               # Сборка HTML из секций
 python3 scripts/build.py --admin-only  # Только admin.bundle.js
 npm run lint && npm run format:check   # Проверка перед коммитом

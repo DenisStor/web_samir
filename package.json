@@ -6,7 +6,7 @@
     "build": "python3 scripts/build.py",
     "build:watch": "python3 scripts/build.py --watch",
     "build:admin": "python3 scripts/build.py --admin-only",
-    "start": "python3 server.py",
+    "start": "python3 run.py",
     "lint": "eslint src/js/ --ext .js",
     "lint:fix": "eslint src/js/ --ext .js --fix",
     "format": "prettier --write 'src/js/**/*.js' 'src/css/**/*.css'",

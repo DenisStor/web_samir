@@ -18,7 +18,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Импортируем функции из модулей
 try:
-    from validators import (
+    from server import (
         is_valid_filename,
         validate_master,
         validate_service,
@@ -26,9 +26,9 @@ try:
         validate_faq,
         validate_principle,
         validate_image_bytes,
-        sanitize_html_content
+        sanitize_html_content,
+        generate_token,
     )
-    from auth import generate_token
     SERVER_IMPORTS_OK = True
 except ImportError as e:
     print(f"Warning: Could not import modules: {e}")

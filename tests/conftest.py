@@ -195,25 +195,19 @@ def test_password():
 @pytest.fixture
 def auth_token(test_server_url, test_password):
     """Get valid auth token from test server"""
-    from server import generate_token, sessions, CONFIG
-    from datetime import datetime, timedelta
+    from server import generate_token, session_manager, CONFIG
 
     # Store original password and set test password
     original_password = CONFIG.get('admin_password')
     CONFIG['admin_password'] = test_password
 
-    # Generate token directly
-    token = generate_token()
-    sessions[token] = {
-        'created': datetime.now(),
-        'expires': datetime.now() + timedelta(hours=24)
-    }
+    # Generate token directly via session_manager
+    token = session_manager.create()
 
     yield token
 
     # Cleanup
-    if token in sessions:
-        del sessions[token]
+    session_manager.delete(token)
     CONFIG['admin_password'] = original_password
 
 
@@ -221,7 +215,6 @@ def auth_token(test_server_url, test_password):
 def expired_token():
     """Generate an expired token for testing"""
     from server import generate_token, sessions
-    from datetime import datetime, timedelta
 
     token = generate_token()
     sessions[token] = {
@@ -250,14 +243,14 @@ def test_server():
         s.bind(('', 0))
         port = s.getsockname()[1]
 
-    server = HTTPServer(('localhost', port), AdminAPIHandler)
-    thread = threading.Thread(target=server.serve_forever)
+    http_server = HTTPServer(('localhost', port), AdminAPIHandler)
+    thread = threading.Thread(target=http_server.serve_forever)
     thread.daemon = True
     thread.start()
 
-    yield server
+    yield http_server
 
-    server.shutdown()
+    http_server.shutdown()
 
 
 @pytest.fixture
@@ -289,16 +282,16 @@ def temp_uploads_dir(tmp_path):
 @pytest.fixture
 def mock_data_dir(temp_data_dir, monkeypatch):
     """Mock the DATA_DIR to use temp directory"""
-    import server
-    monkeypatch.setattr(server, 'DATA_DIR', temp_data_dir)
+    import server.handler as handler_module
+    monkeypatch.setattr(handler_module, 'DATA_DIR', temp_data_dir)
     return temp_data_dir
 
 
 @pytest.fixture
 def mock_uploads_dir(temp_uploads_dir, monkeypatch):
     """Mock the UPLOADS_DIR to use temp directory"""
-    import server
-    monkeypatch.setattr(server, 'UPLOADS_DIR', temp_uploads_dir)
+    import server.handler as handler_module
+    monkeypatch.setattr(handler_module, 'UPLOADS_DIR', temp_uploads_dir)
     return temp_uploads_dir
 
 
@@ -309,16 +302,16 @@ def mock_uploads_dir(temp_uploads_dir, monkeypatch):
 @pytest.fixture
 def clean_login_attempts():
     """Clear login attempts before and after test"""
-    from server import login_attempts
-    login_attempts.clear()
-    yield login_attempts
-    login_attempts.clear()
+    from server import login_limiter
+    login_limiter._attempts.clear()
+    yield login_limiter._attempts
+    login_limiter._attempts.clear()
 
 
 @pytest.fixture
 def clean_sessions():
     """Clear sessions before and after test"""
-    from server import sessions
-    sessions.clear()
-    yield sessions
-    sessions.clear()
+    from server import session_manager
+    session_manager._sessions.clear()
+    yield session_manager._sessions
+    session_manager._sessions.clear()

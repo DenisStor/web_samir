@@ -45,6 +45,14 @@ src/
     ├── shop/           # shop-app.js
     └── legal/          # legal-app.js
 
+server/                 # Python серверные модули
+├── __init__.py         # Экспорт пакета
+├── handler.py          # HTTP обработчик (AdminAPIHandler)
+├── routes.py           # Маршрутизатор API
+├── auth.py             # Аутентификация, сессии, rate limiting
+├── storage.py          # JSONStorage для работы с данными
+└── validators.py       # Валидация данных
+
 data/                   # JSON данные (редактируются через админку)
 uploads/                # Загруженные изображения
 public/                 # Статические SEO файлы

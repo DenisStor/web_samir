@@ -23,11 +23,11 @@ try:
         is_valid_filename,
         get_file_lock,
         DATA_DIR,
-        UPLOADS_DIR
+        UPLOADS_DIR,
     )
     SERVER_IMPORTS_OK = True
 except ImportError as e:
-    print(f"Warning: Could not import from server.py: {e}")
+    print(f"Warning: Could not import from server: {e}")
     SERVER_IMPORTS_OK = False
 
 
