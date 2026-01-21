@@ -218,7 +218,7 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
         if handler_name:
             # Проверка аутентификации если требуется
             if auth_required and not self.require_auth():
-                return
+                return True
 
             # Вызов обработчика
             handler = getattr(self, handler_name, None)
@@ -227,7 +227,7 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
                     handler(**params)
                 else:
                     handler()
-                return
+                return True
 
         # Fallback для статических файлов и страниц
         return None  # Сигнал для вызова родительского обработчика
