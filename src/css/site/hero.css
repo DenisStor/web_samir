@@ -46,7 +46,6 @@
     font-size: 0.85rem;
     color: var(--accent-green);
     margin-bottom: 32px;
-    animation: fadeInUp 0.8s ease forwards;
 }
 
 .hero-badge::before {
@@ -62,8 +61,6 @@
     font-size: clamp(2.5rem, 6vw, 5rem);
     font-weight: 900;
     margin-bottom: 24px;
-    animation: fadeInUp 0.8s ease 0.1s forwards;
-    opacity: 0;
 }
 
 .hero h1 .accent {
@@ -76,16 +73,12 @@
     color: var(--text-gray-light);
     margin-bottom: 56px;
     max-width: 700px;
-    animation: fadeInUp 0.8s ease 0.2s forwards;
-    opacity: 0;
 }
 
 .hero-features {
     display: grid;
     gap: 12px;
     margin-bottom: 40px;
-    animation: fadeInUp 0.8s ease 0.3s forwards;
-    opacity: 0;
 }
 
 .hero-feature {
@@ -107,8 +100,6 @@
     display: flex;
     gap: 16px;
     flex-wrap: wrap;
-    animation: fadeInUp 0.8s ease 0.4s forwards;
-    opacity: 0;
 }
 
 /* Responsive */

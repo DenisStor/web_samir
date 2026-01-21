@@ -291,6 +291,68 @@ textarea.form-input {
 }
 
 /* =================================================================
+   SKELETON LOADING
+   ================================================================= */
+
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        var(--content-bg) 25%,
+        var(--border-subtle) 50%,
+        var(--content-bg) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.skeleton-card {
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    border: 1px solid var(--border-subtle);
+}
+
+.skeleton-image {
+    aspect-ratio: 1 / 1;
+}
+
+.skeleton-image-blog {
+    height: 240px;
+}
+
+.skeleton-content {
+    padding: 24px;
+}
+
+.skeleton-text {
+    height: 16px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+}
+
+.skeleton-text.title {
+    height: 24px;
+    width: 80%;
+}
+
+.skeleton-text.subtitle {
+    height: 14px;
+    width: 50%;
+}
+
+.skeleton-text.line {
+    width: 100%;
+}
+
+.skeleton-text.short {
+    width: 60%;
+}
+
+/* =================================================================
    RESPONSIVE
    ================================================================= */
 

@@ -94,7 +94,7 @@
         var safeInitial = escapeHTML(master.initial || master.name.charAt(0));
 
         var imageHtml = master.photo
-            ? '<img src="' + safePhoto + '" alt="' + escapeAttr(master.name) + '" class="master-photo" loading="lazy" decoding="async">'
+            ? '<img src="' + safePhoto + '" alt="' + escapeAttr(master.name) + '" class="master-photo" width="400" height="400" loading="lazy" decoding="async">'
             : '<div class="master-avatar">' + safeInitial + '</div>';
 
         var principlesHtml = firstPrinciples.map(function(p) {
@@ -160,7 +160,7 @@
         var safeImage = escapeAttr(article.image);
 
         var imageHtml = article.image
-            ? '<img src="' + safeImage + '" alt="' + escapeAttr(article.title) + '" loading="lazy" decoding="async">'
+            ? '<img src="' + safeImage + '" alt="' + escapeAttr(article.title) + '" width="400" height="240" loading="lazy" decoding="async">'
             : icons.scissors;
 
         return '<article class="blog-card fade-in visible" onclick="openBlogModal(\'' + safeId + '\')">' +

@@ -12,6 +12,7 @@
     gap: 32px;
     max-width: 1200px;
     margin: 0 auto;
+    min-height: 500px;
 }
 
 /* Master Card */
