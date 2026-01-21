@@ -46,12 +46,20 @@ var BlogModal = (function() {
     function showDynamicArticleModal(article) {
         var modal = document.getElementById('blogModal');
         var container = document.getElementById('blogModalContent');
+        var topMeta = document.getElementById('blogModalTopMeta');
         if (!modal || !container) return;
 
         var icons = window.SiteTemplates ? SiteTemplates.icons : {};
         var safeImage = escapeAttr(article.image || '');
         var safeTitle = escapeAttr(article.title || '');
         var dateText = formatDate(article.date);
+
+        // Заполняем шапку (категория + дата)
+        if (topMeta) {
+            topMeta.innerHTML =
+                '<span class="blog-modal-tag">' + escapeHtml(article.tag || 'Статья') + '</span>' +
+                '<span class="blog-modal-date">' + (icons.calendar || '') + ' ' + dateText + '</span>';
+        }
 
         // Генерируем HTML для изображения
         var imageHtml = article.image
@@ -76,10 +84,6 @@ var BlogModal = (function() {
         // Генерируем полный HTML и вставляем в контейнер
         container.innerHTML =
             imageHtml +
-            '<div class="blog-modal-header">' +
-                '<span class="blog-modal-tag">' + escapeHtml(article.tag || 'Статья') + '</span>' +
-                '<span class="blog-modal-date">' + (icons.calendar || '') + ' ' + dateText + '</span>' +
-            '</div>' +
             '<h2 class="blog-modal-title">' + escapeHtml(article.title || '') + '</h2>' +
             '<div class="blog-modal-body">' + contentHtml + '</div>';
 

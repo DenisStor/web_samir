@@ -135,7 +135,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.2.3/purify.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- CSS Modules -->
     <link rel="stylesheet" href="/src/css/shared/index.css?v=1.2">
-    <link rel="stylesheet" href="/src/css/site/index.css?v=1.7">
+    <link rel="stylesheet" href="/src/css/site/index.css?v=1.8">
 </head>
 <body>
 
@@ -1011,9 +1011,13 @@
     <!-- Blog Modal -->
     <div class="blog-modal" id="blogModal" role="dialog" aria-modal="true" aria-labelledby="blogModalTitle" aria-hidden="true">
         <div class="blog-modal-content">
-            <button class="blog-modal-close" onclick="closeBlogModal()" aria-label="Закрыть статью" type="button">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
+            <!-- Шапка с категорией, датой и крестиком -->
+            <div class="blog-modal-top-bar">
+                <div class="blog-modal-top-meta" id="blogModalTopMeta"></div>
+                <button class="blog-modal-close" onclick="closeBlogModal()" aria-label="Закрыть статью" type="button">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
             <!-- Контент статьи загружается динамически через JS -->
             <div id="blogModalContent"></div>
         </div>

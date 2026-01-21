@@ -183,17 +183,30 @@
     border-radius: var(--radius-xl);
     max-width: 900px;
     width: 100%;
-    padding: 48px;
     position: relative;
     border: 1px solid var(--accent-green-subtle);
     animation: slideUp var(--transition-slow);
+    overflow: hidden;
+}
+
+/* Top bar with category, date and close button */
+.blog-modal-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    background: var(--bg-dark);
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.blog-modal-top-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
 }
 
 .blog-modal-close {
-    position: absolute;
-    top: 24px;
-    right: 24px;
-    z-index: 10;
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -203,6 +216,7 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    flex-shrink: 0;
     transition: background var(--transition-base),
                 border-color var(--transition-base),
                 transform var(--transition-base);
@@ -226,6 +240,10 @@
     gap: 16px;
     margin-bottom: 24px;
     flex-wrap: wrap;
+}
+
+#blogModalContent {
+    padding: 32px 48px 48px;
 }
 
 .blog-modal-image {
