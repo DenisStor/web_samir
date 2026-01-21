@@ -45,62 +45,43 @@ var BlogModal = (function() {
      */
     function showDynamicArticleModal(article) {
         var modal = document.getElementById('blogModal');
-        if (!modal) return;
+        var container = document.getElementById('blogModalContent');
+        if (!modal || !container) return;
 
         var icons = window.SiteTemplates ? SiteTemplates.icons : {};
+        var safeImage = escapeAttr(article.image || '');
+        var safeTitle = escapeAttr(article.title || '');
+        var dateText = formatDate(article.date);
 
-        // Update modal content
-        var modalImage = modal.querySelector('.blog-modal-image');
-        var modalTag = modal.querySelector('.blog-modal-tag');
-        var modalDate = modal.querySelector('.blog-modal-date span, .blog-modal-date');
-        var modalTitle = modal.querySelector('.blog-modal-title');
-        var modalContent = modal.querySelector('.blog-modal-text, .blog-modal-body');
+        // Генерируем HTML для изображения
+        var imageHtml = article.image
+            ? '<div class="blog-modal-image"><img src="' + safeImage + '" alt="' + safeTitle + '" style="width:100%; height:100%; object-fit:cover;"></div>'
+            : '';
 
-        // Sanitize data
-        var safeImage = escapeAttr(article.image);
-        var safeTitle = escapeAttr(article.title);
-
-        if (modalImage) {
-            if (article.image) {
-                modalImage.innerHTML = '<img src="' + safeImage + '" alt="' + safeTitle + '" style="width:100%; height:100%; object-fit:cover;">';
-            } else {
-                modalImage.innerHTML = icons.scissors || '';
+        // Обработка контента
+        var content = article.content || article.excerpt || '';
+        var contentHtml = '';
+        if (/<[a-z][\s\S]*>/i.test(content)) {
+            contentHtml = sanitizeHTML(content);
+        } else {
+            contentHtml = content.split('\n\n')
+                .filter(function(p) { return p.trim(); })
+                .map(function(p) { return '<p>' + escapeHtml(p).replace(/\n/g, '<br>') + '</p>'; })
+                .join('');
+            if (!contentHtml) {
+                contentHtml = '<p>' + escapeHtml(article.excerpt || '') + '</p>';
             }
         }
 
-        if (modalTag) {
-            modalTag.textContent = article.tag || 'Статья';
-        }
-
-        if (modalDate) {
-            var dateText = formatDate(article.date);
-            if (modalDate.querySelector('span')) {
-                modalDate.querySelector('span').textContent = dateText;
-            } else {
-                var svg = modalDate.querySelector('svg');
-                var calendarIcon = icons.calendar || '';
-                modalDate.innerHTML = (svg ? svg.outerHTML : calendarIcon) + ' ' + dateText;
-            }
-        }
-
-        if (modalTitle) {
-            modalTitle.textContent = article.title;
-        }
-
-        if (modalContent) {
-            var content = article.content || article.excerpt || '';
-            // Если контент содержит HTML-теги, санитизируем
-            if (/<[a-z][\s\S]*>/i.test(content)) {
-                modalContent.innerHTML = sanitizeHTML(content);
-            } else {
-                // Плоский текст - разбиваем на параграфы
-                var paragraphs = content.split('\n\n')
-                    .filter(function(p) { return p.trim(); })
-                    .map(function(p) { return '<p>' + escapeHtml(p).replace(/\n/g, '<br>') + '</p>'; })
-                    .join('');
-                modalContent.innerHTML = sanitizeHTML(paragraphs || '<p>' + escapeHtml(article.excerpt || '') + '</p>');
-            }
-        }
+        // Генерируем полный HTML и вставляем в контейнер
+        container.innerHTML =
+            imageHtml +
+            '<div class="blog-modal-header">' +
+                '<span class="blog-modal-tag">' + escapeHtml(article.tag || 'Статья') + '</span>' +
+                '<span class="blog-modal-date">' + (icons.calendar || '') + ' ' + dateText + '</span>' +
+            '</div>' +
+            '<h2 class="blog-modal-title">' + escapeHtml(article.title || '') + '</h2>' +
+            '<div class="blog-modal-text">' + contentHtml + '</div>';
 
         // Show modal
         modal.classList.add('active');
