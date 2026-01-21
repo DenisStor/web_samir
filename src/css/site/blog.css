@@ -193,6 +193,7 @@
     position: absolute;
     top: 24px;
     right: 24px;
+    z-index: 10;
     width: 40px;
     height: 40px;
     border-radius: 50%;
