@@ -9,7 +9,7 @@
 
   <!-- Магазин -->
   <url>
-    <loc>https://saysbarbers.ru/shop</loc>
+    <loc>https://saysbarbers.ru/shop.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
