@@ -680,7 +680,11 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
         if path.startswith('/api/'):
             return 'no-store, no-cache, must-revalidate'
 
-        # Статические ресурсы - кеш на неделю
+        # JS - без кеша, всегда проверять актуальность
+        if ext == '.js':
+            return 'no-cache, must-revalidate'
+
+        # Статические ресурсы (CSS, изображения, шрифты) - кеш на неделю
         if ext in self.CACHEABLE_EXTENSIONS:
             return 'public, max-age=604800, immutable'
 
