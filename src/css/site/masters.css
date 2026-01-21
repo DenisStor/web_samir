@@ -285,34 +285,26 @@
     filter: drop-shadow(0 0 6px var(--accent-green-glow-intense));
 }
 
-/* Master Extra (reveal on hover) */
+/* Master Extra (reveal on hover via grid animation) */
 .master-extra {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: grid-template-rows 0.4s ease, opacity 0.3s ease;
+}
+
+.master-extra-inner {
+    overflow: hidden;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     gap: 8px;
-    overflow: hidden;
-    max-height: 0;
-    opacity: 0;
-    transition: max-height 0.35s ease-out, opacity 0.25s ease;
 }
 
 .master-card:hover .master-extra {
-    max-height: 200px;
+    grid-template-rows: 1fr;
     opacity: 1;
 }
-
-.master-extra .master-principle {
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.master-card:hover .master-extra .master-principle {
-    opacity: 1;
-}
-
-.master-card:hover .master-extra .master-principle:nth-child(1) { transition-delay: 0.05s; }
-.master-card:hover .master-extra .master-principle:nth-child(2) { transition-delay: 0.1s; }
-.master-card:hover .master-extra .master-principle:nth-child(3) { transition-delay: 0.15s; }
 
 /* Responsive */
 @media (max-width: 1024px) {

@@ -66,11 +66,11 @@ var SiteTemplates = (function() {
 
         var extraHtml = '';
         if (extraPrinciples.length > 0) {
-            extraHtml = '<div class="master-extra">' +
+            extraHtml = '<div class="master-extra"><div class="master-extra-inner">' +
                 extraPrinciples.map(function(p) {
                     return '<div class="master-principle">' + icons.check + '<span>' + escapeHTML(p) + '</span></div>';
                 }).join('') +
-            '</div>';
+            '</div></div>';
         }
 
         return '<div class="master-card fade-in stagger-item">' +
