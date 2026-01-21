@@ -15,6 +15,10 @@
     min-height: 450px;
 }
 
+.blog-grid:has(.empty-message) {
+    min-height: auto;
+}
+
 /* Show more button */
 .blog-show-more {
     display: flex;
