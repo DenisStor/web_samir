@@ -48,5 +48,9 @@ logs/
 uploads/
 !uploads/.gitkeep
 
+# Data (CMS data, хранится вне git на сервере)
+data/
+!data/.gitkeep
+
 # Test coverage
 .coverage

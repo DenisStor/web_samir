@@ -35,3 +35,4 @@ npm test                               # Тесты
 - [CSS конвенции](docs/css-conventions.md) — переменные, правила
 - [JS конвенции](docs/js-conventions.md) — паттерны, SharedHelpers, AppConfig
 - [Производительность](docs/performance.md) — оптимизация
+- [Деплой](docs/deployment.md) — развёртывание на VPS, симлинки
