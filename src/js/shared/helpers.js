@@ -60,6 +60,40 @@
     }
 
     // =================================================================
+    // SLUG GENERATION
+    // =================================================================
+
+    /**
+     * Генерация slug из текста (транслитерация + нормализация)
+     * @param {string} text - Исходный текст
+     * @returns {string} URL-friendly slug
+     * @example
+     * generateSlug('Помада для укладки') // 'pomada-dlya-ukladki'
+     */
+    function generateSlug(text) {
+        if (!text) return '';
+
+        var translitMap = {
+            'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo',
+            'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
+            'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
+            'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch',
+            'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya'
+        };
+
+        return text
+            .toLowerCase()
+            .split('')
+            .map(function(char) {
+                return translitMap[char] !== undefined ? translitMap[char] : char;
+            })
+            .join('')
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '')
+            .substring(0, 100);
+    }
+
+    // =================================================================
     // DEBOUNCE / THROTTLE
     // =================================================================
 
@@ -151,8 +185,9 @@
         escapeHtml: escapeHtml,
         escapeAttr: escapeAttr,
 
-        // ID
+        // ID & Slug
         generateId: generateId,
+        generateSlug: generateSlug,
 
         // Timing
         debounce: debounce,
@@ -167,6 +202,7 @@
     window.escapeHtml = escapeHtml;
     window.escapeAttr = escapeAttr;
     window.generateId = generateId;
+    window.generateSlug = generateSlug;
     window.debounce = debounce;
 
 })();
