@@ -220,7 +220,48 @@
 }
 
 .blog-modal-header {
-    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.blog-modal-image {
+    height: 300px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 24px;
+    background: var(--content-bg-light);
+}
+
+.blog-modal-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.blog-modal-tag {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: var(--accent-green-subtle);
+    color: var(--accent-green);
+    border: 1px solid var(--border-accent);
+}
+
+.blog-modal-date {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-gray);
+    font-size: 0.85rem;
+}
+
+.blog-modal-date svg {
+    width: 14px;
+    height: 14px;
 }
 
 .blog-modal-title {

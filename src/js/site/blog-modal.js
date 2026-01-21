@@ -81,7 +81,7 @@ var BlogModal = (function() {
                 '<span class="blog-modal-date">' + (icons.calendar || '') + ' ' + dateText + '</span>' +
             '</div>' +
             '<h2 class="blog-modal-title">' + escapeHtml(article.title || '') + '</h2>' +
-            '<div class="blog-modal-text">' + contentHtml + '</div>';
+            '<div class="blog-modal-body">' + contentHtml + '</div>';
 
         // Show modal
         modal.classList.add('active');
