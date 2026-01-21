@@ -684,7 +684,11 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
         if ext in self.CACHEABLE_EXTENSIONS:
             return 'public, max-age=604800, immutable'
 
-        # HTML и прочее - короткий кеш с проверкой
+        # HTML - без кеша, всегда проверять актуальность
+        if ext == '.html' or path in ('/', ''):
+            return 'no-cache, must-revalidate'
+
+        # Прочее - короткий кеш
         return 'public, max-age=300, must-revalidate'
 
     def get_cors_origin(self):
