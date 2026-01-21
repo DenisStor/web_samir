@@ -20,6 +20,9 @@ var ShopApp = (function() {
     // DOM elements cache
     var elements = {};
 
+    // Progress bar element
+    var progressBar = null;
+
     // Для cleanup и throttle
     var scrollRAF = null;
     var boundHandlers = {
@@ -67,6 +70,7 @@ var ShopApp = (function() {
         elements.lightboxImage = document.getElementById('lightboxImage');
         elements.filterSheet = document.querySelector('.filter-sheet');
         elements.filterBackdrop = document.querySelector('.filter-backdrop');
+        progressBar = document.getElementById('progressBar');
     }
 
     function initEventListeners() {
@@ -234,12 +238,35 @@ var ShopApp = (function() {
     }
 
     // =================================================================
+    // PROGRESS BAR
+    // =================================================================
+
+    function showProgress() {
+        if (progressBar) {
+            progressBar.classList.add('active', 'loading');
+        }
+    }
+
+    function hideProgress() {
+        if (progressBar) {
+            progressBar.classList.remove('loading');
+            progressBar.classList.add('complete');
+            setTimeout(function() {
+                if (progressBar) {
+                    progressBar.classList.remove('active', 'complete');
+                }
+            }, 300);
+        }
+    }
+
+    // =================================================================
     // DATA LOADING
     // =================================================================
 
     async function loadData() {
-        // Show skeleton loading
+        // Show skeleton loading and progress bar
         elements.productsGrid.innerHTML = renderSkeletons(8);
+        showProgress();
 
         try {
             var results = await Promise.all([
@@ -252,8 +279,10 @@ var ShopApp = (function() {
 
             renderCategories();
             renderProducts();
+            hideProgress();
         } catch (error) {
             console.error('Error loading shop data:', error);
+            hideProgress();
             elements.productsGrid.innerHTML = '<div class="empty-message">' +
                 '<svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">' +
                     '<circle cx="12" cy="12" r="10"/>' +

@@ -291,6 +291,51 @@ textarea.form-input {
 }
 
 /* =================================================================
+   PAGE LOADER
+   ================================================================= */
+
+.page-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: var(--bg-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.page-loader.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.page-loader.instant-hide {
+    display: none;
+}
+
+.page-loader-spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid var(--border-subtle);
+    border-top-color: var(--accent-green);
+    border-radius: 50%;
+    animation: loader-spin 0.8s linear infinite;
+}
+
+@keyframes loader-spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .page-loader-spinner {
+        animation: none;
+        border-top-color: var(--border-subtle);
+    }
+}
+
+/* =================================================================
    SKELETON LOADING
    ================================================================= */
 
@@ -350,6 +395,53 @@ textarea.form-input {
 
 .skeleton-text.short {
     width: 60%;
+}
+
+/* =================================================================
+   RESPONSIVE
+   ================================================================= */
+
+/* =================================================================
+   STAGGER ANIMATION
+   ================================================================= */
+
+.stagger-item:nth-child(1) { transition-delay: 0ms; }
+.stagger-item:nth-child(2) { transition-delay: 50ms; }
+.stagger-item:nth-child(3) { transition-delay: 100ms; }
+.stagger-item:nth-child(4) { transition-delay: 150ms; }
+.stagger-item:nth-child(5) { transition-delay: 200ms; }
+.stagger-item:nth-child(6) { transition-delay: 250ms; }
+
+@media (prefers-reduced-motion: reduce) {
+    .stagger-item {
+        transition-delay: 0ms !important;
+    }
+}
+
+/* =================================================================
+   IMAGE SMOOTH LOADING
+   ================================================================= */
+
+.image-wrapper {
+    position: relative;
+    overflow: hidden;
+    background: var(--content-bg);
+}
+
+.image-wrapper img {
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.image-wrapper img.loaded {
+    opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .image-wrapper img {
+        opacity: 1;
+        transition: none;
+    }
 }
 
 /* =================================================================

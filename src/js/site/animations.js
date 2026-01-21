@@ -25,6 +25,15 @@
      * Создать и запустить наблюдатель для анимаций
      */
     function initAnimations() {
+        // Проверяем prefers-reduced-motion
+        var prefersReducedMotion = window.matchMedia &&
+            window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        if (prefersReducedMotion) {
+            $$('.fade-in').forEach(function(el) { el.classList.add('visible'); });
+            return;
+        }
+
         fadeObserver = new IntersectionObserver(function(entries) {
             entries.forEach(function(entry) {
                 if (entry.isIntersecting) {

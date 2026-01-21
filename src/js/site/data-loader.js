@@ -94,7 +94,7 @@
         var safeInitial = escapeHTML(master.initial || master.name.charAt(0));
 
         var imageHtml = master.photo
-            ? '<img src="' + safePhoto + '" alt="' + escapeAttr(master.name) + '" class="master-photo" width="400" height="400" loading="lazy" decoding="async">'
+            ? '<img src="' + safePhoto + '" alt="' + escapeAttr(master.name) + '" class="master-photo" width="400" height="400" loading="lazy" decoding="async" data-smooth-load>'
             : '<div class="master-avatar">' + safeInitial + '</div>';
 
         var principlesHtml = firstPrinciples.map(function(p) {
@@ -110,8 +110,8 @@
             '</div>';
         }
 
-        return '<div class="master-card fade-in visible">' +
-            '<div class="master-image">' + imageHtml +
+        return '<div class="master-card fade-in stagger-item">' +
+            '<div class="master-image image-wrapper">' + imageHtml +
                 '<span class="master-badge ' + badgeClass + '">' + badgeLabel + '</span>' +
             '</div>' +
             '<div class="master-content">' +
@@ -160,11 +160,11 @@
         var safeImage = escapeAttr(article.image);
 
         var imageHtml = article.image
-            ? '<img src="' + safeImage + '" alt="' + escapeAttr(article.title) + '" width="400" height="240" loading="lazy" decoding="async">'
+            ? '<img src="' + safeImage + '" alt="' + escapeAttr(article.title) + '" width="400" height="240" loading="lazy" decoding="async" data-smooth-load>'
             : icons.scissors;
 
-        return '<article class="blog-card fade-in visible" onclick="openBlogModal(\'' + safeId + '\')">' +
-            '<div class="blog-image">' + imageHtml + '</div>' +
+        return '<article class="blog-card fade-in stagger-item" onclick="openBlogModal(\'' + safeId + '\')">' +
+            '<div class="blog-image image-wrapper">' + imageHtml + '</div>' +
             '<div class="blog-content">' +
                 '<div class="blog-meta">' +
                     '<span class="blog-tag">' + safeTag + '</span>' +
@@ -607,6 +607,14 @@
         // Re-initialize animations for dynamically loaded elements
         if (SaysApp.animations && SaysApp.animations.reinit) {
             SaysApp.animations.reinit();
+        }
+
+        // Initialize smooth image loading for dynamically added images
+        if (window.SharedHelpers && window.SharedHelpers.setupImage) {
+            var images = document.querySelectorAll('img[data-smooth-load]');
+            for (var i = 0; i < images.length; i++) {
+                window.SharedHelpers.setupImage(images[i]);
+            }
         }
     }
 
