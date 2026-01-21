@@ -43,3 +43,10 @@ logs/
 # Temporary files
 *.tmp
 *.temp
+
+# Uploads (media files)
+uploads/
+!uploads/.gitkeep
+
+# Test coverage
+.coverage

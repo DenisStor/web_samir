@@ -1020,10 +1020,10 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
             try:
                 content_length = int(self.headers['Content-Length'])
 
-                # Лимит размера POST данных (1MB для JSON)
-                max_post_size = 1 * 1024 * 1024
+                # Лимит размера POST данных (5MB для JSON, синхронизировано с ui.maxImageSize)
+                max_post_size = 5 * 1024 * 1024
                 if content_length > max_post_size:
-                    self.send_error_response(413, 'Request too large. Max size is 1MB.')
+                    self.send_error_response(413, 'Request too large. Max size is 5MB.')
                     return
 
                 post_data = self.rfile.read(content_length)

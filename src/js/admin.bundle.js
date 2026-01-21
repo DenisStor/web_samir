@@ -224,35 +224,6 @@
     }
 
     // =================================================================
-    // SLUG GENERATION
-    // =================================================================
-
-    var cyrillicToLatin = {
-        'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo',
-        'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
-        'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
-        'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch', 'ъ': '',
-        'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya'
-    };
-
-    /**
-     * Генерация URL-безопасного slug из текста
-     * @param {string} text - Текст для преобразования
-     * @returns {string} URL-safe slug
-     * @example
-     * generateSlug('Привет Мир!') // 'privet-mir'
-     */
-    function generateSlug(text) {
-        if (!text) return '';
-        return text.toLowerCase()
-            .split('')
-            .map(function(char) { return cyrillicToLatin[char] || char; })
-            .join('')
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-|-$/g, '');
-    }
-
-    // =================================================================
     // DEBOUNCE / THROTTLE
     // =================================================================
 
@@ -296,32 +267,6 @@
                 rafId = null;
             });
         };
-    }
-
-    // =================================================================
-    // REORDER ITEMS
-    // =================================================================
-
-    /**
-     * Переупорядочить массив элементов по новому порядку ID
-     * @param {Array} items - Массив объектов с полем id
-     * @param {Array} newOrder - Массив ID в новом порядке
-     * @returns {Array} Переупорядоченный массив с обновлённым полем order
-     * @example
-     * var items = [{id: 'a', order: 0}, {id: 'b', order: 1}];
-     * var reordered = reorderItems(items, ['b', 'a']);
-     * // [{id: 'b', order: 0}, {id: 'a', order: 1}]
-     */
-    function reorderItems(items, newOrder) {
-        var reordered = newOrder.map(function(id) {
-            return items.find(function(item) { return item.id === id; });
-        }).filter(Boolean);
-
-        reordered.forEach(function(item, index) {
-            item.order = index;
-        });
-
-        return reordered;
     }
 
     // =================================================================
@@ -370,16 +315,12 @@
         escapeHtml: escapeHtml,
         escapeAttr: escapeAttr,
 
-        // ID & Slug
+        // ID
         generateId: generateId,
-        generateSlug: generateSlug,
 
         // Timing
         debounce: debounce,
         throttleRAF: throttleRAF,
-
-        // Collections
-        reorderItems: reorderItems,
 
         // Formatting
         formatPrice: formatPrice,
@@ -390,7 +331,6 @@
     window.escapeHtml = escapeHtml;
     window.escapeAttr = escapeAttr;
     window.generateId = generateId;
-    window.generateSlug = generateSlug;
     window.debounce = debounce;
 
 })();
@@ -3700,23 +3640,6 @@ var AdminArticlesRenderer = (function() {
     }
 
     /**
-     * Форматирование даты
-     */
-    function formatDate(dateStr) {
-        if (!dateStr) return '';
-        try {
-            var date = new Date(dateStr);
-            return date.toLocaleDateString('ru-RU', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
-            });
-        } catch (e) {
-            return dateStr;
-        }
-    }
-
-    /**
      * Рендеринг списка статей
      */
     function render() {
@@ -3746,7 +3669,7 @@ var AdminArticlesRenderer = (function() {
                 '<div class="article-content">' +
                     '<div class="article-meta">' +
                         '<span class="article-tag">' + escapeHtml(article.tag || 'Статья') + '</span>' +
-                        '<span class="article-date">' + formatDate(article.date) + '</span>' +
+                        '<span class="article-date">' + SharedHelpers.formatDate(article.date) + '</span>' +
                     '</div>' +
                     '<h3 class="article-title">' + escapeHtml(article.title) + '</h3>' +
                     '<p class="article-excerpt">' + escapeHtml(article.excerpt || '') + '</p>' +
@@ -3777,7 +3700,6 @@ var AdminArticlesRenderer = (function() {
     return {
         init: init,
         render: render,
-        formatDate: formatDate,
         reorderArticles: reorderArticles
     };
 })();
@@ -4250,7 +4172,7 @@ var AdminShopProductsRenderer = (function() {
                     '</div>' +
                 '</td>' +
                 '<td>' + (category ? escapeHtml(category.name) : '-') + '</td>' +
-                '<td class="price-cell">' + formatPrice(product.price) + '</td>' +
+                '<td class="price-cell">' + SharedHelpers.formatPrice(product.price) + '</td>' +
                 '<td><span class="status-badge ' + statusClass + '">' + statusText + '</span></td>' +
                 '<td class="actions-cell">' +
                     '<button class="btn btn-icon" data-action="edit-product" data-id="' + escapeAttr(product.id) + '" title="Редактировать">' +
@@ -4315,10 +4237,6 @@ var AdminShopProductsRenderer = (function() {
     function goToPage(page) {
         currentPage = page;
         render();
-    }
-
-    function formatPrice(price) {
-        return new Intl.NumberFormat('ru-RU').format(price) + ' ₽';
     }
 
     function escapeHtml(text) {
@@ -6014,8 +5932,6 @@ var AdminPanel = (function() {
      * Загрузка всех данных
      */
     async function loadData() {
-        console.log('Loading data...');
-
         try {
             var data = await AdminAPI.loadAllData();
 
@@ -6038,7 +5954,6 @@ var AdminPanel = (function() {
             }
 
             showToast('Данные загружены', 'success');
-            console.log('Data loaded successfully');
         } catch (error) {
             console.error('Error loading data:', error);
             showToast('Ошибка загрузки данных', 'error');
@@ -6595,8 +6510,6 @@ var AdminPanel = (function() {
      * Инициализация админ-панели после логина
      */
     function initAdminPanel() {
-        console.log('Admin Panel initializing...');
-
         initElements();
 
         // Инициализация модулей
@@ -6628,8 +6541,6 @@ var AdminPanel = (function() {
         // Загрузка данных и переход на статистику
         loadData();
         switchSection('stats');
-
-        console.log('Admin Panel initialized');
     }
 
     /**
@@ -6683,8 +6594,6 @@ var AdminPanel = (function() {
 
         // Очищаем кэш элементов
         elements = {};
-
-        console.log('Admin Panel destroyed');
     }
 
     // Запуск при готовности DOM

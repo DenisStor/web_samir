@@ -60,23 +60,6 @@ var AdminArticlesRenderer = (function() {
     }
 
     /**
-     * Форматирование даты
-     */
-    function formatDate(dateStr) {
-        if (!dateStr) return '';
-        try {
-            var date = new Date(dateStr);
-            return date.toLocaleDateString('ru-RU', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
-            });
-        } catch (e) {
-            return dateStr;
-        }
-    }
-
-    /**
      * Рендеринг списка статей
      */
     function render() {
@@ -106,7 +89,7 @@ var AdminArticlesRenderer = (function() {
                 '<div class="article-content">' +
                     '<div class="article-meta">' +
                         '<span class="article-tag">' + escapeHtml(article.tag || 'Статья') + '</span>' +
-                        '<span class="article-date">' + formatDate(article.date) + '</span>' +
+                        '<span class="article-date">' + SharedHelpers.formatDate(article.date) + '</span>' +
                     '</div>' +
                     '<h3 class="article-title">' + escapeHtml(article.title) + '</h3>' +
                     '<p class="article-excerpt">' + escapeHtml(article.excerpt || '') + '</p>' +
@@ -137,7 +120,6 @@ var AdminArticlesRenderer = (function() {
     return {
         init: init,
         render: render,
-        formatDate: formatDate,
         reorderArticles: reorderArticles
     };
 })();

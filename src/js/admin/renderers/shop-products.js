@@ -91,7 +91,7 @@ var AdminShopProductsRenderer = (function() {
                     '</div>' +
                 '</td>' +
                 '<td>' + (category ? escapeHtml(category.name) : '-') + '</td>' +
-                '<td class="price-cell">' + formatPrice(product.price) + '</td>' +
+                '<td class="price-cell">' + SharedHelpers.formatPrice(product.price) + '</td>' +
                 '<td><span class="status-badge ' + statusClass + '">' + statusText + '</span></td>' +
                 '<td class="actions-cell">' +
                     '<button class="btn btn-icon" data-action="edit-product" data-id="' + escapeAttr(product.id) + '" title="Редактировать">' +
@@ -156,10 +156,6 @@ var AdminShopProductsRenderer = (function() {
     function goToPage(page) {
         currentPage = page;
         render();
-    }
-
-    function formatPrice(price) {
-        return new Intl.NumberFormat('ru-RU').format(price) + ' ₽';
     }
 
     function escapeHtml(text) {

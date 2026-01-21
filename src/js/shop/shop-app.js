@@ -431,7 +431,7 @@ var ShopApp = (function() {
             '<div class="product-info">' +
                 '<h3 class="product-name">' + escapeHtml(product.name) + '</h3>' +
                 excerpt +
-                '<div class="product-price">' + formatPrice(product.price) + '</div>' +
+                '<div class="product-price">' + SharedHelpers.formatPrice(product.price) + '</div>' +
             '</div>' +
         '</article>';
     }
@@ -504,7 +504,7 @@ var ShopApp = (function() {
                 '<div class="product-detail-info">' +
                     categoryTagHtml +
                     '<h1 class="product-detail-name">' + escapeHtml(product.name) + '</h1>' +
-                    '<div class="product-detail-price">' + formatPrice(product.price) + '</div>' +
+                    '<div class="product-detail-price">' + SharedHelpers.formatPrice(product.price) + '</div>' +
                     descriptionHtml +
                     ctaHtml +
                 '</div>' +
@@ -589,11 +589,7 @@ var ShopApp = (function() {
         }).length;
     }
 
-    function formatPrice(price) {
-        return new Intl.NumberFormat('ru-RU').format(price) + ' ₽';
-    }
-
-    // escapeHtml и debounce теперь используются из SharedHelpers (helpers.js)
+    // formatPrice, escapeHtml и debounce теперь используются из SharedHelpers (helpers.js)
 
     // =================================================================
     // MOBILE MENU

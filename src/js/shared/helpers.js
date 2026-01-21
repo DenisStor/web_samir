@@ -60,35 +60,6 @@
     }
 
     // =================================================================
-    // SLUG GENERATION
-    // =================================================================
-
-    var cyrillicToLatin = {
-        'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo',
-        'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
-        'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
-        'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch', 'ъ': '',
-        'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya'
-    };
-
-    /**
-     * Генерация URL-безопасного slug из текста
-     * @param {string} text - Текст для преобразования
-     * @returns {string} URL-safe slug
-     * @example
-     * generateSlug('Привет Мир!') // 'privet-mir'
-     */
-    function generateSlug(text) {
-        if (!text) return '';
-        return text.toLowerCase()
-            .split('')
-            .map(function(char) { return cyrillicToLatin[char] || char; })
-            .join('')
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-|-$/g, '');
-    }
-
-    // =================================================================
     // DEBOUNCE / THROTTLE
     // =================================================================
 
@@ -132,32 +103,6 @@
                 rafId = null;
             });
         };
-    }
-
-    // =================================================================
-    // REORDER ITEMS
-    // =================================================================
-
-    /**
-     * Переупорядочить массив элементов по новому порядку ID
-     * @param {Array} items - Массив объектов с полем id
-     * @param {Array} newOrder - Массив ID в новом порядке
-     * @returns {Array} Переупорядоченный массив с обновлённым полем order
-     * @example
-     * var items = [{id: 'a', order: 0}, {id: 'b', order: 1}];
-     * var reordered = reorderItems(items, ['b', 'a']);
-     * // [{id: 'b', order: 0}, {id: 'a', order: 1}]
-     */
-    function reorderItems(items, newOrder) {
-        var reordered = newOrder.map(function(id) {
-            return items.find(function(item) { return item.id === id; });
-        }).filter(Boolean);
-
-        reordered.forEach(function(item, index) {
-            item.order = index;
-        });
-
-        return reordered;
     }
 
     // =================================================================
@@ -206,16 +151,12 @@
         escapeHtml: escapeHtml,
         escapeAttr: escapeAttr,
 
-        // ID & Slug
+        // ID
         generateId: generateId,
-        generateSlug: generateSlug,
 
         // Timing
         debounce: debounce,
         throttleRAF: throttleRAF,
-
-        // Collections
-        reorderItems: reorderItems,
 
         // Formatting
         formatPrice: formatPrice,
@@ -226,7 +167,6 @@
     window.escapeHtml = escapeHtml;
     window.escapeAttr = escapeAttr;
     window.generateId = generateId;
-    window.generateSlug = generateSlug;
     window.debounce = debounce;
 
 })();

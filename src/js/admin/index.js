@@ -59,8 +59,6 @@ var AdminPanel = (function() {
      * Загрузка всех данных
      */
     async function loadData() {
-        console.log('Loading data...');
-
         try {
             var data = await AdminAPI.loadAllData();
 
@@ -83,7 +81,6 @@ var AdminPanel = (function() {
             }
 
             showToast('Данные загружены', 'success');
-            console.log('Data loaded successfully');
         } catch (error) {
             console.error('Error loading data:', error);
             showToast('Ошибка загрузки данных', 'error');
@@ -640,8 +637,6 @@ var AdminPanel = (function() {
      * Инициализация админ-панели после логина
      */
     function initAdminPanel() {
-        console.log('Admin Panel initializing...');
-
         initElements();
 
         // Инициализация модулей
@@ -673,8 +668,6 @@ var AdminPanel = (function() {
         // Загрузка данных и переход на статистику
         loadData();
         switchSection('stats');
-
-        console.log('Admin Panel initialized');
     }
 
     /**
@@ -728,8 +721,6 @@ var AdminPanel = (function() {
 
         // Очищаем кэш элементов
         elements = {};
-
-        console.log('Admin Panel destroyed');
     }
 
     // Запуск при готовности DOM
