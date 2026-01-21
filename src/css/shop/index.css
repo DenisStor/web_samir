@@ -12,5 +12,5 @@
 @import 'gallery.css';
 @import 'empty-states.css';
 @import 'filter.css';
-@import 'footer.css';
+@import '../site/footer.css';
 @import 'responsive.css';
