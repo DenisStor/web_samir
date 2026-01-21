@@ -53,8 +53,8 @@ server/                 # Python серверные модули
 ├── storage.py          # JSONStorage для работы с данными
 └── validators.py       # Валидация данных
 
-data/                   # JSON данные (редактируются через админку)
-uploads/                # Загруженные изображения
+data/                   # JSON данные CMS (в .gitignore, на сервере симлинк)
+uploads/                # Загруженные изображения (в .gitignore, на сервере симлинк)
 public/                 # Статические SEO файлы
 ```
 
