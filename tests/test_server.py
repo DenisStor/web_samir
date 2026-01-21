@@ -16,9 +16,9 @@ import urllib.error
 # Добавляем корневую директорию в путь для импорта
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-# Импортируем функции из server.py
+# Импортируем функции из модулей
 try:
-    from server import (
+    from validators import (
         is_valid_filename,
         validate_master,
         validate_service,
@@ -26,12 +26,12 @@ try:
         validate_faq,
         validate_principle,
         validate_image_bytes,
-        sanitize_html_content,
-        generate_token
+        sanitize_html_content
     )
+    from auth import generate_token
     SERVER_IMPORTS_OK = True
 except ImportError as e:
-    print(f"Warning: Could not import from server.py: {e}")
+    print(f"Warning: Could not import modules: {e}")
     SERVER_IMPORTS_OK = False
 
 
