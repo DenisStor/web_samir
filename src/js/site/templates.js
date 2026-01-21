@@ -107,6 +107,33 @@ var SiteTemplates = (function() {
         '</div>';
     }
 
+    // =================================================================
+    // PODOLOGY ICONS
+    // =================================================================
+
+    var podologyIcons = {
+        layers: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>',
+        heart: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>',
+        'plus-circle': '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>'
+    };
+
+    /**
+     * Создать кнопку таба подологии
+     * @param {Object} category - Категория
+     * @param {boolean} isActive - Активный ли таб
+     * @returns {string} HTML кнопки
+     */
+    function createPodologyTab(category, isActive) {
+        var safeName = escapeHTML(category.name);
+        var iconSvg = podologyIcons[category.icon] || podologyIcons.heart;
+        var activeClass = isActive ? ' active' : '';
+
+        return '<button class="podology-tab' + activeClass + '" data-podology-target="' + category.id + '">' +
+            iconSvg +
+            '<span>' + safeName + '</span>' +
+        '</button>';
+    }
+
     /**
      * Создать элемент услуги подологии
      * @param {Object} service - Данные услуги
@@ -115,10 +142,61 @@ var SiteTemplates = (function() {
     function createPodologyServiceItem(service) {
         var safeName = escapeHTML(service.name);
         var safePrice = escapeHTML(service.price);
+        var safeDuration = escapeHTML(service.duration || '');
+        var featuredClass = service.featured ? ' podology-service-featured' : '';
 
-        return '<div class="podology-service-item">' +
+        return '<div class="podology-service-item' + featuredClass + '">' +
             '<div class="podology-service-info">' +
-                '<div class="podology-service-name">' + safeName + '</div>' +
+                '<h4>' + safeName + '</h4>' +
+                (safeDuration ? '<span>' + safeDuration + '</span>' : '') +
+            '</div>' +
+            '<div class="podology-service-price">' + safePrice + '</div>' +
+        '</div>';
+    }
+
+    /**
+     * Создать контент таба подологии
+     * @param {Object} category - Категория с услугами
+     * @param {boolean} isActive - Активный ли таб
+     * @returns {string} HTML контента
+     */
+    function createPodologyTabContent(category, isActive) {
+        var safeName = escapeHTML(category.name);
+        var safeDesc = escapeHTML(category.description || '');
+        var activeClass = isActive ? ' active' : '';
+
+        var badgeHtml = category.badge
+            ? '<span class="podology-tab-badge">' + escapeHTML(category.badge) + '</span>'
+            : '';
+
+        var servicesHtml = (category.services || []).map(function(service) {
+            return createPodologyServiceItem(service);
+        }).join('');
+
+        return '<div class="podology-tab-content' + activeClass + '" data-podology="' + category.id + '">' +
+            '<div class="podology-tab-header">' +
+                '<h3>' + safeName + '</h3>' +
+                badgeHtml +
+            '</div>' +
+            '<p class="podology-tab-desc">' + safeDesc + '</p>' +
+            '<div class="podology-services-list">' + servicesHtml + '</div>' +
+        '</div>';
+    }
+
+    /**
+     * Создать карточку консультации
+     * @param {Object} consultation - Данные консультации
+     * @returns {string} HTML карточки
+     */
+    function createPodologyConsultation(consultation) {
+        var safeName = escapeHTML(consultation.name);
+        var safeDesc = escapeHTML(consultation.description || '');
+        var safePrice = escapeHTML(consultation.price);
+
+        return '<div class="podology-service-item podology-service-featured">' +
+            '<div class="podology-service-info">' +
+                '<h4>' + safeName + '</h4>' +
+                '<span>' + safeDesc + '</span>' +
             '</div>' +
             '<div class="podology-service-price">' + safePrice + '</div>' +
         '</div>';
@@ -180,7 +258,10 @@ var SiteTemplates = (function() {
         icons: icons,
         createMasterCard: createMasterCard,
         createServiceItem: createServiceItem,
+        createPodologyTab: createPodologyTab,
         createPodologyServiceItem: createPodologyServiceItem,
+        createPodologyTabContent: createPodologyTabContent,
+        createPodologyConsultation: createPodologyConsultation,
         createBlogCard: createBlogCard,
         createFaqItem: createFaqItem
     };

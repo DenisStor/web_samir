@@ -108,15 +108,7 @@
             }
 
             if (data.podology !== undefined) {
-                var podologyContainer = document.querySelector('.podology-services .podology-list');
-                if (podologyContainer) {
-                    var services = (data.podology && data.podology.services) || [];
-                    if (services.length > 0) {
-                        podologyContainer.innerHTML = services.map(SiteTemplates.createPodologyServiceItem).join('');
-                    } else {
-                        podologyContainer.innerHTML = '<p class="empty-message">Услуги подологии скоро появятся</p>';
-                    }
-                }
+                renderPodology(data.podology);
             }
         } catch (error) {
             if (typeof console !== 'undefined' && console.warn) {
@@ -238,6 +230,51 @@
             if (typeof console !== 'undefined' && console.warn) {
                 console.warn('[DataLoader] Ошибка загрузки данных:', error.message || error);
             }
+        }
+    }
+
+    // =================================================================
+    // PODOLOGY RENDERING
+    // =================================================================
+
+    /**
+     * Рендеринг подологии с категориями
+     */
+    function renderPodology(podology) {
+        var tabsContainer = document.getElementById('podologyTabs');
+        var contentContainer = document.getElementById('podologyTabsContent');
+        var consultationContainer = document.getElementById('podologyConsultation');
+
+        if (!tabsContainer || !contentContainer) return;
+
+        var categories = podology.categories || [];
+
+        if (categories.length === 0) {
+            tabsContainer.innerHTML = '';
+            contentContainer.innerHTML = '<p class="empty-message">Услуги подологии скоро появятся</p>';
+            return;
+        }
+
+        // Рендерим табы
+        var tabsHtml = categories.map(function(cat, index) {
+            return SiteTemplates.createPodologyTab(cat, index === 0);
+        }).join('');
+        tabsContainer.innerHTML = tabsHtml;
+
+        // Рендерим контент табов
+        var contentHtml = categories.map(function(cat, index) {
+            return SiteTemplates.createPodologyTabContent(cat, index === 0);
+        }).join('');
+        contentContainer.innerHTML = contentHtml;
+
+        // Рендерим консультацию
+        if (consultationContainer && podology.consultation) {
+            consultationContainer.innerHTML = SiteTemplates.createPodologyConsultation(podology.consultation);
+        }
+
+        // Реинициализируем табы подологии
+        if (window.SaysApp && window.SaysApp.reinitPodologyTabs) {
+            window.SaysApp.reinitPodologyTabs();
         }
     }
 

@@ -134,8 +134,8 @@
     <!-- Security: DOMPurify for XSS protection -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.2.3/purify.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- CSS Modules -->
-    <link rel="stylesheet" href="/src/css/shared/index.css?v=1.2">
-    <link rel="stylesheet" href="/src/css/site/index.css?v=2.1">
+    <link rel="stylesheet" href="/src/css/shared/index.css?v=92ca5dcf">
+    <link rel="stylesheet" href="/src/css/site/index.css?v=4db193e0">
 </head>
 <body>
 
@@ -534,184 +534,19 @@
                 <p class="section-subtitle">Профессиональный уход за ногами с использованием современных методик</p>
             </div>
 
-            <!-- Podology Tabs -->
-            <div class="podology-tabs fade-in">
-                <button class="podology-tab active" data-podology-target="complex">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
-                    <span>Комплексные</span>
-                </button>
-                <button class="podology-tab" data-podology-target="basic">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                    <span>Базовый уход</span>
-                </button>
-                <button class="podology-tab" data-podology-target="treatment">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
-                    <span>Лечение</span>
-                </button>
-                <button class="podology-tab" data-podology-target="additional">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
-                    <span>Ещё</span>
-                </button>
+            <!-- Podology Tabs (динамически загружаются) -->
+            <div class="podology-tabs fade-in" id="podologyTabs">
+                <!-- Табы будут загружены из JSON -->
             </div>
 
-            <!-- Podology Tab Contents -->
-            <div class="podology-tabs-content">
-                <!-- Комплексные программы -->
-                <div class="podology-tab-content active" data-podology="complex">
-                    <div class="podology-tab-header">
-                        <h3>Комплексные программы</h3>
-                        <span class="podology-tab-badge">Выгодно</span>
-                    </div>
-                    <p class="podology-tab-desc">Выгодные пакеты услуг со скидкой</p>
-                    <div class="podology-services-list">
-                        <div class="podology-service-item podology-service-featured">
-                            <div class="podology-service-info">
-                                <h4>Полный уход: руки + ноги + стопы</h4>
-                                <span>2 часа</span>
-                            </div>
-                            <div class="podology-service-price">4000 ₽</div>
-                        </div>
-                        <div class="podology-service-item podology-service-featured">
-                            <div class="podology-service-info">
-                                <h4>Комплекс для ног: ногти + стопы</h4>
-                                <span>1 час 30 минут</span>
-                            </div>
-                            <div class="podology-service-price">2500 ₽</div>
-                        </div>
-                        <div class="podology-service-item podology-service-featured">
-                            <div class="podology-service-info">
-                                <h4>Лечение грибка: стопы + ногти</h4>
-                                <span>1 час 45 минут</span>
-                            </div>
-                            <div class="podology-service-price">4000 ₽</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Базовый уход -->
-                <div class="podology-tab-content" data-podology="basic">
-                    <div class="podology-tab-header">
-                        <h3>Базовый уход</h3>
-                    </div>
-                    <p class="podology-tab-desc">Ногтевой сервис и обработка стоп</p>
-                    <div class="podology-services-list">
-                        <div class="podology-service-item">
-                            <div class="podology-service-info">
-                                <h4>Ногтевой сервис рук</h4>
-                                <span>1 час</span>
-                            </div>
-                            <div class="podology-service-price">1700 ₽</div>
-                        </div>
-                        <div class="podology-service-item">
-                            <div class="podology-service-info">
-                                <h4>Ногтевой сервис ног</h4>
-                                <span>1 час, без обработки стоп</span>
-                            </div>
-                            <div class="podology-service-price">1800 ₽</div>
-                        </div>
-                        <div class="podology-service-item">
-                            <div class="podology-service-info">
-                                <h4>Обработка стоп</h4>
-                                <span>30 минут</span>
-                            </div>
-                            <div class="podology-service-price">1100 ₽</div>
-                        </div>
-                        <div class="podology-service-item">
-                            <div class="podology-service-info">
-                                <h4>Коррекция длины ногтей</h4>
-                                <span>30 минут, руки или ноги</span>
-                            </div>
-                            <div class="podology-service-price">1000 ₽</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Лечебные процедуры -->
-                <div class="podology-tab-content" data-podology="treatment">
-                    <div class="podology-tab-header">
-                        <h3>Лечебные процедуры</h3>
-                    </div>
-                    <p class="podology-tab-desc">Решение проблем со здоровьем ног</p>
-                    <div class="podology-services-list">
-                        <div class="podology-service-item">
-                            <div class="podology-service-info">
-                                <h4>Лечение грибка ногтей</h4>
-                                <span>1 час 15 минут</span>
-                            </div>
-                            <div class="podology-service-price">3000 ₽</div>
-                        </div>
-                        <div class="podology-service-item">
-                            <div class="podology-service-info">
-                                <h4>Лечение грибка стоп</h4>
-                                <span>45 минут</span>
-                            </div>
-                            <div class="podology-service-price">2000 ₽</div>
-                        </div>
-                        <div class="podology-service-item">
-                            <div class="podology-service-info">
-                                <h4>Обработка проблемного ногтя</h4>
-                                <span>30 минут</span>
-                            </div>
-                            <div class="podology-service-price">900 ₽</div>
-                        </div>
-                        <div class="podology-service-item">
-                            <div class="podology-service-info">
-                                <h4>Удаление мозоли</h4>
-                                <span>30 минут</span>
-                            </div>
-                            <div class="podology-service-price">900 ₽</div>
-                        </div>
-                        <div class="podology-service-item">
-                            <div class="podology-service-info">
-                                <h4>Удаление бородавки</h4>
-                                <span>30 минут</span>
-                            </div>
-                            <div class="podology-service-price">900 ₽</div>
-                        </div>
-                        <div class="podology-service-item">
-                            <div class="podology-service-info">
-                                <h4>Титановая нить (коррекция)</h4>
-                                <span>Уточняйте у специалиста</span>
-                            </div>
-                            <div class="podology-service-price podology-price-text">По прайсу</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Дополнительно -->
-                <div class="podology-tab-content" data-podology="additional">
-                    <div class="podology-tab-header">
-                        <h3>Дополнительно</h3>
-                    </div>
-                    <p class="podology-tab-desc">Вспомогательные процедуры</p>
-                    <div class="podology-services-list">
-                        <div class="podology-service-item">
-                            <div class="podology-service-info">
-                                <h4>Антисептическая повязка</h4>
-                                <span>15 минут</span>
-                            </div>
-                            <div class="podology-service-price">600 ₽</div>
-                        </div>
-                        <div class="podology-service-item">
-                            <div class="podology-service-info">
-                                <h4>Разгрузка стопы</h4>
-                                <span>15 минут</span>
-                            </div>
-                            <div class="podology-service-price">600 ₽</div>
-                        </div>
-                    </div>
-                </div>
+            <!-- Podology Tab Contents (динамически загружаются) -->
+            <div class="podology-tabs-content" id="podologyTabsContent">
+                <!-- Контент табов будет загружен из JSON -->
             </div>
 
-            <!-- Consultation Card -->
-            <div class="podology-consultation fade-in">
-                <div class="podology-service-item podology-service-featured">
-                    <div class="podology-service-info">
-                        <h4>Бесплатная консультация</h4>
-                        <span>Запишитесь на приём</span>
-                    </div>
-                    <div class="podology-service-price">Бесплатно</div>
-                </div>
+            <!-- Consultation Card (динамически загружается) -->
+            <div class="podology-consultation fade-in" id="podologyConsultation">
+                <!-- Карточка консультации будет загружена из JSON -->
             </div>
 
         </div>
@@ -1046,19 +881,19 @@
     </footer>
 
     <!-- JavaScript Modules -->
-    <script src="/src/js/shared/helpers.js?v=1.0"></script>
-    <script src="/src/js/site/loader.js?v=1.0"></script>
-    <script src="/src/js/shared/image-loader.js?v=1.0"></script>
-    <script src="/src/js/site/utils.js?v=1.0"></script>
-    <script src="/src/js/site/sanitizer.js?v=1.0"></script>
-    <script src="/src/js/shared/icons.js?v=1.0"></script>
-    <script src="/src/js/site/navigation.js?v=1.0"></script>
-    <script src="/src/js/site/animations.js?v=1.1"></script>
-    <script src="/src/js/site/modals.js?v=1.1"></script>
-    <script src="/src/js/site/main.js?v=1.0"></script>
-    <script src="/src/js/site/templates.js?v=1.1"></script>
-    <script src="/src/js/site/blog-modal.js?v=1.2"></script>
-    <script src="/src/js/site/data-loader.js?v=1.2"></script>
-    <script src="/src/js/site/analytics.js?v=1.0"></script>
+    <script src="/src/js/shared/helpers.js?v=f6ed1dc8"></script>
+    <script src="/src/js/site/loader.js?v=71c7a8b5"></script>
+    <script src="/src/js/shared/image-loader.js?v=95fbe7f5"></script>
+    <script src="/src/js/site/utils.js?v=c77cdc83"></script>
+    <script src="/src/js/site/sanitizer.js?v=e2719ed9"></script>
+    <script src="/src/js/shared/icons.js?v=77eb6b6d"></script>
+    <script src="/src/js/site/navigation.js?v=a8b0a6d7"></script>
+    <script src="/src/js/site/animations.js?v=4e969b80"></script>
+    <script src="/src/js/site/modals.js?v=d4bb965c"></script>
+    <script src="/src/js/site/main.js?v=81153956"></script>
+    <script src="/src/js/site/templates.js?v=88e7ce84"></script>
+    <script src="/src/js/site/blog-modal.js?v=3b3b0cb1"></script>
+    <script src="/src/js/site/data-loader.js?v=71e98ee8"></script>
+    <script src="/src/js/site/analytics.js?v=717faf50"></script>
 </body>
 </html>

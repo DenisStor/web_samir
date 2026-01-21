@@ -6,7 +6,7 @@
 var AdminState = {
     // Данные
     masters: [],
-    services: { categories: [], podology: { services: [] } },
+    services: { categories: [], podology: { categories: [], consultation: null } },
     articles: [],
     faq: [],
     social: { social: [], phone: '', email: '', address: '' },
@@ -18,6 +18,8 @@ var AdminState = {
 
     // UI состояние
     currentSection: 'stats',
+    currentCategory: 'main',
+    currentPodologyCategory: 'complex',
     isLoading: false,
     editingItem: null,
 
@@ -28,7 +30,7 @@ var AdminState = {
      */
     reset: function() {
         this.masters = [];
-        this.services = { categories: [], podology: { services: [] } };
+        this.services = { categories: [], podology: { categories: [], consultation: null } };
         this.articles = [];
         this.faq = [];
         this.social = { social: [], phone: '', email: '', address: '' };
@@ -36,6 +38,7 @@ var AdminState = {
         this.products = [];
         this.legalDocuments = [];
         this.editingItem = null;
+        this.currentPodologyCategory = 'complex';
     },
 
     /**

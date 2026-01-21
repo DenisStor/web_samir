@@ -346,7 +346,7 @@
 var AdminState = {
     // Данные
     masters: [],
-    services: { categories: [], podology: { services: [] } },
+    services: { categories: [], podology: { categories: [], consultation: null } },
     articles: [],
     faq: [],
     social: { social: [], phone: '', email: '', address: '' },
@@ -358,6 +358,8 @@ var AdminState = {
 
     // UI состояние
     currentSection: 'stats',
+    currentCategory: 'main',
+    currentPodologyCategory: 'complex',
     isLoading: false,
     editingItem: null,
 
@@ -368,7 +370,7 @@ var AdminState = {
      */
     reset: function() {
         this.masters = [];
-        this.services = { categories: [], podology: { services: [] } };
+        this.services = { categories: [], podology: { categories: [], consultation: null } };
         this.articles = [];
         this.faq = [];
         this.social = { social: [], phone: '', email: '', address: '' };
@@ -376,6 +378,7 @@ var AdminState = {
         this.products = [];
         this.legalDocuments = [];
         this.editingItem = null;
+        this.currentPodologyCategory = 'complex';
     },
 
     /**
@@ -3627,11 +3630,29 @@ var AdminRouter = (function() {
         }
     }
 
+    /**
+     * Переключение категории подологии
+     * @param {string} category - ID категории
+     */
+    function switchPodologyCategory(category) {
+        AdminState.currentPodologyCategory = category;
+
+        var tabs = document.querySelectorAll('[data-podology-category]');
+        tabs.forEach(function(tab) {
+            tab.classList.toggle('active', tab.getAttribute('data-podology-category') === category);
+        });
+
+        if (window.AdminServicesRenderer) {
+            AdminServicesRenderer.renderPodology();
+        }
+    }
+
     // Публичный API
     return {
         init: init,
         switchSection: switchSection,
         switchServiceCategory: switchServiceCategory,
+        switchPodologyCategory: switchPodologyCategory,
         renderCurrentSection: renderCurrentSection,
         loadStats: loadStats,
         SECTION_CONFIG: SECTION_CONFIG
@@ -3703,10 +3724,27 @@ var AdminEventHandlers = (function() {
                 AdminServiceForm.remove(category, parseInt(index, 10));
                 break;
             case 'edit-podology':
-                AdminServiceForm.showPodology(parseInt(index, 10));
+                AdminServiceForm.showPodology(category, parseInt(index, 10));
                 break;
             case 'delete-podology':
-                AdminServiceForm.removePodology(parseInt(index, 10));
+                AdminServiceForm.removePodology(category, parseInt(index, 10));
+                break;
+        }
+    }
+
+    /**
+     * Обработка действий с категориями подологии
+     */
+    function handlePodologyCategoryAction(action, id) {
+        switch (action) {
+            case 'add-podology-category':
+                AdminPodologyCategoryForm.show();
+                break;
+            case 'edit-podology-category':
+                AdminPodologyCategoryForm.show(id);
+                break;
+            case 'delete-podology-category':
+                AdminPodologyCategoryForm.remove(id);
                 break;
         }
     }
@@ -3840,6 +3878,13 @@ var AdminEventHandlers = (function() {
      */
     function handleModalSave() {
         var section = AdminState.currentSection;
+        var editing = AdminState.editingItem || {};
+
+        // Проверяем тип редактируемого элемента
+        if (editing.type === 'podology-category') {
+            AdminPodologyCategoryForm.save();
+            return;
+        }
 
         switch (section) {
             case 'masters':
@@ -3881,8 +3926,11 @@ var AdminEventHandlers = (function() {
         'delete-master': function(t) { handleMasterAction('delete-master', t.getAttribute('data-id')); },
         'edit-service': function(t) { handleServiceAction('edit-service', t.getAttribute('data-category'), t.getAttribute('data-index')); },
         'delete-service': function(t) { handleServiceAction('delete-service', t.getAttribute('data-category'), t.getAttribute('data-index')); },
-        'edit-podology': function(t) { handleServiceAction('edit-podology', null, t.getAttribute('data-index')); },
-        'delete-podology': function(t) { handleServiceAction('delete-podology', null, t.getAttribute('data-index')); },
+        'edit-podology': function(t) { handleServiceAction('edit-podology', t.getAttribute('data-category'), t.getAttribute('data-index')); },
+        'delete-podology': function(t) { handleServiceAction('delete-podology', t.getAttribute('data-category'), t.getAttribute('data-index')); },
+        'add-podology-category': function() { handlePodologyCategoryAction('add-podology-category'); },
+        'edit-podology-category': function(t) { handlePodologyCategoryAction('edit-podology-category', t.getAttribute('data-id')); },
+        'delete-podology-category': function(t) { handlePodologyCategoryAction('delete-podology-category', t.getAttribute('data-id')); },
         'edit-article': function(t) { handleArticleAction('edit-article', t.getAttribute('data-id')); },
         'delete-article': function(t) { handleArticleAction('delete-article', t.getAttribute('data-id')); },
         'edit-faq': function(t) { handleFaqAction('edit-faq', t.getAttribute('data-id')); },
@@ -3919,6 +3967,14 @@ var AdminEventHandlers = (function() {
      */
     function initEventDelegation() {
         boundHandlers.documentClick = function(e) {
+            // Обработка табов подологии
+            var podologyTab = e.target.closest('[data-podology-category]');
+            if (podologyTab) {
+                var category = podologyTab.getAttribute('data-podology-category');
+                AdminRouter.switchPodologyCategory(category);
+                return;
+            }
+
             var target = e.target.closest('[data-action]');
             if (target) routeAction(target);
         };
@@ -3970,6 +4026,14 @@ var AdminEventHandlers = (function() {
         bindClick(elements.modalCancel, function() { AdminModals.close('modal'); });
         bindClick(elements.modalSave, handleModalSave);
         bindClick(elements.saveSocialBtn, function() { if (window.AdminSocialRenderer) AdminSocialRenderer.save(); });
+
+        // Podology categories button
+        var managePodologyCategoriesBtn = document.getElementById('managePodologyCategoriesBtn');
+        bindClick(managePodologyCategoriesBtn, function() {
+            if (window.AdminPodologyCategoryForm) {
+                AdminPodologyCategoryForm.showList();
+            }
+        });
 
         // Modal overlay click
         bindClick(elements.modalOverlay, function(e) {
@@ -4695,14 +4759,21 @@ var AdminServicesRenderer = (function() {
      */
     function reorderPodology(newOrder) {
         var services = AdminState.services || {};
+        var currentCategory = AdminState.currentPodologyCategory || 'complex';
 
-        if (!services.podology || !services.podology.services) return;
+        if (!services.podology || !services.podology.categories) return;
+
+        var category = services.podology.categories.find(function(c) {
+            return c.id === currentCategory;
+        });
+
+        if (!category || !category.services) return;
 
         var reordered = newOrder.map(function(id) {
-            return services.podology.services.find(function(s) { return String(s.id) === String(id); });
+            return category.services.find(function(s) { return String(s.id) === String(id); });
         }).filter(Boolean);
 
-        services.podology.services = reordered;
+        category.services = reordered;
 
         AdminAPI.save('services', services)
             .then(function() {
@@ -4771,34 +4842,84 @@ var AdminServicesRenderer = (function() {
     }
 
     /**
+     * Рендеринг табов категорий подологии
+     */
+    function renderPodologyTabs() {
+        var tabsContainer = document.getElementById('podologyCategoryTabs');
+        if (!tabsContainer) return;
+
+        var services = AdminState.services || {};
+        var podology = services.podology || {};
+        var categories = podology.categories || [];
+
+        if (categories.length === 0) {
+            tabsContainer.innerHTML = '';
+            return;
+        }
+
+        var currentCategory = AdminState.currentPodologyCategory || categories[0].id;
+
+        var html = categories.map(function(cat) {
+            var activeClass = cat.id === currentCategory ? ' active' : '';
+            return '<button class="tab' + activeClass + '" data-podology-category="' + cat.id + '">' +
+                escapeHtml(cat.name) +
+            '</button>';
+        }).join('');
+
+        tabsContainer.innerHTML = html;
+    }
+
+    /**
      * Рендеринг услуг подологии
      */
     function renderPodology() {
+        // Рендерим табы категорий
+        renderPodologyTabs();
+
         if (!podologyList) {
             podologyList = document.getElementById('podologyList');
             if (!podologyList) return;
         }
 
         var services = AdminState.services || {};
-        var podologyServices = (services.podology && services.podology.services) || [];
+        var podology = services.podology || {};
+        var categories = podology.categories || [];
 
-        if (podologyServices.length === 0) {
-            podologyList.innerHTML = '<p class="empty-message">Нет услуг подологии</p>';
+        if (categories.length === 0) {
+            podologyList.innerHTML = '<p class="empty-message">Нет категорий. Добавьте категорию через кнопку "Категории".</p>';
             return;
         }
 
-        var html = podologyServices.map(function(service, index) {
-            return '<div class="service-item" data-id="' + service.id + '" data-index="' + index + '" data-search="' + escapeAttr(service.name) + '" draggable="true">' +
+        var currentCategory = AdminState.currentPodologyCategory || categories[0].id;
+        var category = categories.find(function(c) { return c.id === currentCategory; });
+
+        if (!category) {
+            category = categories[0];
+            AdminState.currentPodologyCategory = category.id;
+        }
+
+        var categoryServices = category.services || [];
+
+        if (categoryServices.length === 0) {
+            podologyList.innerHTML = '<p class="empty-message">Нет услуг в этой категории</p>';
+            return;
+        }
+
+        var html = categoryServices.map(function(service, index) {
+            var featuredClass = service.featured ? ' featured' : '';
+            var durationHtml = service.duration ? '<span class="service-duration">' + escapeHtml(service.duration) + '</span>' : '';
+
+            return '<div class="service-item' + featuredClass + '" data-id="' + service.id + '" data-index="' + index + '" data-search="' + escapeAttr(service.name) + '" draggable="true">' +
                 '<div class="drag-handle" title="Перетащите для изменения порядка">' + SharedIcons.get('grip') + '</div>' +
-                '<span class="service-name">' + escapeHtml(service.name) + '</span>' +
+                '<span class="service-name">' + escapeHtml(service.name) + durationHtml + '</span>' +
                 '<div class="service-prices">' +
                     '<span class="price-tag price-single">' + escapeHtml(service.price) + '</span>' +
                 '</div>' +
                 '<div class="service-actions">' +
-                    '<button class="btn btn-icon" data-action="edit-podology" data-index="' + index + '" title="Редактировать">' +
+                    '<button class="btn btn-icon" data-action="edit-podology" data-category="' + currentCategory + '" data-index="' + index + '" title="Редактировать">' +
                         SharedIcons.get('edit') +
                     '</button>' +
-                    '<button class="btn btn-icon danger" data-action="delete-podology" data-index="' + index + '" data-name="' + escapeAttr(service.name) + '" title="Удалить">' +
+                    '<button class="btn btn-icon danger" data-action="delete-podology" data-category="' + currentCategory + '" data-index="' + index + '" data-name="' + escapeAttr(service.name) + '" title="Удалить">' +
                         SharedIcons.get('delete') +
                     '</button>' +
                 '</div>' +
@@ -5912,17 +6033,22 @@ var AdminServiceForm = (function() {
     /**
      * Показать форму услуги подологии
      */
-    function showPodology(index) {
+    function showPodology(categoryId, index) {
+        categoryId = categoryId || AdminState.currentPodologyCategory || 'complex';
+
         var services = AdminState.services || {};
-        var podologyServices = (services.podology && services.podology.services) || [];
+        var podology = services.podology || {};
+        var categories = podology.categories || [];
+        var category = categories.find(function(c) { return c.id === categoryId; });
         var service = null;
 
-        if (index !== null && index !== undefined) {
-            service = podologyServices[index];
+        if (category && index !== null && index !== undefined) {
+            service = category.services[index];
         }
 
         AdminState.editingItem = {
             type: 'podology',
+            categoryId: categoryId,
             index: index,
             service: service
         };
@@ -5935,8 +6061,18 @@ var AdminServiceForm = (function() {
                 '<input type="text" class="form-input" id="podologyName" value="' + window.escapeHtml(service && service.name || '') + '" placeholder="Введите название услуги" required>' +
             '</div>' +
             '<div class="form-group">' +
+                '<label class="form-label">Длительность</label>' +
+                '<input type="text" class="form-input" id="podologyDuration" value="' + window.escapeHtml(service && service.duration || '') + '" placeholder="1 час 30 минут">' +
+            '</div>' +
+            '<div class="form-group">' +
                 '<label class="form-label">Цена</label>' +
-                '<input type="text" class="form-input" id="podologyPrice" value="' + window.escapeHtml(service && service.price || '') + '" placeholder="от 2000 ₽">' +
+                '<input type="text" class="form-input" id="podologyPrice" value="' + window.escapeHtml(service && service.price || '') + '" placeholder="2500 ₽">' +
+            '</div>' +
+            '<div class="form-group">' +
+                '<label class="form-checkbox">' +
+                    '<input type="checkbox" id="podologyFeatured"' + (service && service.featured ? ' checked' : '') + '>' +
+                    '<span>Выделить услугу</span>' +
+                '</label>' +
             '</div>' +
         '</form>';
 
@@ -6038,6 +6174,7 @@ var AdminServiceForm = (function() {
      */
     async function savePodology() {
         var editing = AdminState.editingItem || {};
+        var categoryId = editing.categoryId;
         var index = editing.index;
 
         var nameEl = document.getElementById('podologyName');
@@ -6048,28 +6185,44 @@ var AdminServiceForm = (function() {
             return;
         }
 
+        var durationEl = document.getElementById('podologyDuration');
         var priceEl = document.getElementById('podologyPrice');
-        var price = priceEl ? priceEl.value.trim() : 'Уточняйте';
+        var featuredEl = document.getElementById('podologyFeatured');
 
         var serviceData = {
-            id: editing.service ? editing.service.id : SharedHelpers.generateId('service'),
+            id: editing.service ? editing.service.id : SharedHelpers.generateId('pod'),
             name: name,
-            price: price || 'Уточняйте'
+            duration: durationEl ? durationEl.value.trim() : '',
+            price: priceEl ? priceEl.value.trim() : 'Уточняйте',
+            featured: featuredEl ? featuredEl.checked : false
         };
 
         var services = AdminState.services || {};
 
         if (!services.podology) {
-            services.podology = { services: [] };
+            services.podology = { categories: [], consultation: null };
         }
-        if (!services.podology.services) {
-            services.podology.services = [];
+        if (!services.podology.categories) {
+            services.podology.categories = [];
+        }
+
+        var category = services.podology.categories.find(function(c) {
+            return c.id === categoryId;
+        });
+
+        if (!category) {
+            showToast('Категория не найдена', 'error');
+            return;
+        }
+
+        if (!category.services) {
+            category.services = [];
         }
 
         if (index !== null && index !== undefined) {
-            services.podology.services[index] = serviceData;
+            category.services[index] = serviceData;
         } else {
-            services.podology.services.push(serviceData);
+            category.services.push(serviceData);
         }
 
         try {
@@ -6113,15 +6266,20 @@ var AdminServiceForm = (function() {
     /**
      * Удалить услугу подологии
      */
-    async function removePodology(index) {
+    async function removePodology(categoryId, index) {
         if (!confirm('Вы уверены, что хотите удалить эту услугу?')) {
             return;
         }
 
         var services = AdminState.services || {};
 
-        if (services.podology && services.podology.services) {
-            services.podology.services.splice(index, 1);
+        if (services.podology && services.podology.categories) {
+            var category = services.podology.categories.find(function(c) {
+                return c.id === categoryId;
+            });
+            if (category && category.services) {
+                category.services.splice(index, 1);
+            }
         }
 
         try {
@@ -6147,6 +6305,237 @@ var AdminServiceForm = (function() {
 
 // Экспорт
 window.AdminServiceForm = AdminServiceForm;
+
+
+// ============= forms/podology-category-form.js =============
+
+/**
+ * Admin Podology Category Form
+ * Форма добавления/редактирования категорий подологии
+ */
+
+var AdminPodologyCategoryForm = (function() {
+    'use strict';
+
+    var availableIcons = [
+        { id: 'layers', name: 'Слои' },
+        { id: 'heart', name: 'Сердце' },
+        { id: 'plus-circle', name: 'Плюс' }
+    ];
+
+    /**
+     * Показать список категорий для управления
+     */
+    function showList() {
+        var services = AdminState.services || {};
+        var podology = services.podology || {};
+        var categories = podology.categories || [];
+
+        var listHtml = categories.length > 0
+            ? categories.map(function(cat, index) {
+                return '<div class="category-item" data-id="' + cat.id + '">' +
+                    '<div class="category-info">' +
+                        '<strong>' + escapeHtml(cat.name) + '</strong>' +
+                        '<span>' + (cat.services ? cat.services.length : 0) + ' услуг</span>' +
+                    '</div>' +
+                    '<div class="category-actions">' +
+                        '<button class="btn btn-icon" data-action="edit-podology-category" data-id="' + cat.id + '" title="Редактировать">' +
+                            SharedIcons.get('edit') +
+                        '</button>' +
+                        '<button class="btn btn-icon danger" data-action="delete-podology-category" data-id="' + cat.id + '" title="Удалить">' +
+                            SharedIcons.get('delete') +
+                        '</button>' +
+                    '</div>' +
+                '</div>';
+            }).join('')
+            : '<p class="empty-message">Нет категорий</p>';
+
+        var html = '<div class="categories-manager">' +
+            '<div class="categories-list">' + listHtml + '</div>' +
+            '<button class="btn btn-primary" data-action="add-podology-category" style="margin-top: 16px;">' +
+                SharedIcons.get('plus') + ' Добавить категорию' +
+            '</button>' +
+        '</div>';
+
+        AdminModals.setTitle('modal', 'Управление категориями');
+        var modalBody = document.getElementById('modalBody');
+        if (modalBody) {
+            modalBody.innerHTML = html;
+        }
+
+        // Скрываем стандартную кнопку сохранения
+        var modalSave = document.getElementById('modalSave');
+        if (modalSave) {
+            modalSave.style.display = 'none';
+        }
+
+        AdminModals.open('modal');
+    }
+
+    /**
+     * Показать форму категории
+     */
+    function show(categoryId) {
+        var services = AdminState.services || {};
+        var podology = services.podology || {};
+        var categories = podology.categories || [];
+        var category = null;
+
+        if (categoryId) {
+            category = categories.find(function(c) { return c.id === categoryId; });
+        }
+
+        AdminState.editingItem = {
+            type: 'podology-category',
+            categoryId: categoryId,
+            category: category
+        };
+
+        var title = category ? 'Редактировать категорию' : 'Добавить категорию';
+
+        var iconsHtml = availableIcons.map(function(icon) {
+            var selected = category && category.icon === icon.id ? ' selected' : '';
+            return '<option value="' + icon.id + '"' + selected + '>' + icon.name + '</option>';
+        }).join('');
+
+        var html = '<form id="podologyCategoryForm" class="admin-form">' +
+            '<div class="form-group">' +
+                '<label class="form-label">Название категории *</label>' +
+                '<input type="text" class="form-input" id="podCategoryName" value="' + escapeHtml(category && category.name || '') + '" placeholder="Комплексные программы" required>' +
+            '</div>' +
+            '<div class="form-group">' +
+                '<label class="form-label">Описание</label>' +
+                '<input type="text" class="form-input" id="podCategoryDescription" value="' + escapeHtml(category && category.description || '') + '" placeholder="Выгодные пакеты услуг">' +
+            '</div>' +
+            '<div class="form-row">' +
+                '<div class="form-group">' +
+                    '<label class="form-label">Иконка</label>' +
+                    '<select class="form-select" id="podCategoryIcon">' + iconsHtml + '</select>' +
+                '</div>' +
+                '<div class="form-group">' +
+                    '<label class="form-label">Бейдж</label>' +
+                    '<input type="text" class="form-input" id="podCategoryBadge" value="' + escapeHtml(category && category.badge || '') + '" placeholder="Выгодно">' +
+                '</div>' +
+            '</div>' +
+        '</form>';
+
+        AdminModals.setTitle('modal', title);
+        var modalBody = document.getElementById('modalBody');
+        if (modalBody) {
+            modalBody.innerHTML = html;
+        }
+
+        // Показываем кнопку сохранения
+        var modalSave = document.getElementById('modalSave');
+        if (modalSave) {
+            modalSave.style.display = '';
+        }
+
+        AdminModals.open('modal');
+    }
+
+    /**
+     * Сохранить категорию
+     */
+    async function save() {
+        var editing = AdminState.editingItem || {};
+        if (editing.type !== 'podology-category') return;
+
+        var nameEl = document.getElementById('podCategoryName');
+        var name = nameEl ? nameEl.value.trim() : '';
+
+        if (!name) {
+            showToast('Введите название категории', 'error');
+            return;
+        }
+
+        var descEl = document.getElementById('podCategoryDescription');
+        var iconEl = document.getElementById('podCategoryIcon');
+        var badgeEl = document.getElementById('podCategoryBadge');
+
+        var categoryData = {
+            id: editing.category ? editing.category.id : name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+            name: name,
+            description: descEl ? descEl.value.trim() : '',
+            icon: iconEl ? iconEl.value : 'heart',
+            badge: badgeEl ? badgeEl.value.trim() : '',
+            services: editing.category ? editing.category.services : []
+        };
+
+        var services = AdminState.services || {};
+        if (!services.podology) {
+            services.podology = { categories: [], consultation: null };
+        }
+        if (!services.podology.categories) {
+            services.podology.categories = [];
+        }
+
+        if (editing.categoryId) {
+            var index = services.podology.categories.findIndex(function(c) {
+                return c.id === editing.categoryId;
+            });
+            if (index !== -1) {
+                services.podology.categories[index] = categoryData;
+            }
+        } else {
+            services.podology.categories.push(categoryData);
+        }
+
+        try {
+            await AdminAPI.save('services', services);
+            AdminState.setServices(services);
+            showToast('Категория сохранена', 'success');
+            AdminModals.close('modal');
+            AdminServicesRenderer.renderPodology();
+        } catch (error) {
+            showToast('Ошибка сохранения: ' + error.message, 'error');
+        }
+    }
+
+    /**
+     * Удалить категорию
+     */
+    async function remove(categoryId) {
+        if (!confirm('Удалить категорию и все её услуги?')) {
+            return;
+        }
+
+        var services = AdminState.services || {};
+        if (!services.podology || !services.podology.categories) return;
+
+        services.podology.categories = services.podology.categories.filter(function(c) {
+            return c.id !== categoryId;
+        });
+
+        // Если удалили текущую категорию, переключаемся на первую
+        if (AdminState.currentPodologyCategory === categoryId) {
+            AdminState.currentPodologyCategory = services.podology.categories.length > 0
+                ? services.podology.categories[0].id
+                : '';
+        }
+
+        try {
+            await AdminAPI.save('services', services);
+            AdminState.setServices(services);
+            showToast('Категория удалена', 'success');
+            AdminModals.close('modal');
+            AdminServicesRenderer.renderPodology();
+        } catch (error) {
+            showToast('Ошибка удаления: ' + error.message, 'error');
+        }
+    }
+
+    // Публичный API
+    return {
+        showList: showList,
+        show: show,
+        save: save,
+        remove: remove
+    };
+})();
+
+// Экспорт
+window.AdminPodologyCategoryForm = AdminPodologyCategoryForm;
 
 
 // ============= forms/article-form.js =============

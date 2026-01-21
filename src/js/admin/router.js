@@ -229,11 +229,29 @@ var AdminRouter = (function() {
         }
     }
 
+    /**
+     * Переключение категории подологии
+     * @param {string} category - ID категории
+     */
+    function switchPodologyCategory(category) {
+        AdminState.currentPodologyCategory = category;
+
+        var tabs = document.querySelectorAll('[data-podology-category]');
+        tabs.forEach(function(tab) {
+            tab.classList.toggle('active', tab.getAttribute('data-podology-category') === category);
+        });
+
+        if (window.AdminServicesRenderer) {
+            AdminServicesRenderer.renderPodology();
+        }
+    }
+
     // Публичный API
     return {
         init: init,
         switchSection: switchSection,
         switchServiceCategory: switchServiceCategory,
+        switchPodologyCategory: switchPodologyCategory,
         renderCurrentSection: renderCurrentSection,
         loadStats: loadStats,
         SECTION_CONFIG: SECTION_CONFIG

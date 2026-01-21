@@ -16,7 +16,9 @@ Build script для сборки HTML страниц из секций и admin.
 Порядок модулей admin определён в ADMIN_MODULES.
 """
 
+import hashlib
 import os
+import re
 import sys
 import time
 from pathlib import Path
@@ -124,6 +126,7 @@ ADMIN_MODULES = [
     # Forms
     'forms/master-form.js',
     'forms/service-form.js',
+    'forms/podology-category-form.js',
     'forms/article-form.js',
     'forms/faq-form.js',
     'forms/category-form.js',
@@ -141,6 +144,70 @@ SECTIONS_DIR = SRC_DIR / 'sections'
 SHARED_MODULES_DIR = SRC_DIR / 'js' / 'shared'
 ADMIN_MODULES_DIR = SRC_DIR / 'js' / 'admin'
 ADMIN_BUNDLE_FILE = SRC_DIR / 'js' / 'admin.bundle.js'
+
+# CSS файлы с @import (требуют рекурсивного хеша)
+CSS_BUNDLES = {
+    '/src/css/shared/index.css',
+    '/src/css/site/index.css',
+    '/src/css/shop/index.css',
+    '/src/css/admin/index.css',
+    '/src/css/legal/index.css',
+}
+
+
+def get_file_hash(filepath, length=8):
+    """Вычисляет MD5 хеш файла."""
+    if not filepath.exists():
+        return None
+    content = filepath.read_bytes()
+    return hashlib.md5(content).hexdigest()[:length]
+
+
+def get_css_bundle_hash(css_path, length=8):
+    """Хеширует CSS с учётом всех @import."""
+    if not css_path.exists():
+        return None
+
+    hasher = hashlib.md5()
+    visited = set()
+
+    def process_file(filepath):
+        if filepath in visited or not filepath.exists():
+            return
+        visited.add(filepath)
+
+        content = filepath.read_text(encoding='utf-8')
+        hasher.update(content.encode('utf-8'))
+
+        # Парсим @import
+        import_pattern = r"@import\s+['\"]([^'\"]+)['\"]"
+        for match in re.finditer(import_pattern, content):
+            import_path = filepath.parent / match.group(1)
+            process_file(import_path)
+
+    process_file(css_path)
+    return hasher.hexdigest()[:length]
+
+
+def update_asset_versions(html, base_dir):
+    """Заменяет ?v=X.X на ?v={hash} для CSS и JS."""
+
+    def replace_version(match):
+        attr = match.group(1)   # href или src
+        path = match.group(2)   # /src/css/... или /src/js/...
+        filepath = base_dir / path.lstrip('/')
+
+        if path in CSS_BUNDLES:
+            file_hash = get_css_bundle_hash(filepath)
+        else:
+            file_hash = get_file_hash(filepath)
+
+        if file_hash:
+            return '{}="{}"'.format(attr, path + '?v=' + file_hash)
+        return match.group(0)
+
+    pattern = r'(href|src)="(/src/(?:css|js)/[^"]+)\?v=[^"]*"'
+    return re.sub(pattern, replace_version, html)
 
 
 def build_page(page_name):
@@ -167,6 +234,9 @@ def build_page(page_name):
 
     # Собираем финальный HTML
     html = '\n'.join(parts)
+
+    # Автоматический cache busting
+    html = update_asset_versions(html, BASE_DIR)
 
     # Записываем результат
     output_file.write_text(html, encoding='utf-8')

@@ -74,7 +74,7 @@
                 if (!targetTab) return;
 
                 // Убрать active со всех табов
-                tabButtons.forEach(function(btn) { toggleClass(btn, 'active', false); });
+                $$('.podology-tab').forEach(function(btn) { toggleClass(btn, 'active', false); });
 
                 // Добавить active на кликнутый таб
                 toggleClass(button, 'active', true);
@@ -92,6 +92,16 @@
             });
         });
     }
+
+    /**
+     * Реинициализация табов подологии (после динамической загрузки)
+     */
+    function reinitPodologyTabs() {
+        initPodologyTabs();
+    }
+
+    // Экспорт в SaysApp
+    SaysApp.reinitPodologyTabs = reinitPodologyTabs;
 
     // Запуск при готовности DOM
     ready(initServiceTabs);

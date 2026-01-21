@@ -57,10 +57,27 @@ var AdminEventHandlers = (function() {
                 AdminServiceForm.remove(category, parseInt(index, 10));
                 break;
             case 'edit-podology':
-                AdminServiceForm.showPodology(parseInt(index, 10));
+                AdminServiceForm.showPodology(category, parseInt(index, 10));
                 break;
             case 'delete-podology':
-                AdminServiceForm.removePodology(parseInt(index, 10));
+                AdminServiceForm.removePodology(category, parseInt(index, 10));
+                break;
+        }
+    }
+
+    /**
+     * Обработка действий с категориями подологии
+     */
+    function handlePodologyCategoryAction(action, id) {
+        switch (action) {
+            case 'add-podology-category':
+                AdminPodologyCategoryForm.show();
+                break;
+            case 'edit-podology-category':
+                AdminPodologyCategoryForm.show(id);
+                break;
+            case 'delete-podology-category':
+                AdminPodologyCategoryForm.remove(id);
                 break;
         }
     }
@@ -194,6 +211,13 @@ var AdminEventHandlers = (function() {
      */
     function handleModalSave() {
         var section = AdminState.currentSection;
+        var editing = AdminState.editingItem || {};
+
+        // Проверяем тип редактируемого элемента
+        if (editing.type === 'podology-category') {
+            AdminPodologyCategoryForm.save();
+            return;
+        }
 
         switch (section) {
             case 'masters':
@@ -235,8 +259,11 @@ var AdminEventHandlers = (function() {
         'delete-master': function(t) { handleMasterAction('delete-master', t.getAttribute('data-id')); },
         'edit-service': function(t) { handleServiceAction('edit-service', t.getAttribute('data-category'), t.getAttribute('data-index')); },
         'delete-service': function(t) { handleServiceAction('delete-service', t.getAttribute('data-category'), t.getAttribute('data-index')); },
-        'edit-podology': function(t) { handleServiceAction('edit-podology', null, t.getAttribute('data-index')); },
-        'delete-podology': function(t) { handleServiceAction('delete-podology', null, t.getAttribute('data-index')); },
+        'edit-podology': function(t) { handleServiceAction('edit-podology', t.getAttribute('data-category'), t.getAttribute('data-index')); },
+        'delete-podology': function(t) { handleServiceAction('delete-podology', t.getAttribute('data-category'), t.getAttribute('data-index')); },
+        'add-podology-category': function() { handlePodologyCategoryAction('add-podology-category'); },
+        'edit-podology-category': function(t) { handlePodologyCategoryAction('edit-podology-category', t.getAttribute('data-id')); },
+        'delete-podology-category': function(t) { handlePodologyCategoryAction('delete-podology-category', t.getAttribute('data-id')); },
         'edit-article': function(t) { handleArticleAction('edit-article', t.getAttribute('data-id')); },
         'delete-article': function(t) { handleArticleAction('delete-article', t.getAttribute('data-id')); },
         'edit-faq': function(t) { handleFaqAction('edit-faq', t.getAttribute('data-id')); },
@@ -273,6 +300,14 @@ var AdminEventHandlers = (function() {
      */
     function initEventDelegation() {
         boundHandlers.documentClick = function(e) {
+            // Обработка табов подологии
+            var podologyTab = e.target.closest('[data-podology-category]');
+            if (podologyTab) {
+                var category = podologyTab.getAttribute('data-podology-category');
+                AdminRouter.switchPodologyCategory(category);
+                return;
+            }
+
             var target = e.target.closest('[data-action]');
             if (target) routeAction(target);
         };
@@ -324,6 +359,14 @@ var AdminEventHandlers = (function() {
         bindClick(elements.modalCancel, function() { AdminModals.close('modal'); });
         bindClick(elements.modalSave, handleModalSave);
         bindClick(elements.saveSocialBtn, function() { if (window.AdminSocialRenderer) AdminSocialRenderer.save(); });
+
+        // Podology categories button
+        var managePodologyCategoriesBtn = document.getElementById('managePodologyCategoriesBtn');
+        bindClick(managePodologyCategoriesBtn, function() {
+            if (window.AdminPodologyCategoryForm) {
+                AdminPodologyCategoryForm.showList();
+            }
+        });
 
         // Modal overlay click
         bindClick(elements.modalOverlay, function(e) {

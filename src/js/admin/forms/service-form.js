@@ -69,17 +69,22 @@ var AdminServiceForm = (function() {
     /**
      * Показать форму услуги подологии
      */
-    function showPodology(index) {
+    function showPodology(categoryId, index) {
+        categoryId = categoryId || AdminState.currentPodologyCategory || 'complex';
+
         var services = AdminState.services || {};
-        var podologyServices = (services.podology && services.podology.services) || [];
+        var podology = services.podology || {};
+        var categories = podology.categories || [];
+        var category = categories.find(function(c) { return c.id === categoryId; });
         var service = null;
 
-        if (index !== null && index !== undefined) {
-            service = podologyServices[index];
+        if (category && index !== null && index !== undefined) {
+            service = category.services[index];
         }
 
         AdminState.editingItem = {
             type: 'podology',
+            categoryId: categoryId,
             index: index,
             service: service
         };
@@ -92,8 +97,18 @@ var AdminServiceForm = (function() {
                 '<input type="text" class="form-input" id="podologyName" value="' + window.escapeHtml(service && service.name || '') + '" placeholder="Введите название услуги" required>' +
             '</div>' +
             '<div class="form-group">' +
+                '<label class="form-label">Длительность</label>' +
+                '<input type="text" class="form-input" id="podologyDuration" value="' + window.escapeHtml(service && service.duration || '') + '" placeholder="1 час 30 минут">' +
+            '</div>' +
+            '<div class="form-group">' +
                 '<label class="form-label">Цена</label>' +
-                '<input type="text" class="form-input" id="podologyPrice" value="' + window.escapeHtml(service && service.price || '') + '" placeholder="от 2000 ₽">' +
+                '<input type="text" class="form-input" id="podologyPrice" value="' + window.escapeHtml(service && service.price || '') + '" placeholder="2500 ₽">' +
+            '</div>' +
+            '<div class="form-group">' +
+                '<label class="form-checkbox">' +
+                    '<input type="checkbox" id="podologyFeatured"' + (service && service.featured ? ' checked' : '') + '>' +
+                    '<span>Выделить услугу</span>' +
+                '</label>' +
             '</div>' +
         '</form>';
 
@@ -195,6 +210,7 @@ var AdminServiceForm = (function() {
      */
     async function savePodology() {
         var editing = AdminState.editingItem || {};
+        var categoryId = editing.categoryId;
         var index = editing.index;
 
         var nameEl = document.getElementById('podologyName');
@@ -205,28 +221,44 @@ var AdminServiceForm = (function() {
             return;
         }
 
+        var durationEl = document.getElementById('podologyDuration');
         var priceEl = document.getElementById('podologyPrice');
-        var price = priceEl ? priceEl.value.trim() : 'Уточняйте';
+        var featuredEl = document.getElementById('podologyFeatured');
 
         var serviceData = {
-            id: editing.service ? editing.service.id : SharedHelpers.generateId('service'),
+            id: editing.service ? editing.service.id : SharedHelpers.generateId('pod'),
             name: name,
-            price: price || 'Уточняйте'
+            duration: durationEl ? durationEl.value.trim() : '',
+            price: priceEl ? priceEl.value.trim() : 'Уточняйте',
+            featured: featuredEl ? featuredEl.checked : false
         };
 
         var services = AdminState.services || {};
 
         if (!services.podology) {
-            services.podology = { services: [] };
+            services.podology = { categories: [], consultation: null };
         }
-        if (!services.podology.services) {
-            services.podology.services = [];
+        if (!services.podology.categories) {
+            services.podology.categories = [];
+        }
+
+        var category = services.podology.categories.find(function(c) {
+            return c.id === categoryId;
+        });
+
+        if (!category) {
+            showToast('Категория не найдена', 'error');
+            return;
+        }
+
+        if (!category.services) {
+            category.services = [];
         }
 
         if (index !== null && index !== undefined) {
-            services.podology.services[index] = serviceData;
+            category.services[index] = serviceData;
         } else {
-            services.podology.services.push(serviceData);
+            category.services.push(serviceData);
         }
 
         try {
@@ -270,15 +302,20 @@ var AdminServiceForm = (function() {
     /**
      * Удалить услугу подологии
      */
-    async function removePodology(index) {
+    async function removePodology(categoryId, index) {
         if (!confirm('Вы уверены, что хотите удалить эту услугу?')) {
             return;
         }
 
         var services = AdminState.services || {};
 
-        if (services.podology && services.podology.services) {
-            services.podology.services.splice(index, 1);
+        if (services.podology && services.podology.categories) {
+            var category = services.podology.categories.find(function(c) {
+                return c.id === categoryId;
+            });
+            if (category && category.services) {
+                category.services.splice(index, 1);
+            }
         }
 
         try {
