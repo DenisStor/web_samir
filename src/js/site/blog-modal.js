@@ -10,8 +10,8 @@ var BlogModal = (function () {
     var escapeAttr = window.SharedHelpers ? SharedHelpers.escapeAttr : window.escapeAttr;
     var formatDate = window.SharedHelpers ? SharedHelpers.formatDate : window.formatDate;
 
-    // Store escape handler reference for cleanup
-    var currentEscapeHandler = null;
+    // Store escape cleanup function
+    var removeEscapeHandler = null;
 
     // Store original function if exists
     var originalOpenBlogModal = null;
@@ -136,17 +136,12 @@ var BlogModal = (function () {
         SharedHelpers.lockScroll(true);
 
         // Remove previous escape handler if exists
-        if (currentEscapeHandler) {
-            document.removeEventListener('keydown', currentEscapeHandler);
+        if (removeEscapeHandler) {
+            removeEscapeHandler();
         }
 
         // Handle escape key
-        currentEscapeHandler = function (e) {
-            if (e.key === 'Escape') {
-                close();
-            }
-        };
-        document.addEventListener('keydown', currentEscapeHandler);
+        removeEscapeHandler = SaysApp.onEscape(close);
     }
 
     /**
@@ -175,9 +170,9 @@ var BlogModal = (function () {
      * Закрыть модальное окно блога
      */
     function close() {
-        if (currentEscapeHandler) {
-            document.removeEventListener('keydown', currentEscapeHandler);
-            currentEscapeHandler = null;
+        if (removeEscapeHandler) {
+            removeEscapeHandler();
+            removeEscapeHandler = null;
         }
 
         if (typeof originalCloseBlogModal === 'function') {
@@ -208,9 +203,9 @@ var BlogModal = (function () {
      * Очистка
      */
     function cleanup() {
-        if (currentEscapeHandler) {
-            document.removeEventListener('keydown', currentEscapeHandler);
-            currentEscapeHandler = null;
+        if (removeEscapeHandler) {
+            removeEscapeHandler();
+            removeEscapeHandler = null;
         }
     }
 
