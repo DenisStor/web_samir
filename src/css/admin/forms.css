@@ -1,5 +1,9 @@
 /* =====================================================================
    FORMS.CSS - Стили форм админ-панели
+   =====================================================================
+   ВНИМАНИЕ: Admin НЕ подключает shared CSS. .form-input здесь —
+   автономное определение (padding 14px 16px, bg-dark), отличается от
+   shared/components.css (padding 16px 20px, bg-light). Это НЕ дубль.
    ===================================================================== */
 
 .form-group {
@@ -232,38 +236,3 @@
     margin-left: 4px;
 }
 
-/* =================================================================
-   PRINCIPLES LIST (Master form)
-   ================================================================= */
-
-.principles-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 12px;
-}
-
-.principle-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.principle-item .form-input {
-    flex: 1;
-}
-
-.principle-item .btn-icon {
-    flex-shrink: 0;
-}
-
-.add-principle {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.add-principle svg {
-    width: 16px;
-    height: 16px;
-}
