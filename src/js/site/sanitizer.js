@@ -69,16 +69,16 @@
     };
 
     /**
-     * escapeHtml — использует SharedHelpers если доступен, иначе собственная реализация.
-     * На admin-странице helpers.js загружается позже через bundle.
+     * escapeHtml — делегирует в window.escapeHtml (из helpers.js).
+     * Fallback для случая, когда helpers.js ещё не загрузился (admin bundle).
      */
-    function escapeHtml(text) {
+    var escapeHtml = window.escapeHtml || function (text) {
         if (text === null || text === undefined) return '';
         var str = String(text);
         var div = document.createElement('div');
         div.textContent = str;
         return div.innerHTML;
-    }
+    };
 
     /**
      * Sanitize HTML content
