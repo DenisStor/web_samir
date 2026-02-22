@@ -190,7 +190,7 @@
     width: 100%;
     position: relative;
     border: 1px solid var(--accent-green-subtle);
-    animation: slideUp var(--transition-slow);
+    animation: fadeInUp var(--transition-slow);
     overflow: hidden;
 }
 
