@@ -3850,8 +3850,7 @@ var AdminEventHandlers = (function () {
     // Ссылки на handlers для cleanup
     var boundHandlers = {
         documentClick: null,
-        documentChange: null,
-        documentKeydown: null
+        documentChange: null
     };
 
     /**
@@ -4280,12 +4279,6 @@ var AdminEventHandlers = (function () {
         bindClick(elements.modalOverlay, function (e) {
             if (e.target === elements.modalOverlay) AdminModals.close('modal');
         });
-
-        // Escape key
-        boundHandlers.documentKeydown = function (e) {
-            if (e.key === 'Escape') AdminModals.closeCurrent();
-        };
-        document.addEventListener('keydown', boundHandlers.documentKeydown);
     }
 
     /**
@@ -4299,10 +4292,6 @@ var AdminEventHandlers = (function () {
         if (boundHandlers.documentChange) {
             document.removeEventListener('change', boundHandlers.documentChange);
             boundHandlers.documentChange = null;
-        }
-        if (boundHandlers.documentKeydown) {
-            document.removeEventListener('keydown', boundHandlers.documentKeydown);
-            boundHandlers.documentKeydown = null;
         }
 
         elements = null;
