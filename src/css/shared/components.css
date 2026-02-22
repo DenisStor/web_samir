@@ -6,6 +6,15 @@
    ===================================================================== */
 
 /* =================================================================
+   ССЫЛКИ - Утилитарные стили
+   ================================================================= */
+
+.link-plain {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* =================================================================
    КНОПКИ - Базовые стили
    ================================================================= */
 
@@ -423,19 +432,25 @@ textarea.form-input {
     transition-delay: 0ms;
 }
 .stagger-item:nth-child(2) {
-    transition-delay: 50ms;
-}
-.stagger-item:nth-child(3) {
     transition-delay: 100ms;
 }
-.stagger-item:nth-child(4) {
-    transition-delay: 150ms;
-}
-.stagger-item:nth-child(5) {
+.stagger-item:nth-child(3) {
     transition-delay: 200ms;
 }
+.stagger-item:nth-child(4) {
+    transition-delay: 300ms;
+}
+.stagger-item:nth-child(5) {
+    transition-delay: 400ms;
+}
 .stagger-item:nth-child(6) {
-    transition-delay: 250ms;
+    transition-delay: 500ms;
+}
+.stagger-item:nth-child(7) {
+    transition-delay: 600ms;
+}
+.stagger-item:nth-child(8) {
+    transition-delay: 700ms;
 }
 
 @media (prefers-reduced-motion: reduce) {

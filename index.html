@@ -134,8 +134,8 @@
     <!-- Security: DOMPurify for XSS protection -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.2.3/purify.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- CSS Modules -->
-    <link rel="stylesheet" href="/src/css/shared/index.css?v=797c591e">
-    <link rel="stylesheet" href="/src/css/site/index.css?v=aaeaf86d">
+    <link rel="stylesheet" href="/src/css/shared/index.css?v=00c6a09e">
+    <link rel="stylesheet" href="/src/css/site/index.css?v=13d05362">
 </head>
 <body>
 
@@ -632,7 +632,7 @@
                             Телефон
                         </h3>
                         <p>
-                            <a href="tel:+79110701107" id="sitePhone" style="color: inherit; text-decoration: none;">+7 911 070 11 07</a><br>
+                            <a href="tel:+79110701107" id="sitePhone" class="link-plain">+7 911 070 11 07</a><br>
                             Звоните или пишите в мессенджеры
                         </p>
                     </div>
@@ -642,7 +642,7 @@
                     </a>
                 </div>
                 <div class="location-map fade-in">
-                    <iframe src="https://yandex.ru/map-widget/v1/?ll=20.611456%2C54.764930&mode=search&ol=geo&ouri=ymapsbm1%3A%2F%2Fgeo%3Fdata%3DCgg1NjAxNzA1MhKCAdrQvtGB0YHQuNGPLCDQmtCw0LvQuNC90LjQvdCz0YDQsNC00YHQutCw0Y8g0L7QsdC70LDRgdGC0YwsINCT0YPRgNGM0LXQstGB0LrQuNC5INCz0L7RgNC-0LTRgdC60L7QuSDQvtC60YDRg9CzLCDRg9C70LjRhtCwINCa0LDRiNGC0LDQvdC-0LLQsNGPLCA0IgoNkfGBQhW3_Flc&z=17" allowfullscreen="" loading="lazy"></iframe>
+                    <iframe src="https://yandex.ru/map-widget/v1/?z=12&ol=biz&oid=39945477120" allowfullscreen="" loading="lazy"></iframe>
                 </div>
             </div>
         </div>
@@ -858,6 +858,25 @@
         </div>
     </div>
 
+    <!-- Join Modal -->
+    <div class="join-modal" id="joinModal" role="dialog" aria-modal="true" aria-labelledby="joinModalTitle" aria-hidden="true">
+        <div class="join-modal-content">
+            <div class="join-modal-header">
+                <h3 id="joinModalTitle">Стать мастером Say's Barbers</h3>
+                <button class="join-modal-close" onclick="closeJoinModal()" aria-label="Закрыть" type="button">&times;</button>
+            </div>
+            <form id="joinForm" class="join-form" novalidate>
+                <input type="text" name="name" placeholder="Ваше имя" required autocomplete="name">
+                <input type="tel" name="phone" placeholder="+7 (___) ___-__-__" required autocomplete="tel">
+                <div id="joinFormError" class="join-form-error" style="display:none"></div>
+                <button type="submit" class="btn btn-primary">Отправить заявку</button>
+            </form>
+            <div id="joinFormSuccess" class="join-form-success" style="display:none">
+                Заявка отправлена! Мы свяжемся с вами.
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
@@ -881,19 +900,19 @@
     </footer>
 
     <!-- JavaScript Modules -->
-    <script src="/src/js/shared/helpers.js?v=ff7fd363"></script>
+    <script src="/src/js/shared/helpers.js?v=6510dd12"></script>
     <script src="/src/js/site/loader.js?v=d8e1a772"></script>
     <script src="/src/js/shared/image-loader.js?v=cac062fc"></script>
-    <script src="/src/js/site/utils.js?v=a47d3864"></script>
-    <script src="/src/js/site/sanitizer.js?v=5499e44c"></script>
+    <script src="/src/js/site/utils.js?v=fe5c4c36"></script>
+    <script src="/src/js/site/sanitizer.js?v=7f0b38d0"></script>
     <script src="/src/js/shared/icons.js?v=eeca8827"></script>
     <script src="/src/js/site/navigation.js?v=87d31578"></script>
-    <script src="/src/js/site/animations.js?v=38b46063"></script>
-    <script src="/src/js/site/modals.js?v=298be6ff"></script>
+    <script src="/src/js/site/animations.js?v=9998895f"></script>
+    <script src="/src/js/site/modals.js?v=ad391c7d"></script>
     <script src="/src/js/site/main.js?v=9a5ecd16"></script>
-    <script src="/src/js/site/templates.js?v=ac4d1826"></script>
-    <script src="/src/js/site/blog-modal.js?v=ff660904"></script>
-    <script src="/src/js/site/data-loader.js?v=50bfde29"></script>
+    <script src="/src/js/site/templates.js?v=1e2e219b"></script>
+    <script src="/src/js/site/blog-modal.js?v=68752cdf"></script>
+    <script src="/src/js/site/data-loader.js?v=1270f768"></script>
     <script src="/src/js/site/analytics.js?v=f41968cf"></script>
 </body>
 </html>
