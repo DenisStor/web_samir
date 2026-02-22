@@ -284,6 +284,7 @@ def mock_data_dir(temp_data_dir, monkeypatch):
     """Mock the DATA_DIR to use temp directory"""
     import server.handler as handler_module
     monkeypatch.setattr(handler_module, 'DATA_DIR', temp_data_dir)
+    monkeypatch.setattr(handler_module.storage, 'data_dir', temp_data_dir)
     return temp_data_dir
 
 
@@ -315,3 +316,48 @@ def clean_sessions():
     session_manager._sessions.clear()
     yield session_manager._sessions
     session_manager._sessions.clear()
+
+
+# =============================================================================
+# ISOLATED COMPONENT FIXTURES
+# =============================================================================
+
+@pytest.fixture
+def isolated_storage(tmp_path):
+    """Isolated JSONStorage for unit tests"""
+    from server.storage import JSONStorage
+    return JSONStorage(data_dir=str(tmp_path))
+
+
+@pytest.fixture
+def isolated_session_manager():
+    """Isolated SessionManager for unit tests"""
+    from server.auth import SessionManager
+    return SessionManager(timeout_hours=1)
+
+
+@pytest.fixture
+def isolated_rate_limiter():
+    """Isolated RateLimiter for unit tests"""
+    from server.auth import RateLimiter
+    return RateLimiter(max_attempts=3, lockout_minutes=1)
+
+
+@pytest.fixture
+def isolated_upload_limiter():
+    """Isolated UploadRateLimiter for unit tests"""
+    from server.auth import UploadRateLimiter
+    return UploadRateLimiter(max_uploads=3, window_seconds=10)
+
+
+@pytest.fixture
+def sample_social_data():
+    """Sample social data"""
+    return {
+        'social': [
+            {'id': 'social_1', 'type': 'telegram', 'url': 'https://t.me/test'}
+        ],
+        'phone': '+7 999 123-45-67',
+        'email': 'test@example.com',
+        'address': 'ул. Тестовая, д. 1'
+    }

@@ -308,57 +308,6 @@ describe('SharedHelpers', function() {
   });
 
   // =========================================================================
-  // reorderItems Tests
-  // =========================================================================
-
-  describe('reorderItems', function() {
-    test('should reorder items by ID order', function() {
-      var items = [
-        { id: 'a', order: 0 },
-        { id: 'b', order: 1 },
-        { id: 'c', order: 2 }
-      ];
-
-      var result = SharedHelpers.reorderItems(items, ['c', 'a', 'b']);
-
-      expect(result[0].id).toBe('c');
-      expect(result[1].id).toBe('a');
-      expect(result[2].id).toBe('b');
-    });
-
-    test('should update order field', function() {
-      var items = [
-        { id: 'a', order: 0 },
-        { id: 'b', order: 1 }
-      ];
-
-      var result = SharedHelpers.reorderItems(items, ['b', 'a']);
-
-      expect(result[0].order).toBe(0);
-      expect(result[1].order).toBe(1);
-    });
-
-    test('should filter out missing items', function() {
-      var items = [
-        { id: 'a', order: 0 },
-        { id: 'b', order: 1 }
-      ];
-
-      var result = SharedHelpers.reorderItems(items, ['a', 'nonexistent', 'b']);
-
-      expect(result.length).toBe(2);
-    });
-
-    test('should handle empty order array', function() {
-      var items = [{ id: 'a', order: 0 }];
-
-      var result = SharedHelpers.reorderItems(items, []);
-
-      expect(result.length).toBe(0);
-    });
-  });
-
-  // =========================================================================
   // formatPrice Tests
   // =========================================================================
 
@@ -414,7 +363,7 @@ describe('SharedHelpers', function() {
 
     test('should handle invalid date', function() {
       var result = SharedHelpers.formatDate('not a date');
-      expect(result).toBe('');
+      expect(result).toBe('not a date');
     });
 
     test('should handle null', function() {

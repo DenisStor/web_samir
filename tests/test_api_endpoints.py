@@ -503,7 +503,7 @@ class TestProtectedEndpoints:
         response = make_request(
             f'{test_server_url}/api/masters',
             method='POST',
-            data=[{'id': 'master_1', 'name': 'Test'}],
+            data={'masters': [{'id': 'master_1', 'name': 'Test', 'initial': 'T', 'badge': 'green', 'role': 'Барбер'}]},
             headers={'Authorization': f'Bearer {token}'}
         )
 
@@ -666,6 +666,138 @@ class TestStatsEndpoints:
             data={'type': 'pageview', 'session_id': 'test_session_123'}
         )
 
+        assert response['status'] == 200
+        assert response['data'].get('success') is True
+
+
+# =============================================================================
+# CORS
+# =============================================================================
+
+class TestCORS:
+    """Tests for CORS handling"""
+
+    def test_options_preflight(self, test_server_url):
+        """Should respond 200 to OPTIONS requests"""
+        if not SERVER_IMPORTS_OK:
+            pytest.skip("Server imports failed")
+
+        req = urllib.request.Request(
+            f'{test_server_url}/api/masters',
+            method='OPTIONS'
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=5) as response:
+                assert response.status == 200
+        except urllib.error.HTTPError:
+            pytest.fail("OPTIONS should return 200")
+
+    def test_cors_allowed_origin(self, test_server_url):
+        """Should include CORS headers for allowed origins"""
+        if not SERVER_IMPORTS_OK:
+            pytest.skip("Server imports failed")
+
+        req = urllib.request.Request(
+            f'{test_server_url}/api/masters',
+            method='OPTIONS',
+            headers={'Origin': 'http://localhost:8000'}
+        )
+        with urllib.request.urlopen(req, timeout=5) as response:
+            allow_origin = response.headers.get('Access-Control-Allow-Origin', '')
+            assert allow_origin == 'http://localhost:8000'
+
+
+# =============================================================================
+# ERROR HANDLING
+# =============================================================================
+
+class TestErrorHandling:
+    """Tests for error handling in data endpoints"""
+
+    def test_post_invalid_json(self, test_server_url, clean_sessions):
+        """Should return 400 for invalid JSON body"""
+        if not SERVER_IMPORTS_OK:
+            pytest.skip("Server imports failed")
+
+        token = generate_token()
+        sessions[token] = {
+            'created': datetime.now(),
+            'expires': datetime.now() + timedelta(hours=24)
+        }
+
+        req = urllib.request.Request(
+            f'{test_server_url}/api/masters',
+            data=b'not valid json{{{',
+            headers={
+                'Authorization': f'Bearer {token}',
+                'Content-Type': 'application/json'
+            },
+            method='POST'
+        )
+        try:
+            urllib.request.urlopen(req, timeout=5)
+        except urllib.error.HTTPError as e:
+            assert e.code == 400
+
+    def test_post_array_instead_dict(self, test_server_url, clean_sessions):
+        """Should reject non-dict JSON body"""
+        if not SERVER_IMPORTS_OK:
+            pytest.skip("Server imports failed")
+
+        token = generate_token()
+        sessions[token] = {
+            'created': datetime.now(),
+            'expires': datetime.now() + timedelta(hours=24)
+        }
+
+        response = make_request(
+            f'{test_server_url}/api/masters',
+            method='POST',
+            data=[1, 2, 3],
+            headers={'Authorization': f'Bearer {token}'}
+        )
+        assert response['status'] == 400
+
+
+# =============================================================================
+# SOCIAL ENDPOINTS
+# =============================================================================
+
+class TestSocialEndpoints:
+    """Tests for social data endpoints"""
+
+    def test_get_social(self, test_server_url, mock_data_dir):
+        """Should return social data"""
+        if not SERVER_IMPORTS_OK:
+            pytest.skip("Server imports failed")
+
+        test_data = {
+            'social': [{'id': 'social_1', 'type': 'telegram', 'url': 'https://t.me/test'}],
+            'phone': '+7 999 123-45-67'
+        }
+        (mock_data_dir / 'social.json').write_text(json.dumps(test_data))
+
+        response = make_request(f'{test_server_url}/api/social')
+        assert response['status'] == 200
+        assert 'social' in response['data']
+
+    def test_save_social_with_auth(self, test_server_url, mock_data_dir, clean_sessions):
+        """Should save social data with authentication"""
+        if not SERVER_IMPORTS_OK:
+            pytest.skip("Server imports failed")
+
+        token = generate_token()
+        sessions[token] = {
+            'created': datetime.now(),
+            'expires': datetime.now() + timedelta(hours=24)
+        }
+
+        response = make_request(
+            f'{test_server_url}/api/social',
+            method='POST',
+            data={'social': [{'id': 'social_1', 'type': 'vk', 'url': 'https://vk.com/test'}]},
+            headers={'Authorization': f'Bearer {token}'}
+        )
         assert response['status'] == 200
         assert response['data'].get('success') is True
 

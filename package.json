@@ -20,7 +20,7 @@
     "test:auth": "python3 -m pytest tests/test_auth.py -v",
     "test:api": "python3 -m pytest tests/test_api_endpoints.py -v",
     "test:files": "python3 -m pytest tests/test_file_operations.py -v",
-    "test:coverage": "python3 -m pytest tests/ --cov=. --cov-report=html --ignore=tests/javascript"
+    "test:coverage": "python3 -m pytest tests/ --cov=server --cov-report=html --cov-report=term-missing --ignore=tests/javascript"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
