@@ -168,6 +168,18 @@
     }
 
     // =================================================================
+    // SCROLL LOCK
+    // =================================================================
+
+    /**
+     * Заблокировать/разблокировать скролл страницы
+     * @param {boolean} lock - true для блокировки, false для разблокировки
+     */
+    function lockScroll(lock) {
+        document.body.style.overflow = lock ? 'hidden' : '';
+    }
+
+    // =================================================================
     // FORMAT UTILITIES
     // =================================================================
 
@@ -224,6 +236,9 @@
         // Timing
         debounce: debounce,
         throttleRAF: throttleRAF,
+
+        // Scroll
+        lockScroll: lockScroll,
 
         // Formatting
         formatPrice: formatPrice,

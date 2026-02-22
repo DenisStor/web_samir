@@ -47,12 +47,10 @@ SaysApp.byId = function (id) {
 // =================================================================
 
 /**
- * Заблокировать/разблокировать скролл страницы
+ * Заблокировать/разблокировать скролл страницы — делегирует в SharedHelpers
  * @param {boolean} lock - true для блокировки, false для разблокировки
  */
-SaysApp.lockScroll = function (lock) {
-    document.body.style.overflow = lock ? 'hidden' : '';
-};
+SaysApp.lockScroll = SharedHelpers.lockScroll;
 
 // =================================================================
 // ARIA УТИЛИТЫ (Accessibility)

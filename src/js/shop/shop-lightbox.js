@@ -20,7 +20,7 @@ var ShopLightbox = (function () {
 
         if (elements.lightbox) {
             elements.lightbox.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
+            SharedHelpers.lockScroll(true);
         }
     }
 
@@ -32,7 +32,7 @@ var ShopLightbox = (function () {
 
         if (elements.lightbox) {
             elements.lightbox.style.display = 'none';
-            document.body.style.overflow = '';
+            SharedHelpers.lockScroll(false);
         }
     }
 

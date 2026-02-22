@@ -332,6 +332,18 @@
     }
 
     // =================================================================
+    // SCROLL LOCK
+    // =================================================================
+
+    /**
+     * Заблокировать/разблокировать скролл страницы
+     * @param {boolean} lock - true для блокировки, false для разблокировки
+     */
+    function lockScroll(lock) {
+        document.body.style.overflow = lock ? 'hidden' : '';
+    }
+
+    // =================================================================
     // FORMAT UTILITIES
     // =================================================================
 
@@ -388,6 +400,9 @@
         // Timing
         debounce: debounce,
         throttleRAF: throttleRAF,
+
+        // Scroll
+        lockScroll: lockScroll,
 
         // Formatting
         formatPrice: formatPrice,
@@ -1156,7 +1171,6 @@ var AdminNavigation = (function () {
         masters: 'Мастера',
         services: 'Услуги',
         articles: 'Статьи',
-        principles: 'Принципы',
         faq: 'FAQ',
         social: 'Соцсети'
     };
@@ -1270,7 +1284,7 @@ var AdminModals = (function () {
         }
 
         overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
+        SharedHelpers.lockScroll(true);
         currentModal = overlay;
 
         // Обработчик закрытия по Escape (только если ещё не добавлен)
@@ -1305,7 +1319,7 @@ var AdminModals = (function () {
         if (!overlay) return;
 
         overlay.classList.remove('active');
-        document.body.style.overflow = '';
+        SharedHelpers.lockScroll(false);
 
         // Удаляем обработчики
         if (escapeHandlerBound) {
@@ -4142,12 +4156,6 @@ var AdminEventHandlers = (function () {
             if (window.AdminImageHandler)
                 AdminImageHandler.removeImage(t.getAttribute('data-target'));
         },
-        'add-principle': function () {
-            AdminMasterForm.addPrinciple();
-        },
-        'remove-principle': function (t) {
-            AdminMasterForm.removePrinciple(t);
-        },
         'edit-shop-category': function (t) {
             handleShopCategoryAction('edit-shop-category', t.getAttribute('data-id'));
         },
@@ -6311,24 +6319,6 @@ var AdminMasterForm = (function () {
         AdminState.editingItem = master || null;
 
         var title = master ? 'Редактировать мастера' : 'Добавить мастера';
-        var principles = (master && master.principles) || ['', '', '', ''];
-
-        var principlesHtml = principles
-            .map(function (p, i) {
-                return (
-                    '<div class="principle-item">' +
-                    '<input type="text" class="form-input principle-input" value="' +
-                    window.escapeHtml(p) +
-                    '" placeholder="Принцип ' +
-                    (i + 1) +
-                    '">' +
-                    '<button type="button" class="btn btn-icon danger" data-action="remove-principle">' +
-                    SharedIcons.get('close') +
-                    '</button>' +
-                    '</div>'
-                );
-            })
-            .join('');
 
         var html =
             '<form id="masterForm" class="admin-form">' +
@@ -6391,16 +6381,6 @@ var AdminMasterForm = (function () {
             window.escapeHtml((master && master.specialization) || '') +
             '</textarea>' +
             '</div>' +
-            '<div class="form-group">' +
-            '<label class="form-label">Принципы работы</label>' +
-            '<div class="principles-list" id="principlesList">' +
-            principlesHtml +
-            '</div>' +
-            '<button type="button" class="btn btn-secondary add-principle" data-action="add-principle">' +
-            SharedIcons.get('plus') +
-            'Добавить принцип' +
-            '</button>' +
-            '</div>' +
             '</form>';
 
         AdminModals.setTitle('modal', title);
@@ -6435,15 +6415,6 @@ var AdminMasterForm = (function () {
         var specialization = specEl ? specEl.value.trim() : '';
         var photo = photoEl ? photoEl.value : null;
 
-        var principles = [];
-        var principleInputs = document.querySelectorAll('.principle-input');
-        principleInputs.forEach(function (input) {
-            var val = input.value.trim();
-            if (val) {
-                principles.push(val);
-            }
-        });
-
         var masterData = {
             id: AdminState.editingItem
                 ? AdminState.editingItem.id
@@ -6453,7 +6424,6 @@ var AdminMasterForm = (function () {
             badge: badge,
             role: role || 'Мастер',
             specialization: specialization,
-            principles: principles,
             photo: photo,
             active: true
         };
@@ -6504,45 +6474,11 @@ var AdminMasterForm = (function () {
         }
     }
 
-    /**
-     * Добавить поле принципа
-     */
-    function addPrinciple() {
-        var list = document.getElementById('principlesList');
-        if (!list) return;
-
-        var count = list.querySelectorAll('.principle-item').length;
-
-        var div = document.createElement('div');
-        div.className = 'principle-item';
-        div.innerHTML =
-            '<input type="text" class="form-input principle-input" value="" placeholder="Принцип ' +
-            (count + 1) +
-            '">' +
-            '<button type="button" class="btn btn-icon danger" data-action="remove-principle">' +
-            SharedIcons.get('close') +
-            '</button>';
-
-        list.appendChild(div);
-    }
-
-    /**
-     * Удалить поле принципа
-     */
-    function removePrinciple(button) {
-        var item = button.closest('.principle-item');
-        if (item) {
-            item.remove();
-        }
-    }
-
     // Публичный API
     return {
         show: show,
         save: save,
-        remove: remove,
-        addPrinciple: addPrinciple,
-        removePrinciple: removePrinciple
+        remove: remove
     };
 })();
 
@@ -8551,14 +8487,6 @@ var AdminPanel = (function () {
         },
         removeImage: function (inputId) {
             AdminImageHandler.removeImage(inputId);
-        },
-
-        // Master principles
-        addPrinciple: function () {
-            AdminMasterForm.addPrinciple();
-        },
-        removePrinciple: function (btn) {
-            AdminMasterForm.removePrinciple(btn);
         },
 
         // Shop categories

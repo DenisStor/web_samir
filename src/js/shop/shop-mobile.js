@@ -23,7 +23,7 @@ var ShopMobile = (function () {
             menu.classList.add('active');
             menu.setAttribute('aria-hidden', 'false');
             if (burger) burger.setAttribute('aria-expanded', 'true');
-            document.body.style.overflow = 'hidden';
+            SharedHelpers.lockScroll(true);
         }
     }
 
@@ -39,7 +39,7 @@ var ShopMobile = (function () {
         menu.classList.remove('active');
         menu.setAttribute('aria-hidden', 'true');
         if (burger) burger.setAttribute('aria-expanded', 'false');
-        document.body.style.overflow = '';
+        SharedHelpers.lockScroll(false);
     }
 
     /**
@@ -54,7 +54,7 @@ var ShopMobile = (function () {
         if (elements.filterBackdrop) {
             elements.filterBackdrop.classList.add('active');
         }
-        document.body.style.overflow = 'hidden';
+        SharedHelpers.lockScroll(true);
     }
 
     /**
@@ -69,7 +69,7 @@ var ShopMobile = (function () {
         if (elements.filterBackdrop) {
             elements.filterBackdrop.classList.remove('active');
         }
-        document.body.style.overflow = '';
+        SharedHelpers.lockScroll(false);
     }
 
     /**

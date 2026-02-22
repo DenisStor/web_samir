@@ -133,7 +133,7 @@ var BlogModal = (function () {
 
         // Show modal
         modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
+        SharedHelpers.lockScroll(true);
 
         // Remove previous escape handler if exists
         if (currentEscapeHandler) {
@@ -186,7 +186,7 @@ var BlogModal = (function () {
             var modal = document.getElementById('blogModal');
             if (modal) {
                 modal.classList.remove('active');
-                document.body.style.overflow = '';
+                SharedHelpers.lockScroll(false);
             }
         }
     }

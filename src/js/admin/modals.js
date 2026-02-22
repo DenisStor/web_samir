@@ -30,7 +30,7 @@ var AdminModals = (function () {
         }
 
         overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
+        SharedHelpers.lockScroll(true);
         currentModal = overlay;
 
         // Обработчик закрытия по Escape (только если ещё не добавлен)
@@ -65,7 +65,7 @@ var AdminModals = (function () {
         if (!overlay) return;
 
         overlay.classList.remove('active');
-        document.body.style.overflow = '';
+        SharedHelpers.lockScroll(false);
 
         // Удаляем обработчики
         if (escapeHandlerBound) {
