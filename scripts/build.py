@@ -41,7 +41,8 @@ PAGES = {
             'faq.html',
             'booking.html',
             'blog-modal.html',
-            'footer.html',
+            'join-modal.html',
+            'shared/footer.html',
             'scripts.html',
         ],
         'output': 'index.html',
@@ -52,7 +53,7 @@ PAGES = {
             'head.html',
             'navigation.html',
             'main.html',
-            'footer.html',
+            'shared/footer.html',
             'lightbox.html',
             'mobile-filter.html',
             'scripts.html',
@@ -78,7 +79,7 @@ PAGES = {
             'head.html',
             'header.html',
             'main.html',
-            'footer.html',
+            'shared/footer.html',
             'scripts.html',
         ],
         'output': 'legal.html',
@@ -224,7 +225,12 @@ def build_page(page_name):
     parts = []
 
     for section in config['sections']:
-        section_path = sections_dir / section
+        # Поддержка shared/ префикса: shared/footer.html → sections/shared/footer.html
+        if section.startswith('shared/'):
+            section_path = SECTIONS_DIR / section
+        else:
+            section_path = sections_dir / section
+
         if not section_path.exists():
             print(f'⚠️  [{page_name}] Секция не найдена: {section}')
             continue
@@ -332,7 +338,10 @@ def get_page_sections_mtime(page_name):
     max_mtime = 0
 
     for section in config['sections']:
-        section_path = sections_dir / section
+        if section.startswith('shared/'):
+            section_path = SECTIONS_DIR / section
+        else:
+            section_path = sections_dir / section
         if section_path.exists():
             mtime = section_path.stat().st_mtime
             if mtime > max_mtime:
