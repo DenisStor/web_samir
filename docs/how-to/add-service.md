@@ -35,27 +35,7 @@ http://localhost:8000/admin.html
 
 ## Структура данных
 
-Услуги хранятся в `data/services.json`:
-
-```json
-{
-  "categories": [
-    {
-      "id": "category_1705312847123_abc",
-      "name": "Стрижки",
-      "order": 0,
-      "services": [
-        {
-          "id": "service_1705312847124_xyz",
-          "name": "Мужская стрижка",
-          "price": 1500,
-          "description": "Стрижка + укладка"
-        }
-      ]
-    }
-  ]
-}
-```
+Услуги хранятся в SQLite (`data/saysbarbers.db`), таблицы `services` и `service_categories`.
 
 ---
 
@@ -83,30 +63,17 @@ http://localhost:8000/admin.html
 
 ## Ручное редактирование (для продвинутых)
 
-### Локально
+Данные хранятся в SQLite. Для ручного редактирования используйте админку (`/admin.html`) — это рекомендуемый способ.
+
+При необходимости можно работать с БД напрямую:
 
 ```bash
-nano data/services.json
+# Локально
+sqlite3 data/saysbarbers.db
+
+# На сервере
+ssh root@80.90.187.187 "sqlite3 /var/www/web_samir-data/data/saysbarbers.db"
 ```
-
-### На сервере
-
-```bash
-ssh root@80.90.187.187 "nano /var/www/web_samir-data/data/services.json"
-```
-
-### Формат записи
-
-```json
-{
-  "id": "service_<timestamp>_<random>",
-  "name": "Название услуги",
-  "price": 1500,
-  "description": "Описание (опционально)"
-}
-```
-
-**Важно:** ID должен быть уникальным. Используйте формат `service_<timestamp>_<random>`.
 
 ---
 
@@ -124,7 +91,7 @@ ssh root@80.90.187.187 "nano /var/www/web_samir-data/data/services.json"
 
 ### Как скрыть услугу?
 
-Удалите её через админку. Альтернатива — добавьте поле `"hidden": true` в JSON.
+Удалите её через админку.
 
 ### Как изменить порядок категорий?
 

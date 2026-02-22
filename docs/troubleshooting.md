@@ -55,12 +55,12 @@ python3 scripts/build.py --force
 2. Права на запись:
    ```bash
    chmod 755 data/
-   chmod 644 data/*.json
+   chmod 644 data/saysbarbers.db
    ```
 
-3. Валидный JSON:
+3. SQLite БД не повреждена:
    ```bash
-   python3 -c "import json; json.load(open('data/masters.json'))"
+   python3 -c "import sqlite3; c=sqlite3.connect('data/saysbarbers.db'); print(c.execute('PRAGMA integrity_check').fetchone())"
    ```
 
 ### Изображения не загружаются

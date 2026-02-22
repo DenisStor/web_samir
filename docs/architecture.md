@@ -53,9 +53,10 @@
 ## Процесс сборки
 
 ```
-src/sections/index/*.html  ──┐
-                             ├──→ python3 build.py ──→ index.html
-src/css/site/*.css ──────────┘
+src/sections/index/*.html    ──┐
+src/sections/shared/*.html  ──┤  (shared/ доступны через префикс shared/)
+                              ├──→ python3 build.py ──→ index.html
+src/css/site/*.css ───────────┘
 
 src/js/admin/*.js ──→ python3 build.py ──→ admin.bundle.js
 ```
@@ -99,6 +100,7 @@ python3 scripts/build.py --watch        # Автопересборка при и
 ```
 src/
 ├── sections/           # HTML секции → собираются в *.html
+│   ├── shared/         # Общие секции (footer.html — для index, shop, legal)
 │   ├── index/          # Главная страница
 │   ├── shop/           # Магазин
 │   ├── admin/          # Админка
@@ -129,6 +131,8 @@ server/                 # Python серверные модули
 data/                   # SQLite БД (в .gitignore, на сервере симлинк)
 uploads/                # Загруженные изображения (в .gitignore, на сервере симлинк)
 public/                 # Статические SEO файлы
+.editorconfig           # Настройки форматирования для редакторов
+.stylelintrc.json       # Конфигурация CSS линтера
 ```
 
 ## Модульная система CSS

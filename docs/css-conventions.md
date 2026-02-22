@@ -50,7 +50,29 @@
 }
 ```
 
+### Утилитарные классы (shared/components.css)
+
+```css
+.link-plain   /* Ссылка без подчёркивания и цвета — наследует стили родителя */
+```
+
+### Анимации
+
+- Используется `fadeInUp` (определён в `shared/utilities.css`)
+- `slideUp` удалён — везде заменён на `fadeInUp`
+
 ### Производительность
 
 - НЕ использовать `backdrop-filter: blur()` на фиксированных элементах без `@supports`
 - `will-change` добавлять только в `:hover`, не в базовые стили
+
+## CSS линтинг (stylelint)
+
+Конфигурация: `.stylelintrc.json` в корне проекта.
+
+```bash
+npm run lint:css              # Проверить CSS
+npm run lint                  # Проверить всё (JS + CSS)
+```
+
+Запускайте перед коммитом вместе с `npm run lint`.

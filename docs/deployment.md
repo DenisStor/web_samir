@@ -91,7 +91,7 @@ After=network.target
 Type=simple
 User=www-data
 WorkingDirectory=/var/www/web_samir
-ExecStart=/usr/bin/python3 server.py
+ExecStart=/usr/bin/python3 run.py
 Restart=always
 RestartSec=5
 

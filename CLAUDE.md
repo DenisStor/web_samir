@@ -8,7 +8,9 @@ Say's Barbers — барбершоп с CMS админкой и интернет
 python3 run.py                         # Запуск сервера (localhost:8000)
 python3 scripts/build.py               # Сборка HTML из секций
 python3 scripts/build.py --admin-only  # Только admin.bundle.js
-npm run lint && npm run format:check   # Проверка перед коммитом
+npm run lint && npm run format:check   # Проверка перед коммитом (JS + CSS)
+npm run lint:js                        # Только ESLint
+npm run lint:css                       # Только stylelint
 npm test                               # Тесты
 ```
 
@@ -16,7 +18,7 @@ npm test                               # Тесты
 
 1. **НЕ редактировать HTML в корне** — только `src/sections/{page}/`, затем `build.py`
 2. **НЕ использовать** `?.`, `??`, `let`, `const` — старые браузеры
-3. **Использовать `SharedHelpers`** для `escapeHtml`, `generateId`, `debounce`, `generateSlug`
+3. **Использовать `SharedHelpers`** для `escapeHtml`, `generateId`, `debounce`, `generateSlug`, `lockScroll`
 4. **parseInt** — всегда с radix: `parseInt(value, 10)`
 5. **Legal URL**: `/legal.html?page=privacy`, НЕ `/legal/privacy`
 6. **Cache busting автоматический** — `build.py` сам заменяет `?v=X.X` на `?v={md5hash}` для CSS/JS файлов
@@ -34,10 +36,11 @@ npm test                               # Тесты
 web_samir/
 ├── src/
 │   ├── sections/          # HTML секции → build.py → корневые .html
+│   │   ├── shared/        # footer.html (общий для index, shop, legal)
 │   │   ├── index/         # hero, services, masters, blog, faq...
-│   │   ├── shop/          # navigation, main, lightbox, footer
+│   │   ├── shop/          # navigation, main, lightbox
 │   │   ├── admin/         # login, sidebar, content, modals
-│   │   └── legal/         # header, main, footer
+│   │   └── legal/         # header, main
 │   ├── css/               # Модульные стили (index.css = bundle)
 │   │   ├── shared/        # variables, base, components, navigation, utilities
 │   │   ├── site/          # hero, services, masters, blog, booking, faq, podology, social
@@ -64,6 +67,8 @@ web_samir/
 ├── tests/                 # Python (pytest) + JS (Jest)
 ├── docs/                  # Документация
 ├── config.json            # Конфигурация (пароль, лимиты, таймауты)
+├── .editorconfig          # Настройки форматирования для редакторов
+├── .stylelintrc.json      # Конфигурация CSS линтера
 ├── deploy.sh              # Деплой на VPS
 └── run.py                 # Entry point
 ```
@@ -83,7 +88,7 @@ web_samir/
 
 | Объект | Страница | Описание |
 |--------|----------|----------|
-| `SharedHelpers` | все | `escapeHtml`, `generateId`, `generateSlug`, `debounce`, `throttleRAF`, `formatPrice`, `formatDate` |
+| `SharedHelpers` | все | `escapeHtml`, `generateId`, `generateSlug`, `debounce`, `throttleRAF`, `formatPrice`, `formatDate`, `lockScroll` |
 | `AppConfig` | все | `AppConfig.get('site.name')`, `AppConfig.get('ui.toastDuration', 3000)` |
 | `AdminState` | admin | Централизованное состояние: `AdminState.masters`, `AdminState.setMasters()` |
 | `AdminRouter` | admin | Hash-роутинг: `AdminRouter.navigate('masters')` |
@@ -161,7 +166,7 @@ ssh root@80.90.187.187 "cd /var/www/web_samir && ./deploy.sh"
 - [Навигация по документации](docs/README.md) — полный список
 - [Архитектура](docs/architecture.md) — структура проекта, сборка, страницы
 - [API](docs/api.md) — эндпоинты, аутентификация
-- [Структуры данных](docs/data-structures.md) — JSON схемы
+- [Структуры данных](docs/data-structures.md) — схемы данных (SQLite)
 - [CSS конвенции](docs/css-conventions.md) — переменные, правила
 - [JS конвенции](docs/js-conventions.md) — паттерны, SharedHelpers, AppConfig
 - [Производительность](docs/performance.md) — оптимизация

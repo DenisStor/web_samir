@@ -181,6 +181,8 @@ var(--radius-full) /* 9999px */
 ## Утилиты
 
 ```css
+.link-plain     /* Ссылка без подчёркивания, наследует стили родителя */
+
 .text-center    /* text-align: center */
 .text-left      /* text-align: left */
 .text-right     /* text-align: right */
@@ -248,6 +250,16 @@ var(--radius-full) /* 9999px */
 ```
 
 ---
+
+## CSS линтинг
+
+Перед коммитом проверяйте CSS:
+
+```bash
+npm run lint:css
+```
+
+Конфигурация: `.stylelintrc.json` в корне проекта.
 
 ## Шаблон модуля
 

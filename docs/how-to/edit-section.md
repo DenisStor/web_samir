@@ -29,7 +29,7 @@ ls src/sections/index/
 | `blog.html` | Статьи |
 | `faq.html` | Вопросы-ответы |
 | `location.html` | Карта и адрес |
-| `footer.html` | Подвал |
+| `shared/footer.html` | Подвал (общий для index, shop, legal) |
 
 ### 2. Откройте файл секции
 
@@ -92,8 +92,8 @@ touch src/sections/index/new-section.html
     'marquee.html',
     'services.html',
     # ... другие секции
-    'new-section.html',  # Добавьте здесь
-    'footer.html',
+    'new-section.html',      # Добавьте здесь
+    'shared/footer.html',    # Общий футер (из src/sections/shared/)
     'scripts.html',
 ],
 ```
@@ -118,6 +118,24 @@ touch src/sections/index/new-section.html
 
 ```bash
 python3 scripts/build.py --page=index
+```
+
+## Shared секции
+
+Секции из `src/sections/shared/` доступны всем страницам через префикс `shared/`:
+
+```python
+'index': [
+    # ... страничные секции
+    'shared/footer.html',   # Берётся из src/sections/shared/footer.html
+    'scripts.html',
+],
+```
+
+При изменении `shared/footer.html` нужно пересобрать все страницы, где он используется:
+
+```bash
+python3 scripts/build.py
 ```
 
 ## Советы

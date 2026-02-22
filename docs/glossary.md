@@ -124,6 +124,19 @@ showToast('Ошибка', 'error')
 
 What You See Is What You Get — визуальный редактор текста в админке для статей.
 
+### lockScroll
+
+Функция блокировки прокрутки страницы. Используется при открытии модалок и мобильного меню.
+
+```javascript
+SharedHelpers.lockScroll(true);   // Заблокировать
+SharedHelpers.lockScroll(false);  // Разблокировать
+```
+
+### Shared секции
+
+HTML-секции в `src/sections/shared/`, общие для нескольких страниц. Подключаются через префикс `shared/` в конфиге сборки (например, `shared/footer.html`).
+
 ### Cache Busting
 
 Добавление хэша к URL ресурса для сброса кэша браузера:
@@ -148,7 +161,7 @@ style.css?v=a1b2c3d4
 | `src/css/` | CSS модули |
 | `src/js/` | JavaScript модули |
 | `server/` | Python серверные модули |
-| `data/` | JSON данные CMS |
+| `data/` | SQLite БД CMS (`saysbarbers.db`) |
 | `uploads/` | Загруженные изображения |
 | `scripts/` | Утилиты сборки |
 

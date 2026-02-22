@@ -6,7 +6,7 @@
 - [ ] Не использовал `?.`, `??`, `let`, `const`
 - [ ] Использовал `SharedHelpers` для утилит
 - [ ] `parseInt()` с radix: `parseInt(value, 10)`
-- [ ] Запустил `npm run lint && npm run format:check`
+- [ ] Запустил `npm run lint && npm run lint:css && npm run format:check`
 - [ ] Запустил `python3 scripts/build.py`
 
 ---
@@ -124,7 +124,7 @@ var num = parseInt(value, 10);
 - **Локально:** `./data/`
 - **На сервере:** `/var/www/web_samir-data/data/` (симлинк)
 
-Не добавляйте `data/*.json` в git.
+Не добавляйте файлы из `data/` в git. Данные хранятся в SQLite (`data/saysbarbers.db`).
 
 ---
 

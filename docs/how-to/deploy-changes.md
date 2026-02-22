@@ -5,7 +5,8 @@
 ### Чеклист
 
 - [ ] Код работает локально
-- [ ] `npm run lint` без ошибок
+- [ ] `npm run lint` без ошибок (JS)
+- [ ] `npm run lint:css` без ошибок (CSS)
 - [ ] `npm run format:check` без ошибок
 - [ ] `python3 scripts/build.py` успешно
 - [ ] Изменения закоммичены
@@ -13,7 +14,7 @@
 ### Проверка
 
 ```bash
-npm run lint && npm run format:check && python3 scripts/build.py
+npm run lint && npm run lint:css && npm run format:check && python3 scripts/build.py
 ```
 
 ---
@@ -35,31 +36,21 @@ ssh root@80.90.187.187 "cd /var/www/web_samir && ./deploy.sh"
 
 ---
 
-## Редактирование данных на сервере
+## Данные на сервере
 
-Данные CMS живут отдельно от кода:
+Данные CMS хранятся в SQLite отдельно от кода:
 
 ```
 /var/www/web_samir-data/data/
-├── masters.json
-├── services.json
-├── articles.json
-├── faq.json
-├── social.json
-├── legal.json
-├── shop-categories.json
-├── products.json
-└── stats.json
+└── saysbarbers.db          ← SQLite БД
 ```
 
-### Редактирование
+Управление данными — через админку (`/admin.html`).
+
+При необходимости прямого доступа к БД:
 
 ```bash
-# Мастера
-ssh root@80.90.187.187 "nano /var/www/web_samir-data/data/masters.json"
-
-# Услуги
-ssh root@80.90.187.187 "nano /var/www/web_samir-data/data/services.json"
+ssh root@80.90.187.187 "sqlite3 /var/www/web_samir-data/data/saysbarbers.db '.tables'"
 ```
 
 ---

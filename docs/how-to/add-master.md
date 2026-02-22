@@ -44,24 +44,7 @@ http://localhost:8000/admin.html
 
 ## Структура данных
 
-Мастера хранятся в `data/masters.json`:
-
-```json
-{
-  "masters": [
-    {
-      "id": "master_1705312847123_abc",
-      "name": "Иван Петров",
-      "role": "Топ-барбер",
-      "badge": "blue",
-      "specialization": "Классические стрижки, оформление бороды",
-      "photo": "/uploads/ivan.jpg",
-      "initial": "И",
-      "order": 0
-    }
-  ]
-}
-```
+Мастера хранятся в SQLite (`data/saysbarbers.db`), таблица `masters`.
 
 ---
 
@@ -73,25 +56,12 @@ http://localhost:8000/admin.html
 
 ## Ручное редактирование
 
-### На сервере
+Данные хранятся в SQLite. Рекомендуется использовать админку (`/admin.html`).
+
+При необходимости прямого доступа:
 
 ```bash
-ssh root@80.90.187.187 "nano /var/www/web_samir-data/data/masters.json"
-```
-
-### Формат записи
-
-```json
-{
-  "id": "master_<timestamp>_<random>",
-  "name": "Имя Фамилия",
-  "role": "Барбер",
-  "badge": "green",
-  "specialization": "Описание специализации",
-  "photo": "/uploads/photo.jpg",
-  "initial": "И",
-  "order": 0
-}
+ssh root@80.90.187.187 "sqlite3 /var/www/web_samir-data/data/saysbarbers.db 'SELECT id, name FROM masters'"
 ```
 
 **Поля:**
@@ -113,7 +83,7 @@ ssh root@80.90.187.187 "nano /var/www/web_samir-data/data/masters.json"
 
 ### Путь к фото
 
-После загрузки фото сохраняется в `uploads/` и путь записывается в JSON:
+После загрузки фото сохраняется в `uploads/` и путь записывается в БД:
 
 ```json
 "photo": "/uploads/master_1705312847123_abc.jpg"

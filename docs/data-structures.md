@@ -46,7 +46,7 @@
 }
 ```
 
-**Важно:** Подология — отдельная структура внутри `services.json`.
+**Важно:** Подология — отдельная структура внутри таблицы services (SQLite: `podology_meta` + `podology_categories`).
 
 ## Product (магазин)
 

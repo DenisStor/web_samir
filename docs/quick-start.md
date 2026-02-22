@@ -29,19 +29,7 @@ npm install
 mkdir -p data
 ```
 
-Создайте начальные файлы данных:
-
-```bash
-echo '{"masters":[]}' > data/masters.json
-echo '{"categories":[]}' > data/services.json
-echo '{"articles":[]}' > data/articles.json
-echo '{"items":[]}' > data/faq.json
-echo '{"links":[]}' > data/social.json
-echo '{"documents":[]}' > data/legal.json
-echo '{"categories":[]}' > data/shop-categories.json
-echo '{"products":[]}' > data/products.json
-echo '{"visits":[],"pageViews":{}}' > data/stats.json
-```
+SQLite БД (`data/saysbarbers.db`) создаётся автоматически при первом запуске сервера.
 
 ### 4. Создание конфигурации
 
@@ -126,7 +114,7 @@ python3 scripts/build.py --watch
 Перед коммитом:
 
 ```bash
-npm run lint && npm run format:check
+npm run lint && npm run lint:css && npm run format:check
 ```
 
 ## Следующие шаги

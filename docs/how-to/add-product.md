@@ -51,40 +51,7 @@ http://localhost:8000/admin.html
 
 ## Структура данных
 
-### Категории (`data/shop-categories.json`)
-
-```json
-{
-  "categories": [
-    {
-      "id": "cat_1705312847123_abc",
-      "name": "Уход за волосами",
-      "slug": "uhod-za-volosami",
-      "order": 0
-    }
-  ]
-}
-```
-
-### Товары (`data/products.json`)
-
-```json
-{
-  "products": [
-    {
-      "id": "prod_1705312847123_xyz",
-      "name": "Воск для укладки",
-      "categoryId": "cat_1705312847123_abc",
-      "price": 1200,
-      "oldPrice": 1500,
-      "description": "Матовый воск средней фиксации",
-      "images": ["/uploads/wax1.jpg", "/uploads/wax2.jpg"],
-      "inStock": true,
-      "order": 0
-    }
-  ]
-}
-```
+Категории и товары хранятся в SQLite (`data/saysbarbers.db`), таблицы `shop_categories` и `products`.
 
 ---
 
@@ -136,14 +103,12 @@ http://localhost:8000/admin.html
 
 ## Ручное редактирование
 
-### На сервере
+Данные хранятся в SQLite. Рекомендуется использовать админку (`/admin.html`).
+
+При необходимости прямого доступа:
 
 ```bash
-# Категории
-ssh root@80.90.187.187 "nano /var/www/web_samir-data/data/shop-categories.json"
-
-# Товары
-ssh root@80.90.187.187 "nano /var/www/web_samir-data/data/products.json"
+ssh root@80.90.187.187 "sqlite3 /var/www/web_samir-data/data/saysbarbers.db '.tables'"
 ```
 
 ---

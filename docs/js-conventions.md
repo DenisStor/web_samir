@@ -52,9 +52,35 @@ var throttledScroll = SharedHelpers.throttleRAF(onScroll);
 // Форматирование
 SharedHelpers.formatPrice(1500);        // → '1 500 ₽'
 SharedHelpers.formatDate('2024-01-15'); // → '15 января 2024 г.'
+
+// Блокировка скролла (модалки, меню)
+SharedHelpers.lockScroll(true);   // Заблокировать
+SharedHelpers.lockScroll(false);  // Разблокировать
 ```
 
 **Глобальные алиасы:** `escapeHtml()`, `generateId()`, `generateSlug()`, `debounce()`
+
+**Делегаты:** `debounce`, `formatDate` — прямые обёртки без собственных fallback.
+
+## SaysApp API (главная страница)
+
+```javascript
+// Регистрация обработчика Escape — возвращает cleanup-функцию
+var removeHandler = SaysApp.onEscape(function() {
+    closeModal();
+});
+// Для снятия обработчика:
+removeHandler();
+
+// lockScroll — делегирует в SharedHelpers.lockScroll
+SaysApp.lockScroll(true);
+```
+
+## sanitizer.js
+
+Модуль `sanitizer.js` предоставляет `sanitize()`, `sanitizeText()`, `sanitizeUrl()`.
+
+`escapeHtml` внутри sanitizer.js делегирует в `window.escapeHtml` (из helpers.js). Имеет inline fallback на случай, если helpers.js ещё не загрузился (порядок в admin bundle).
 
 ## AppConfig
 
