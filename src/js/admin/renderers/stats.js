@@ -3,7 +3,7 @@
  * Рендеринг статистики посещений
  */
 
-var AdminStatsRenderer = (function() {
+var AdminStatsRenderer = (function () {
     'use strict';
 
     var elements = {};
@@ -58,20 +58,22 @@ var AdminStatsRenderer = (function() {
      */
     function renderTopSections(sections) {
         var sectionNames = {
-            'hero': 'Главная',
-            'services': 'Услуги',
-            'masters': 'Мастера',
-            'quality': 'Качество',
-            'blog': 'Блог',
-            'faq': 'FAQ',
-            'booking': 'Запись',
-            'podology': 'Подология',
-            'location': 'Контакты',
-            'social': 'Соцсети'
+            hero: 'Главная',
+            services: 'Услуги',
+            masters: 'Мастера',
+            quality: 'Качество',
+            blog: 'Блог',
+            faq: 'FAQ',
+            booking: 'Запись',
+            podology: 'Подология',
+            location: 'Контакты',
+            social: 'Соцсети'
         };
 
         var sortedSections = Object.entries(sections)
-            .sort(function(a, b) { return b[1] - a[1]; })
+            .sort(function (a, b) {
+                return b[1] - a[1];
+            })
             .slice(0, 6);
 
         if (sortedSections.length === 0) {
@@ -81,20 +83,30 @@ var AdminStatsRenderer = (function() {
 
         var maxViews = sortedSections[0][1];
 
-        var html = sortedSections.map(function(item, index) {
-            var key = item[0];
-            var views = item[1];
-            var name = sectionNames[key] || key;
-            var percent = maxViews > 0 ? Math.round((views / maxViews) * 100) : 0;
+        var html = sortedSections
+            .map(function (item, index) {
+                var key = item[0];
+                var views = item[1];
+                var name = sectionNames[key] || key;
+                var percent = maxViews > 0 ? Math.round((views / maxViews) * 100) : 0;
 
-            return '<div class="page-stat-row">' +
-                '<span class="page-stat-name">' + escapeHtml(name) + '</span>' +
-                '<div class="page-stat-bar-wrap">' +
-                    '<div class="page-stat-bar" style="width: ' + percent + '%"></div>' +
-                '</div>' +
-                '<span class="page-stat-count">' + views + '</span>' +
-            '</div>';
-        }).join('');
+                return (
+                    '<div class="page-stat-row">' +
+                    '<span class="page-stat-name">' +
+                    escapeHtml(name) +
+                    '</span>' +
+                    '<div class="page-stat-bar-wrap">' +
+                    '<div class="page-stat-bar" style="width: ' +
+                    percent +
+                    '%"></div>' +
+                    '</div>' +
+                    '<span class="page-stat-count">' +
+                    views +
+                    '</span>' +
+                    '</div>'
+                );
+            })
+            .join('');
 
         elements.topSections.innerHTML = html;
     }
@@ -122,7 +134,7 @@ var AdminStatsRenderer = (function() {
         ctx.textAlign = 'right';
 
         for (var j = 0; j <= 4; j++) {
-            var value = Math.round(dims.maxViews * (4 - j) / 4);
+            var value = Math.round((dims.maxViews * (4 - j)) / 4);
             var labelY = dims.padding + (dims.chartHeight / 4) * j;
             ctx.fillText(formatNumber(value), dims.padding - 10, labelY + 4);
         }
@@ -138,7 +150,7 @@ var AdminStatsRenderer = (function() {
         var barWidth = dims.chartWidth / chartData.length;
         var barGap = 4;
 
-        chartData.forEach(function(data, index) {
+        chartData.forEach(function (data, index) {
             var barHeight = Math.max(2, (data.views / dims.maxViews) * dims.chartHeight);
             var x = dims.padding + index * barWidth + barGap;
             var y = dims.height - dims.paddingBottom - barHeight;
@@ -185,7 +197,7 @@ var AdminStatsRenderer = (function() {
         ctx.font = '10px Manrope, sans-serif';
         ctx.textAlign = 'center';
 
-        chartData.forEach(function(data, index) {
+        chartData.forEach(function (data, index) {
             var x = dims.padding + index * barWidth + barWidth / 2;
             var date = new Date(data.date);
             var label = date.getDate() + '/' + (date.getMonth() + 1);
@@ -237,7 +249,9 @@ var AdminStatsRenderer = (function() {
         }
 
         // Вычисляем размеры
-        var views = chartData.map(function(d) { return d.views || 0; });
+        var views = chartData.map(function (d) {
+            return d.views || 0;
+        });
         var maxViews = views.length > 0 ? Math.max.apply(null, views) : 0;
         if (maxViews === 0) maxViews = 1;
 

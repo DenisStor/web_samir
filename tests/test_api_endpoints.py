@@ -248,8 +248,7 @@ class TestGetMasters:
             pytest.skip("Server imports failed")
 
         # Create test data
-        test_data = [{'id': 'master_1', 'name': 'Test Master'}]
-        (mock_data_dir / 'masters.json').write_text(json.dumps(test_data))
+        mock_data_dir.write('masters.json', {'masters': [{'id': 'master_1', 'name': 'Test Master'}]})
 
         response = make_request(f'{test_server_url}/api/masters')
 
@@ -275,9 +274,9 @@ class TestGetServices:
 
         test_data = {
             'categories': [{'id': 'main', 'name': 'Основные услуги'}],
-            'podology': {'services': []}
+            'podology': {'title': 'Подология', 'description': '', 'categories': []}
         }
-        (mock_data_dir / 'services.json').write_text(json.dumps(test_data))
+        mock_data_dir.write('services.json', test_data)
 
         response = make_request(f'{test_server_url}/api/services')
 
@@ -292,8 +291,7 @@ class TestGetArticles:
         if not SERVER_IMPORTS_OK:
             pytest.skip("Server imports failed")
 
-        test_data = [{'id': 'article_1', 'title': 'Test Article'}]
-        (mock_data_dir / 'articles.json').write_text(json.dumps(test_data))
+        mock_data_dir.write('articles.json', {'articles': [{'id': 'article_1', 'title': 'Test Article'}]})
 
         response = make_request(f'{test_server_url}/api/articles')
 
@@ -308,8 +306,7 @@ class TestGetFaq:
         if not SERVER_IMPORTS_OK:
             pytest.skip("Server imports failed")
 
-        test_data = [{'id': 'faq_1', 'question': 'Test?', 'answer': 'Answer'}]
-        (mock_data_dir / 'faq.json').write_text(json.dumps(test_data))
+        mock_data_dir.write('faq.json', {'faq': [{'id': 'faq_1', 'question': 'Test?', 'answer': 'Answer'}]})
 
         response = make_request(f'{test_server_url}/api/faq')
 
@@ -324,12 +321,11 @@ class TestGetLegal:
         if not SERVER_IMPORTS_OK:
             pytest.skip("Server imports failed")
 
-        test_data = {
+        mock_data_dir.write('legal.json', {
             'documents': [
                 {'id': 'legal_1', 'slug': 'privacy', 'title': 'Privacy', 'active': True}
             ]
-        }
-        (mock_data_dir / 'legal.json').write_text(json.dumps(test_data))
+        })
 
         response = make_request(f'{test_server_url}/api/legal')
 
@@ -340,12 +336,11 @@ class TestGetLegal:
         if not SERVER_IMPORTS_OK:
             pytest.skip("Server imports failed")
 
-        test_data = {
+        mock_data_dir.write('legal.json', {
             'documents': [
                 {'id': 'legal_1', 'slug': 'privacy', 'title': 'Privacy Policy', 'active': True}
             ]
-        }
-        (mock_data_dir / 'legal.json').write_text(json.dumps(test_data))
+        })
 
         response = make_request(f'{test_server_url}/api/legal/privacy')
 
@@ -357,8 +352,7 @@ class TestGetLegal:
         if not SERVER_IMPORTS_OK:
             pytest.skip("Server imports failed")
 
-        test_data = {'documents': []}
-        (mock_data_dir / 'legal.json').write_text(json.dumps(test_data))
+        mock_data_dir.write('legal.json', {'documents': []})
 
         response = make_request(f'{test_server_url}/api/legal/nonexistent')
 
@@ -377,8 +371,7 @@ class TestGetShopCategories:
         if not SERVER_IMPORTS_OK:
             pytest.skip("Server imports failed")
 
-        test_data = {'categories': [{'id': 'cat_1', 'name': 'Category 1'}]}
-        (mock_data_dir / 'shop-categories.json').write_text(json.dumps(test_data))
+        mock_data_dir.write('shop-categories.json', {'categories': [{'id': 'cat_1', 'name': 'Category 1'}]})
 
         response = make_request(f'{test_server_url}/api/shop/categories')
 
@@ -393,13 +386,12 @@ class TestGetProducts:
         if not SERVER_IMPORTS_OK:
             pytest.skip("Server imports failed")
 
-        test_data = {
+        mock_data_dir.write('products.json', {
             'products': [
-                {'id': 'prod_1', 'name': 'Product 1', 'status': 'active'},
-                {'id': 'prod_2', 'name': 'Product 2', 'status': 'draft'}
+                {'id': 'prod_1', 'name': 'Product 1', 'status': 'active', 'categoryId': ''},
+                {'id': 'prod_2', 'name': 'Product 2', 'status': 'draft', 'categoryId': ''}
             ]
-        }
-        (mock_data_dir / 'products.json').write_text(json.dumps(test_data))
+        })
 
         response = make_request(f'{test_server_url}/api/shop/products')
 
@@ -412,15 +404,13 @@ class TestGetProducts:
         if not SERVER_IMPORTS_OK:
             pytest.skip("Server imports failed")
 
-        categories = {'categories': [{'id': 'cat_1', 'slug': 'hair-care'}]}
-        products = {
+        mock_data_dir.write('shop-categories.json', {'categories': [{'id': 'cat_1', 'slug': 'hair-care'}]})
+        mock_data_dir.write('products.json', {
             'products': [
                 {'id': 'prod_1', 'categoryId': 'cat_1', 'status': 'active'},
                 {'id': 'prod_2', 'categoryId': 'cat_2', 'status': 'active'}
             ]
-        }
-        (mock_data_dir / 'shop-categories.json').write_text(json.dumps(categories))
-        (mock_data_dir / 'products.json').write_text(json.dumps(products))
+        })
 
         response = make_request(f'{test_server_url}/api/shop/products?category=hair-care')
 
@@ -435,12 +425,11 @@ class TestGetProductById:
         if not SERVER_IMPORTS_OK:
             pytest.skip("Server imports failed")
 
-        test_data = {
+        mock_data_dir.write('products.json', {
             'products': [
-                {'id': 'prod_1', 'name': 'Product 1', 'status': 'active'}
+                {'id': 'prod_1', 'name': 'Product 1', 'status': 'active', 'categoryId': ''}
             ]
-        }
-        (mock_data_dir / 'products.json').write_text(json.dumps(test_data))
+        })
 
         response = make_request(f'{test_server_url}/api/shop/products/prod_1')
 
@@ -452,8 +441,7 @@ class TestGetProductById:
         if not SERVER_IMPORTS_OK:
             pytest.skip("Server imports failed")
 
-        test_data = {'products': []}
-        (mock_data_dir / 'products.json').write_text(json.dumps(test_data))
+        mock_data_dir.write('products.json', {'products': []})
 
         response = make_request(f'{test_server_url}/api/shop/products/nonexistent')
 
@@ -642,13 +630,13 @@ class TestStatsEndpoints:
         if not SERVER_IMPORTS_OK:
             pytest.skip("Server imports failed")
 
-        test_stats = {
+        mock_data_dir.write('stats.json', {
             'total_views': 100,
             'unique_visitors': 50,
             'daily': {},
-            'sessions': {}
-        }
-        (mock_data_dir / 'stats.json').write_text(json.dumps(test_stats))
+            'sessions': {},
+            'sections': {}
+        })
 
         response = make_request(f'{test_server_url}/api/stats')
 
@@ -771,11 +759,10 @@ class TestSocialEndpoints:
         if not SERVER_IMPORTS_OK:
             pytest.skip("Server imports failed")
 
-        test_data = {
+        mock_data_dir.write('social.json', {
             'social': [{'id': 'social_1', 'type': 'telegram', 'url': 'https://t.me/test'}],
             'phone': '+7 999 123-45-67'
-        }
-        (mock_data_dir / 'social.json').write_text(json.dumps(test_data))
+        })
 
         response = make_request(f'{test_server_url}/api/social')
         assert response['status'] == 200

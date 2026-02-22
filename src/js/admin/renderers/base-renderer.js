@@ -3,7 +3,7 @@
  * Базовые функции для renderers
  */
 
-var BaseRenderer = (function() {
+var BaseRenderer = (function () {
     'use strict';
 
     /**
@@ -19,14 +19,16 @@ var BaseRenderer = (function() {
         var items = getItems() || [];
 
         // Создаем новый порядок элементов
-        var reordered = newOrder.map(function(id) {
-            return items.find(function(item) {
-                return String(item.id) === String(id);
-            });
-        }).filter(Boolean);
+        var reordered = newOrder
+            .map(function (id) {
+                return items.find(function (item) {
+                    return String(item.id) === String(id);
+                });
+            })
+            .filter(Boolean);
 
         // Обновляем поле order
-        reordered.forEach(function(item, index) {
+        reordered.forEach(function (item, index) {
             item.order = index;
         });
 
@@ -35,7 +37,7 @@ var BaseRenderer = (function() {
         data[entityName] = reordered;
 
         return AdminAPI.save(entityName, data)
-            .then(function() {
+            .then(function () {
                 setItems(reordered);
                 if (window.showToast) {
                     showToast('Порядок сохранён', 'success');
@@ -44,7 +46,7 @@ var BaseRenderer = (function() {
                     onSuccess();
                 }
             })
-            .catch(function(error) {
+            .catch(function (error) {
                 if (window.showToast) {
                     showToast('Ошибка сохранения порядка', 'error');
                 }
@@ -75,21 +77,27 @@ var BaseRenderer = (function() {
         }
 
         if (options.extraAttrs) {
-            Object.keys(options.extraAttrs).forEach(function(key) {
+            Object.keys(options.extraAttrs).forEach(function (key) {
                 var value = escapeAttr(options.extraAttrs[key]);
                 editAttrs += ' data-' + key + '="' + value + '"';
                 deleteAttrs += ' data-' + key + '="' + value + '"';
             });
         }
 
-        return '<div class="item-actions">' +
-            '<button class="btn btn-icon" ' + editAttrs + ' title="Редактировать">' +
-                SharedIcons.get('edit') +
+        return (
+            '<div class="item-actions">' +
+            '<button class="btn btn-icon" ' +
+            editAttrs +
+            ' title="Редактировать">' +
+            SharedIcons.get('edit') +
             '</button>' +
-            '<button class="btn btn-icon danger" ' + deleteAttrs + ' title="Удалить">' +
-                SharedIcons.get('delete') +
+            '<button class="btn btn-icon danger" ' +
+            deleteAttrs +
+            ' title="Удалить">' +
+            SharedIcons.get('delete') +
             '</button>' +
-        '</div>';
+            '</div>'
+        );
     }
 
     /**
@@ -97,9 +105,11 @@ var BaseRenderer = (function() {
      * @returns {string} HTML строка
      */
     function createDragHandle() {
-        return '<div class="drag-handle" title="Перетащите для изменения порядка">' +
+        return (
+            '<div class="drag-handle" title="Перетащите для изменения порядка">' +
             SharedIcons.get('grip') +
-        '</div>';
+            '</div>'
+        );
     }
 
     /**
@@ -109,8 +119,7 @@ var BaseRenderer = (function() {
      * @returns {string} HTML строка
      */
     function renderEmptyState(message, hint) {
-        var html = '<div class="empty-state">' +
-            '<p>' + escapeHtml(message) + '</p>';
+        var html = '<div class="empty-state">' + '<p>' + escapeHtml(message) + '</p>';
 
         if (hint) {
             html += '<p class="empty-hint">' + escapeHtml(hint) + '</p>';

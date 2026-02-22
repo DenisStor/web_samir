@@ -9,10 +9,14 @@
 }
 
 .booking::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse 80% 60% at 50% 100%, var(--accent-green-muted) 0%, transparent 60%);
+    background: radial-gradient(
+        ellipse 80% 60% at 50% 100%,
+        var(--accent-green-muted) 0%,
+        transparent 60%
+    );
     pointer-events: none;
 }
 
@@ -38,7 +42,7 @@
 }
 
 .booking-cta-card::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -105,7 +109,9 @@
     font-size: 1.1rem;
     font-weight: 600;
     text-decoration: none;
-    transition: transform var(--transition-base), box-shadow var(--transition-base);
+    transition:
+        transform var(--transition-base),
+        box-shadow var(--transition-base);
     box-shadow: var(--shadow-glow-sm);
 }
 

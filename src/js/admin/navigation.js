@@ -3,18 +3,18 @@
  * Управление навигацией между секциями админ-панели
  */
 
-var AdminNavigation = (function() {
+var AdminNavigation = (function () {
     'use strict';
 
     var currentSection = 'stats';
     var sectionTitles = {
-        'stats': 'Статистика',
-        'masters': 'Мастера',
-        'services': 'Услуги',
-        'articles': 'Статьи',
-        'principles': 'Принципы',
-        'faq': 'FAQ',
-        'social': 'Соцсети'
+        stats: 'Статистика',
+        masters: 'Мастера',
+        services: 'Услуги',
+        articles: 'Статьи',
+        principles: 'Принципы',
+        faq: 'FAQ',
+        social: 'Соцсети'
     };
 
     /**
@@ -23,7 +23,7 @@ var AdminNavigation = (function() {
     function switchSection(sectionId) {
         // Скрыть все секции
         var sections = document.querySelectorAll('.admin-section');
-        sections.forEach(function(section) {
+        sections.forEach(function (section) {
             section.classList.remove('active');
         });
 
@@ -35,7 +35,7 @@ var AdminNavigation = (function() {
 
         // Обновить активный пункт меню
         var navItems = document.querySelectorAll('.sidebar-nav a');
-        navItems.forEach(function(item) {
+        navItems.forEach(function (item) {
             item.classList.remove('active');
             if (item.getAttribute('data-section') === sectionId) {
                 item.classList.add('active');
@@ -68,8 +68,8 @@ var AdminNavigation = (function() {
      */
     function init() {
         var navItems = document.querySelectorAll('.sidebar-nav a[data-section]');
-        navItems.forEach(function(item) {
-            item.addEventListener('click', function(e) {
+        navItems.forEach(function (item) {
+            item.addEventListener('click', function (e) {
                 e.preventDefault();
                 var sectionId = this.getAttribute('data-section');
                 if (sectionId) {

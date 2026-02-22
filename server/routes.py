@@ -9,11 +9,12 @@ import re
 class Route:
     """Маршрут с поддержкой параметров {id}, {slug}."""
 
-    def __init__(self, pattern, handler, methods=None, auth_required=False):
+    def __init__(self, pattern, handler, methods=None, auth_required=False, context=None):
         self.pattern = pattern
         self.handler = handler
         self.methods = methods if methods else ['GET']
         self.auth_required = auth_required
+        self.context = context or {}
         self._regex = self._compile_pattern(pattern)
 
     def _compile_pattern(self, pattern):
@@ -28,7 +29,10 @@ class Route:
             return None
         match = self._regex.match(path)
         if match:
-            return match.groupdict()
+            params = match.groupdict()
+            if self.context:
+                params.update(self.context)
+            return params
         return None
 
 
@@ -38,27 +42,27 @@ class Router:
     def __init__(self):
         self._routes = []
 
-    def add(self, pattern, handler, methods=None, auth_required=False):
+    def add(self, pattern, handler, methods=None, auth_required=False, context=None):
         """Добавление маршрута."""
-        route = Route(pattern, handler, methods, auth_required)
+        route = Route(pattern, handler, methods, auth_required, context)
         self._routes.append(route)
         return self
 
-    def get(self, pattern, handler, auth_required=False):
+    def get(self, pattern, handler, auth_required=False, context=None):
         """Shortcut для GET маршрута."""
-        return self.add(pattern, handler, ['GET'], auth_required)
+        return self.add(pattern, handler, ['GET'], auth_required, context)
 
-    def post(self, pattern, handler, auth_required=False):
+    def post(self, pattern, handler, auth_required=False, context=None):
         """Shortcut для POST маршрута."""
-        return self.add(pattern, handler, ['POST'], auth_required)
+        return self.add(pattern, handler, ['POST'], auth_required, context)
 
-    def put(self, pattern, handler, auth_required=False):
+    def put(self, pattern, handler, auth_required=False, context=None):
         """Shortcut для PUT маршрута."""
-        return self.add(pattern, handler, ['PUT'], auth_required)
+        return self.add(pattern, handler, ['PUT'], auth_required, context)
 
-    def delete(self, pattern, handler, auth_required=False):
+    def delete(self, pattern, handler, auth_required=False, context=None):
         """Shortcut для DELETE маршрута."""
-        return self.add(pattern, handler, ['DELETE'], auth_required)
+        return self.add(pattern, handler, ['DELETE'], auth_required, context)
 
     def resolve(self, path, method):
         """
@@ -88,47 +92,31 @@ def create_api_router():
     router.get('/api/stats', 'handle_get_stats')
     router.post('/api/stats/visit', 'handle_record_visit')
 
-    # Masters
-    router.get('/api/masters', 'handle_get_masters')
-    router.post('/api/masters', 'handle_save_masters', auth_required=True)
-    router.put('/api/masters', 'handle_save_masters', auth_required=True)
+    # Generic CRUD ресурсы (маппинг в handler.py RESOURCE_MAP)
+    generic_resources = [
+        ('masters', '/api/masters'),
+        ('services', '/api/services'),
+        ('articles', '/api/articles'),
+        ('faq', '/api/faq'),
+        ('social', '/api/social'),
+        ('legal', '/api/legal'),
+        ('shop-categories', '/api/shop/categories'),
+    ]
+    for resource, path in generic_resources:
+        ctx = {'resource': resource}
+        router.get(path, 'handle_generic_get', context=ctx)
+        router.post(path, 'handle_generic_save', auth_required=True, context=ctx)
+        router.put(path, 'handle_generic_save', auth_required=True, context=ctx)
 
-    # Services
-    router.get('/api/services', 'handle_get_services')
-    router.post('/api/services', 'handle_save_services', auth_required=True)
-    router.put('/api/services', 'handle_save_services', auth_required=True)
-
-    # Articles
-    router.get('/api/articles', 'handle_get_articles')
-    router.post('/api/articles', 'handle_save_articles', auth_required=True)
-    router.put('/api/articles', 'handle_save_articles', auth_required=True)
-
-    # FAQ
-    router.get('/api/faq', 'handle_get_faq')
-    router.post('/api/faq', 'handle_save_faq', auth_required=True)
-    router.put('/api/faq', 'handle_save_faq', auth_required=True)
-
-    # Social
-    router.get('/api/social', 'handle_get_social')
-    router.post('/api/social', 'handle_save_social', auth_required=True)
-    router.put('/api/social', 'handle_save_social', auth_required=True)
-
-    # Legal
-    router.get('/api/legal', 'handle_get_legal')
+    # Кастомные endpoints
     router.get('/api/legal/{slug}', 'handle_get_legal_document')
-    router.post('/api/legal', 'handle_save_legal', auth_required=True)
-    router.put('/api/legal', 'handle_save_legal', auth_required=True)
 
-    # Shop categories
-    router.get('/api/shop/categories', 'handle_get_shop_categories')
-    router.post('/api/shop/categories', 'handle_save_shop_categories', auth_required=True)
-    router.put('/api/shop/categories', 'handle_save_shop_categories', auth_required=True)
-
-    # Shop products
+    # Shop products — кастомный GET (фильтрация), generic SAVE
     router.get('/api/shop/products', 'handle_get_products')
     router.get('/api/shop/products/{id}', 'handle_get_product')
-    router.post('/api/shop/products', 'handle_save_products', auth_required=True)
-    router.put('/api/shop/products', 'handle_save_products', auth_required=True)
+    ctx_products = {'resource': 'shop-products'}
+    router.post('/api/shop/products', 'handle_generic_save', auth_required=True, context=ctx_products)
+    router.put('/api/shop/products', 'handle_generic_save', auth_required=True, context=ctx_products)
 
     # Upload
     router.post('/api/upload', 'handle_upload', auth_required=True)

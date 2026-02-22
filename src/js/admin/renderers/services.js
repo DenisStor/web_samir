@@ -3,7 +3,7 @@
  * Рендеринг списка услуг с поддержкой drag & drop
  */
 
-var AdminServicesRenderer = (function() {
+var AdminServicesRenderer = (function () {
     'use strict';
 
     var servicesList = null;
@@ -26,14 +26,14 @@ var AdminServicesRenderer = (function() {
         if (!window.AdminDragDrop) return;
 
         if (!dragDropInitialized.services) {
-            AdminDragDrop.init('servicesList', '.service-item', function(newOrder) {
+            AdminDragDrop.init('servicesList', '.service-item', function (newOrder) {
                 reorderServices(newOrder);
             });
             dragDropInitialized.services = true;
         }
 
         if (!dragDropInitialized.podology) {
-            AdminDragDrop.init('podologyList', '.service-item', function(newOrder) {
+            AdminDragDrop.init('podologyList', '.service-item', function (newOrder) {
                 reorderPodology(newOrder);
             });
             dragDropInitialized.podology = true;
@@ -49,27 +49,31 @@ var AdminServicesRenderer = (function() {
 
         if (!services.categories) return;
 
-        var categoryIndex = services.categories.findIndex(function(c) {
+        var categoryIndex = services.categories.findIndex(function (c) {
             return c.id === currentCategory;
         });
 
         if (categoryIndex === -1) return;
 
         var category = services.categories[categoryIndex];
-        var reordered = newOrder.map(function(id) {
-            return category.services.find(function(s) { return String(s.id) === String(id); });
-        }).filter(Boolean);
+        var reordered = newOrder
+            .map(function (id) {
+                return category.services.find(function (s) {
+                    return String(s.id) === String(id);
+                });
+            })
+            .filter(Boolean);
 
         services.categories[categoryIndex].services = reordered;
 
         AdminAPI.save('services', services)
-            .then(function() {
+            .then(function () {
                 AdminState.setServices(services);
                 if (window.showToast) {
                     showToast('Порядок сохранён', 'success');
                 }
             })
-            .catch(function(error) {
+            .catch(function (error) {
                 if (window.showToast) {
                     showToast('Ошибка сохранения порядка', 'error');
                 }
@@ -86,26 +90,30 @@ var AdminServicesRenderer = (function() {
 
         if (!services.podology || !services.podology.categories) return;
 
-        var category = services.podology.categories.find(function(c) {
+        var category = services.podology.categories.find(function (c) {
             return c.id === currentCategory;
         });
 
         if (!category || !category.services) return;
 
-        var reordered = newOrder.map(function(id) {
-            return category.services.find(function(s) { return String(s.id) === String(id); });
-        }).filter(Boolean);
+        var reordered = newOrder
+            .map(function (id) {
+                return category.services.find(function (s) {
+                    return String(s.id) === String(id);
+                });
+            })
+            .filter(Boolean);
 
         category.services = reordered;
 
         AdminAPI.save('services', services)
-            .then(function() {
+            .then(function () {
                 AdminState.setServices(services);
                 if (window.showToast) {
                     showToast('Порядок сохранён', 'success');
                 }
             })
-            .catch(function(error) {
+            .catch(function (error) {
                 if (window.showToast) {
                     showToast('Ошибка сохранения порядка', 'error');
                 }
@@ -127,7 +135,7 @@ var AdminServicesRenderer = (function() {
         var category = null;
 
         if (services.categories) {
-            category = services.categories.find(function(c) {
+            category = services.categories.find(function (c) {
                 return c.id === currentCategory;
             });
         }
@@ -137,25 +145,55 @@ var AdminServicesRenderer = (function() {
             return;
         }
 
-        var html = category.services.map(function(service, index) {
-            return '<div class="service-item" data-id="' + service.id + '" data-index="' + index + '" data-search="' + escapeAttr(service.name) + '" draggable="true">' +
-                '<div class="drag-handle" title="Перетащите для изменения порядка">' + SharedIcons.get('grip') + '</div>' +
-                '<span class="service-name">' + escapeHtml(service.name) + '</span>' +
-                '<div class="service-prices">' +
-                    '<span class="price-tag price-green">' + (service.priceGreen || 0) + ' ₽</span>' +
-                    '<span class="price-tag price-pink">' + (service.pricePink || 0) + ' ₽</span>' +
-                    '<span class="price-tag price-blue">' + (service.priceBlue || 0) + ' ₽</span>' +
-                '</div>' +
-                '<div class="service-actions">' +
-                    '<button class="btn btn-icon" data-action="edit-service" data-category="' + currentCategory + '" data-index="' + index + '" title="Редактировать">' +
-                        SharedIcons.get('edit') +
+        var html = category.services
+            .map(function (service, index) {
+                return (
+                    '<div class="service-item" data-id="' +
+                    service.id +
+                    '" data-index="' +
+                    index +
+                    '" data-search="' +
+                    escapeAttr(service.name) +
+                    '" draggable="true">' +
+                    '<div class="drag-handle" title="Перетащите для изменения порядка">' +
+                    SharedIcons.get('grip') +
+                    '</div>' +
+                    '<span class="service-name">' +
+                    escapeHtml(service.name) +
+                    '</span>' +
+                    '<div class="service-prices">' +
+                    '<span class="price-tag price-green">' +
+                    (service.priceGreen || 0) +
+                    ' ₽</span>' +
+                    '<span class="price-tag price-pink">' +
+                    (service.pricePink || 0) +
+                    ' ₽</span>' +
+                    '<span class="price-tag price-blue">' +
+                    (service.priceBlue || 0) +
+                    ' ₽</span>' +
+                    '</div>' +
+                    '<div class="service-actions">' +
+                    '<button class="btn btn-icon" data-action="edit-service" data-category="' +
+                    currentCategory +
+                    '" data-index="' +
+                    index +
+                    '" title="Редактировать">' +
+                    SharedIcons.get('edit') +
                     '</button>' +
-                    '<button class="btn btn-icon danger" data-action="delete-service" data-category="' + currentCategory + '" data-index="' + index + '" data-name="' + escapeAttr(service.name) + '" title="Удалить">' +
-                        SharedIcons.get('delete') +
+                    '<button class="btn btn-icon danger" data-action="delete-service" data-category="' +
+                    currentCategory +
+                    '" data-index="' +
+                    index +
+                    '" data-name="' +
+                    escapeAttr(service.name) +
+                    '" title="Удалить">' +
+                    SharedIcons.get('delete') +
                     '</button>' +
-                '</div>' +
-            '</div>';
-        }).join('');
+                    '</div>' +
+                    '</div>'
+                );
+            })
+            .join('');
 
         servicesList.innerHTML = html;
 
@@ -182,12 +220,20 @@ var AdminServicesRenderer = (function() {
 
         var currentCategory = AdminState.currentPodologyCategory || categories[0].id;
 
-        var html = categories.map(function(cat) {
-            var activeClass = cat.id === currentCategory ? ' active' : '';
-            return '<button class="tab' + activeClass + '" data-podology-category="' + cat.id + '">' +
-                escapeHtml(cat.name) +
-            '</button>';
-        }).join('');
+        var html = categories
+            .map(function (cat) {
+                var activeClass = cat.id === currentCategory ? ' active' : '';
+                return (
+                    '<button class="tab' +
+                    activeClass +
+                    '" data-podology-category="' +
+                    cat.id +
+                    '">' +
+                    escapeHtml(cat.name) +
+                    '</button>'
+                );
+            })
+            .join('');
 
         tabsContainer.innerHTML = html;
     }
@@ -209,12 +255,15 @@ var AdminServicesRenderer = (function() {
         var categories = podology.categories || [];
 
         if (categories.length === 0) {
-            podologyList.innerHTML = '<p class="empty-message">Нет категорий. Добавьте категорию через кнопку "Категории".</p>';
+            podologyList.innerHTML =
+                '<p class="empty-message">Нет категорий. Добавьте категорию через кнопку "Категории".</p>';
             return;
         }
 
         var currentCategory = AdminState.currentPodologyCategory || categories[0].id;
-        var category = categories.find(function(c) { return c.id === currentCategory; });
+        var category = categories.find(function (c) {
+            return c.id === currentCategory;
+        });
 
         if (!category) {
             category = categories[0];
@@ -228,26 +277,57 @@ var AdminServicesRenderer = (function() {
             return;
         }
 
-        var html = categoryServices.map(function(service, index) {
-            var featuredClass = service.featured ? ' featured' : '';
-            var durationHtml = service.duration ? '<span class="service-duration">' + escapeHtml(service.duration) + '</span>' : '';
+        var html = categoryServices
+            .map(function (service, index) {
+                var featuredClass = service.featured ? ' featured' : '';
+                var durationHtml = service.duration
+                    ? '<span class="service-duration">' + escapeHtml(service.duration) + '</span>'
+                    : '';
 
-            return '<div class="service-item' + featuredClass + '" data-id="' + service.id + '" data-index="' + index + '" data-search="' + escapeAttr(service.name) + '" draggable="true">' +
-                '<div class="drag-handle" title="Перетащите для изменения порядка">' + SharedIcons.get('grip') + '</div>' +
-                '<span class="service-name">' + escapeHtml(service.name) + durationHtml + '</span>' +
-                '<div class="service-prices">' +
-                    '<span class="price-tag price-single">' + escapeHtml(service.price) + '</span>' +
-                '</div>' +
-                '<div class="service-actions">' +
-                    '<button class="btn btn-icon" data-action="edit-podology" data-category="' + currentCategory + '" data-index="' + index + '" title="Редактировать">' +
-                        SharedIcons.get('edit') +
+                return (
+                    '<div class="service-item' +
+                    featuredClass +
+                    '" data-id="' +
+                    service.id +
+                    '" data-index="' +
+                    index +
+                    '" data-search="' +
+                    escapeAttr(service.name) +
+                    '" draggable="true">' +
+                    '<div class="drag-handle" title="Перетащите для изменения порядка">' +
+                    SharedIcons.get('grip') +
+                    '</div>' +
+                    '<span class="service-name">' +
+                    escapeHtml(service.name) +
+                    durationHtml +
+                    '</span>' +
+                    '<div class="service-prices">' +
+                    '<span class="price-tag price-single">' +
+                    escapeHtml(service.price) +
+                    '</span>' +
+                    '</div>' +
+                    '<div class="service-actions">' +
+                    '<button class="btn btn-icon" data-action="edit-podology" data-category="' +
+                    currentCategory +
+                    '" data-index="' +
+                    index +
+                    '" title="Редактировать">' +
+                    SharedIcons.get('edit') +
                     '</button>' +
-                    '<button class="btn btn-icon danger" data-action="delete-podology" data-category="' + currentCategory + '" data-index="' + index + '" data-name="' + escapeAttr(service.name) + '" title="Удалить">' +
-                        SharedIcons.get('delete') +
+                    '<button class="btn btn-icon danger" data-action="delete-podology" data-category="' +
+                    currentCategory +
+                    '" data-index="' +
+                    index +
+                    '" data-name="' +
+                    escapeAttr(service.name) +
+                    '" title="Удалить">' +
+                    SharedIcons.get('delete') +
                     '</button>' +
-                '</div>' +
-            '</div>';
-        }).join('');
+                    '</div>' +
+                    '</div>'
+                );
+            })
+            .join('');
 
         podologyList.innerHTML = html;
 

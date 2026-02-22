@@ -19,11 +19,12 @@
     font-size: 1rem;
     text-decoration: none;
     /* Оптимизировано: конкретные свойства вместо all */
-    transition: transform var(--transition-base),
-                box-shadow var(--transition-base),
-                background var(--transition-base),
-                color var(--transition-base),
-                border-color var(--transition-base);
+    transition:
+        transform var(--transition-base),
+        box-shadow var(--transition-base),
+        background var(--transition-base),
+        color var(--transition-base),
+        border-color var(--transition-base);
     cursor: pointer;
     border: none;
     font-family: inherit;
@@ -48,7 +49,9 @@
 
 .btn-primary:hover {
     transform: translateY(-3px);
-    box-shadow: 0 0 60px var(--accent-green-glow), var(--shadow-elevated);
+    box-shadow:
+        0 0 60px var(--accent-green-glow),
+        var(--shadow-elevated);
 }
 
 .btn-secondary {
@@ -123,9 +126,10 @@
     font-weight: 600;
     font-size: 0.9rem;
     white-space: nowrap;
-    transition: transform var(--transition-base),
-                background var(--transition-base),
-                box-shadow var(--transition-base);
+    transition:
+        transform var(--transition-base),
+        background var(--transition-base),
+        box-shadow var(--transition-base);
     cursor: pointer;
 }
 
@@ -201,7 +205,9 @@
     color: var(--text-white);
     font-size: 1rem;
     font-family: inherit;
-    transition: border-color var(--transition-base), box-shadow var(--transition-base);
+    transition:
+        border-color var(--transition-base),
+        box-shadow var(--transition-base);
 }
 
 .form-input:focus {
@@ -302,7 +308,9 @@ textarea.form-input {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: opacity 0.4s ease, visibility 0.4s ease;
+    transition:
+        opacity 0.4s ease,
+        visibility 0.4s ease;
 }
 
 .page-loader.hidden {
@@ -325,7 +333,9 @@ textarea.form-input {
 }
 
 @keyframes loader-spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -351,8 +361,12 @@ textarea.form-input {
 }
 
 @keyframes shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
 }
 
 .skeleton-card {
@@ -405,12 +419,24 @@ textarea.form-input {
    STAGGER ANIMATION
    ================================================================= */
 
-.stagger-item:nth-child(1) { transition-delay: 0ms; }
-.stagger-item:nth-child(2) { transition-delay: 50ms; }
-.stagger-item:nth-child(3) { transition-delay: 100ms; }
-.stagger-item:nth-child(4) { transition-delay: 150ms; }
-.stagger-item:nth-child(5) { transition-delay: 200ms; }
-.stagger-item:nth-child(6) { transition-delay: 250ms; }
+.stagger-item:nth-child(1) {
+    transition-delay: 0ms;
+}
+.stagger-item:nth-child(2) {
+    transition-delay: 50ms;
+}
+.stagger-item:nth-child(3) {
+    transition-delay: 100ms;
+}
+.stagger-item:nth-child(4) {
+    transition-delay: 150ms;
+}
+.stagger-item:nth-child(5) {
+    transition-delay: 200ms;
+}
+.stagger-item:nth-child(6) {
+    transition-delay: 250ms;
+}
 
 @media (prefers-reduced-motion: reduce) {
     .stagger-item {

@@ -2,7 +2,7 @@
  * Admin Drag & Drop Module
  * Универсальный модуль для сортировки элементов перетаскиванием
  */
-var AdminDragDrop = (function() {
+var AdminDragDrop = (function () {
     'use strict';
 
     var draggedItem = null;
@@ -45,7 +45,7 @@ var AdminDragDrop = (function() {
         if (!container) return;
 
         var items = container.querySelectorAll(config.selector);
-        items.forEach(function(item, index) {
+        items.forEach(function (item, index) {
             item.setAttribute('draggable', 'true');
             item.dataset.index = index;
         });
@@ -59,8 +59,9 @@ var AdminDragDrop = (function() {
 
         var handle = document.createElement('div');
         handle.className = 'drag-handle';
-        handle.innerHTML = window.SharedIcons ? window.SharedIcons.get('grip') :
-            '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg>';
+        handle.innerHTML = window.SharedIcons
+            ? window.SharedIcons.get('grip')
+            : '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg>';
         handle.title = 'Перетащите для изменения порядка';
 
         // Вставляем в начало элемента
@@ -75,7 +76,7 @@ var AdminDragDrop = (function() {
         draggedIndex = parseInt(item.dataset.index, 10);
 
         // Добавляем класс с небольшой задержкой для анимации
-        setTimeout(function() {
+        setTimeout(function () {
             if (draggedItem) {
                 draggedItem.classList.add('dragging');
             }
@@ -148,13 +149,13 @@ var AdminDragDrop = (function() {
 
         // Обновляем индексы
         var items = container.querySelectorAll(config.selector);
-        items.forEach(function(item, index) {
+        items.forEach(function (item, index) {
             item.dataset.index = index;
         });
 
         // Собираем новый порядок ID
         var newOrder = [];
-        items.forEach(function(item) {
+        items.forEach(function (item) {
             var id = item.dataset.id;
             if (id) {
                 newOrder.push(id);
@@ -184,6 +185,13 @@ var AdminDragDrop = (function() {
             container.removeEventListener('drop', handleDrop);
         }
         delete containers[containerId];
+
+        // Обнулить состояние drag если удалён последний контейнер
+        if (Object.keys(containers).length === 0) {
+            draggedItem = null;
+            draggedIndex = -1;
+            currentDragOver = null;
+        }
     }
 
     // Публичный API

@@ -84,3 +84,123 @@ text?.trim();                          // Optional chaining
 - Все модули должны иметь функцию `cleanup()` или `destroy()`
 - Scroll listeners: использовать `SharedHelpers.throttleRAF()`
 - Добавлять `{ passive: true }` к scroll/touch listeners
+
+---
+
+## Шаблоны кода
+
+### Модуль для site (главная страница)
+
+```javascript
+/**
+ * Module Name
+ * Описание модуля
+ */
+
+(function() {
+    'use strict';
+
+    var container = null;
+    var isInitialized = false;
+
+    function init() {
+        if (isInitialized) return;
+        container = document.getElementById('my-element');
+        if (!container) return;
+        bindEvents();
+        isInitialized = true;
+    }
+
+    function bindEvents() {
+        container.addEventListener('click', handleClick);
+    }
+
+    function handleClick(event) {
+        var target = event.target;
+        if (target.matches('.action-btn')) {
+            doAction(target);
+        }
+    }
+
+    function doAction(element) {
+        var id = element.getAttribute('data-id');
+        var text = SharedHelpers.escapeHtml(element.textContent);
+        // Логика
+    }
+
+    function cleanup() {
+        if (container) {
+            container.removeEventListener('click', handleClick);
+        }
+        isInitialized = false;
+    }
+
+    // Публичный API
+    window.SaysApp = window.SaysApp || {};
+    window.SaysApp.ModuleName = {
+        init: init,
+        cleanup: cleanup
+    };
+
+    document.addEventListener('DOMContentLoaded', init);
+})();
+```
+
+### Renderer для админки
+
+```javascript
+/**
+ * Admin Entity Renderer
+ */
+
+var AdminEntityRenderer = (function() {
+    'use strict';
+
+    var container = null;
+
+    function init() {
+        container = document.getElementById('entityGrid');
+    }
+
+    function render() {
+        if (!container) {
+            container = document.getElementById('entityGrid');
+            if (!container) return;
+        }
+
+        var items = AdminState.entities || [];
+
+        if (items.length === 0) {
+            container.innerHTML = '<p class="empty-message">Нет данных</p>';
+            return;
+        }
+
+        var html = items.map(function(item) {
+            return '<div class="entity-card" data-id="' + item.id + '">' +
+                '<h3>' + window.escapeHtml(item.name) + '</h3>' +
+                '<button data-action="edit-entity" data-id="' + item.id + '">' +
+                    'Редактировать' +
+                '</button>' +
+            '</div>';
+        }).join('');
+
+        container.innerHTML = html;
+    }
+
+    return { init: init, render: render };
+})();
+
+window.AdminEntityRenderer = AdminEntityRenderer;
+```
+
+### Полные примеры
+
+- [Шаблон renderer](examples/new-renderer.js)
+- [Шаблон формы](examples/new-form.js)
+
+---
+
+## Связанные документы
+
+- [Как создать JS модуль](how-to/add-js-module.md) — пошаговый гайд
+- [Глоссарий](glossary.md) — термины (IIFE, Renderer, Form)

@@ -4,24 +4,56 @@
  * Provides safe HTML sanitization for user-generated content.
  * Falls back to text escaping if DOMPurify is not loaded.
  */
-(function() {
+(function () {
     'use strict';
 
     // DOMPurify configuration for allowed tags
     var PURIFY_CONFIG = {
         ALLOWED_TAGS: [
-            'p', 'br', 'strong', 'b', 'em', 'i', 'u', 's', 'strike',
-            'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-            'ul', 'ol', 'li',
-            'blockquote', 'pre', 'code',
-            'a', 'img',
-            'div', 'span',
-            'table', 'thead', 'tbody', 'tr', 'th', 'td'
+            'p',
+            'br',
+            'strong',
+            'b',
+            'em',
+            'i',
+            'u',
+            's',
+            'strike',
+            'h1',
+            'h2',
+            'h3',
+            'h4',
+            'h5',
+            'h6',
+            'ul',
+            'ol',
+            'li',
+            'blockquote',
+            'pre',
+            'code',
+            'a',
+            'img',
+            'div',
+            'span',
+            'table',
+            'thead',
+            'tbody',
+            'tr',
+            'th',
+            'td'
         ],
         ALLOWED_ATTR: [
-            'href', 'src', 'alt', 'title', 'target', 'rel',
-            'class', 'id', 'style',
-            'width', 'height'
+            'href',
+            'src',
+            'alt',
+            'title',
+            'target',
+            'rel',
+            'class',
+            'id',
+            'style',
+            'width',
+            'height'
         ],
         ALLOW_DATA_ATTR: false,
         ADD_ATTR: ['target'],
@@ -37,9 +69,8 @@
     };
 
     /**
-     * Escape HTML entities (fallback when DOMPurify not available)
-     * @param {string} text - Text to escape
-     * @returns {string} Escaped text
+     * escapeHtml — использует SharedHelpers если доступен, иначе собственная реализация.
+     * На admin-странице helpers.js загружается позже через bundle.
      */
     function escapeHtml(text) {
         if (text === null || text === undefined) return '';
@@ -110,15 +141,12 @@
         window.SaysApp = {};
     }
 
-    window.SaysApp.escapeHtml = escapeHtml;
     window.SaysApp.sanitize = sanitize;
     window.SaysApp.sanitizeText = sanitizeText;
     window.SaysApp.sanitizeUrl = sanitizeUrl;
 
-    // Also export globally for backward compatibility
-    window.escapeHtml = escapeHtml;
+    // Глобальные алиасы (escapeHtml уже экспортирован из helpers.js)
     window.sanitize = sanitize;
     window.sanitizeText = sanitizeText;
     window.sanitizeUrl = sanitizeUrl;
-
 })();

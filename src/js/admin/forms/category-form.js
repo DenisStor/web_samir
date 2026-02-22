@@ -3,7 +3,7 @@
  * Форма добавления/редактирования категории товаров
  */
 
-var AdminCategoryForm = (function() {
+var AdminCategoryForm = (function () {
     'use strict';
 
     // Группы иконок для выбора
@@ -33,58 +33,83 @@ var AdminCategoryForm = (function() {
     function show(category) {
         AdminState.editingItem = category || null;
         var title = category ? 'Редактировать категорию' : 'Добавить категорию';
-        var currentIcon = category && category.icon || 'scissors';
+        var currentIcon = (category && category.icon) || 'scissors';
 
-        var html = '<form id="categoryForm" class="admin-form">' +
+        var html =
+            '<form id="categoryForm" class="admin-form">' +
             '<div class="form-row">' +
-                '<div class="form-group form-group-flex">' +
-                    '<label class="form-label">Название *</label>' +
-                    '<input type="text" class="form-input" id="categoryName" ' +
-                        'value="' + window.escapeHtml(category && category.name || '') + '" ' +
-                        'placeholder="Средства для волос" required>' +
-                '</div>' +
-                '<div class="form-group form-group-small">' +
-                    '<label class="form-label">URL (slug)</label>' +
-                    '<input type="text" class="form-input" id="categorySlug" ' +
-                        'value="' + window.escapeHtml(category && category.slug || '') + '" ' +
-                        'placeholder="hair-care">' +
-                '</div>' +
+            '<div class="form-group form-group-flex">' +
+            '<label class="form-label">Название *</label>' +
+            '<input type="text" class="form-input" id="categoryName" ' +
+            'value="' +
+            window.escapeHtml((category && category.name) || '') +
+            '" ' +
+            'placeholder="Средства для волос" required>' +
+            '</div>' +
+            '<div class="form-group form-group-small">' +
+            '<label class="form-label">URL (slug)</label>' +
+            '<input type="text" class="form-input" id="categorySlug" ' +
+            'value="' +
+            window.escapeHtml((category && category.slug) || '') +
+            '" ' +
+            'placeholder="hair-care">' +
+            '</div>' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Описание</label>' +
-                '<textarea class="form-textarea" id="categoryDescription" rows="2" ' +
-                    'placeholder="Краткое описание категории...">' +
-                    window.escapeHtml(category && category.description || '') +
-                '</textarea>' +
+            '<label class="form-label">Описание</label>' +
+            '<textarea class="form-textarea" id="categoryDescription" rows="2" ' +
+            'placeholder="Краткое описание категории...">' +
+            window.escapeHtml((category && category.description) || '') +
+            '</textarea>' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-checkbox">' +
-                    '<input type="checkbox" id="categoryActive" ' + (category && category.active === false ? '' : 'checked') + '>' +
-                    '<span class="checkbox-mark"></span>' +
-                    '<span class="checkbox-label">Активная категория</span>' +
-                '</label>' +
-                '<p class="form-hint">Неактивные категории не отображаются на сайте</p>' +
+            '<label class="form-checkbox">' +
+            '<input type="checkbox" id="categoryActive" ' +
+            (category && category.active === false ? '' : 'checked') +
+            '>' +
+            '<span class="checkbox-mark"></span>' +
+            '<span class="checkbox-label">Активная категория</span>' +
+            '</label>' +
+            '<p class="form-hint">Неактивные категории не отображаются на сайте</p>' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Иконка</label>' +
-                '<div class="icon-selector-grouped" id="iconSelector">' +
-                    iconGroups.map(function(group) {
-                        return '<div class="icon-group">' +
-                            '<span class="icon-group-label">' + group.name + '</span>' +
-                            '<div class="icon-group-icons">' +
-                                group.icons.map(function(icon) {
-                                    var activeClass = currentIcon === icon ? ' active' : '';
-                                    return '<button type="button" class="icon-option' + activeClass + '" data-icon="' + icon + '" title="' + icon + '">' +
-                                        SharedIcons.get(icon) +
-                                    '</button>';
-                                }).join('') +
-                            '</div>' +
-                        '</div>';
-                    }).join('') +
-                '</div>' +
-                '<input type="hidden" id="categoryIcon" value="' + window.escapeHtml(currentIcon) + '">' +
+            '<label class="form-label">Иконка</label>' +
+            '<div class="icon-selector-grouped" id="iconSelector">' +
+            iconGroups
+                .map(function (group) {
+                    return (
+                        '<div class="icon-group">' +
+                        '<span class="icon-group-label">' +
+                        group.name +
+                        '</span>' +
+                        '<div class="icon-group-icons">' +
+                        group.icons
+                            .map(function (icon) {
+                                var activeClass = currentIcon === icon ? ' active' : '';
+                                return (
+                                    '<button type="button" class="icon-option' +
+                                    activeClass +
+                                    '" data-icon="' +
+                                    icon +
+                                    '" title="' +
+                                    icon +
+                                    '">' +
+                                    SharedIcons.get(icon) +
+                                    '</button>'
+                                );
+                            })
+                            .join('') +
+                        '</div>' +
+                        '</div>'
+                    );
+                })
+                .join('') +
             '</div>' +
-        '</form>';
+            '<input type="hidden" id="categoryIcon" value="' +
+            window.escapeHtml(currentIcon) +
+            '">' +
+            '</div>' +
+            '</form>';
 
         AdminModals.setTitle('modal', title);
         document.getElementById('modalBody').innerHTML = html;
@@ -99,7 +124,7 @@ var AdminCategoryForm = (function() {
         var slugInput = document.getElementById('categorySlug');
 
         if (nameInput && slugInput) {
-            nameInput.addEventListener('input', function() {
+            nameInput.addEventListener('input', function () {
                 if (!category) {
                     slugInput.value = generateSlug(nameInput.value);
                 }
@@ -111,10 +136,10 @@ var AdminCategoryForm = (function() {
         var iconInput = document.getElementById('categoryIcon');
 
         if (iconSelector) {
-            iconSelector.addEventListener('click', function(e) {
+            iconSelector.addEventListener('click', function (e) {
                 var option = e.target.closest('.icon-option');
                 if (option) {
-                    iconSelector.querySelectorAll('.icon-option').forEach(function(o) {
+                    iconSelector.querySelectorAll('.icon-option').forEach(function (o) {
                         o.classList.remove('active');
                     });
                     option.classList.add('active');
@@ -137,19 +162,23 @@ var AdminCategoryForm = (function() {
         var active = document.getElementById('categoryActive').checked;
 
         var categoryData = {
-            id: AdminState.editingItem ? AdminState.editingItem.id : SharedHelpers.generateId('category'),
+            id: AdminState.editingItem
+                ? AdminState.editingItem.id
+                : SharedHelpers.generateId('category'),
             name: name,
             slug: slug,
             description: description,
             icon: icon,
-            order: AdminState.editingItem ? AdminState.editingItem.order : AdminState.shopCategories.length + 1,
+            order: AdminState.editingItem
+                ? AdminState.editingItem.order
+                : AdminState.shopCategories.length + 1,
             active: active
         };
 
         var categories = AdminState.shopCategories.slice();
 
         if (AdminState.editingItem) {
-            var index = categories.findIndex(function(c) {
+            var index = categories.findIndex(function (c) {
                 return c.id === AdminState.editingItem.id;
             });
             if (index !== -1) categories[index] = categoryData;
@@ -170,12 +199,15 @@ var AdminCategoryForm = (function() {
 
     async function remove(id) {
         // Check if category has products
-        var productsInCategory = AdminState.products.filter(function(p) {
+        var productsInCategory = AdminState.products.filter(function (p) {
             return p.categoryId === id;
         });
 
         if (productsInCategory.length > 0) {
-            showToast('Нельзя удалить категорию с товарами (' + productsInCategory.length + ' шт.)', 'error');
+            showToast(
+                'Нельзя удалить категорию с товарами (' + productsInCategory.length + ' шт.)',
+                'error'
+            );
             return;
         }
 
@@ -186,7 +218,7 @@ var AdminCategoryForm = (function() {
             return;
         }
 
-        var categories = AdminState.shopCategories.filter(function(c) {
+        var categories = AdminState.shopCategories.filter(function (c) {
             return c.id !== id;
         });
 

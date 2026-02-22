@@ -3,7 +3,7 @@
  * Роутинг магазина
  * @module ShopRouter
  */
-var ShopRouter = (function() {
+var ShopRouter = (function () {
     'use strict';
 
     /**
@@ -34,7 +34,7 @@ var ShopRouter = (function() {
         var elements = ShopState.getElements();
         elements.catalog.style.display = 'block';
         elements.productPage.style.display = 'none';
-        document.title = 'Магазин | Say\'s Barbers';
+        document.title = "Магазин | Say's Barbers";
         window.scrollTo(0, 0);
     }
 
@@ -62,7 +62,7 @@ var ShopRouter = (function() {
         elements.productPage.style.display = 'block';
 
         ShopRenderer.renderProductDetail(product);
-        document.title = product.name + ' | Say\'s Barbers';
+        document.title = product.name + " | Say's Barbers";
         window.scrollTo(0, 0);
     }
 
@@ -72,21 +72,21 @@ var ShopRouter = (function() {
      */
     function fetchProduct(productId) {
         fetch(ShopState.API_BASE + '/products/' + productId)
-            .then(function(response) {
+            .then(function (response) {
                 if (response.ok) {
                     return response.json();
                 }
                 throw new Error('Product not found');
             })
-            .then(function(product) {
+            .then(function (product) {
                 var elements = ShopState.getElements();
                 elements.catalog.style.display = 'none';
                 elements.productPage.style.display = 'block';
                 ShopRenderer.renderProductDetail(product);
-                document.title = product.name + ' | Say\'s Barbers';
+                document.title = product.name + " | Say's Barbers";
                 window.scrollTo(0, 0);
             })
-            .catch(function(error) {
+            .catch(function (error) {
                 console.error('Error fetching product:', error);
                 showCatalog();
             });

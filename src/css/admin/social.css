@@ -66,12 +66,24 @@
     color: var(--accent-green);
 }
 
-.social-link-icon.vk svg { color: #0077ff; }
-.social-link-icon.telegram svg { color: #2AABEE; }
-.social-link-icon.whatsapp svg { color: #25D366; }
-.social-link-icon.youtube svg { color: #FF0000; }
-.social-link-icon.instagram svg { color: #E4405F; }
-.social-link-icon.tiktok svg { color: #ffffff; }
+.social-link-icon.vk svg {
+    color: #0077ff;
+}
+.social-link-icon.telegram svg {
+    color: #2aabee;
+}
+.social-link-icon.whatsapp svg {
+    color: #25d366;
+}
+.social-link-icon.youtube svg {
+    color: #ff0000;
+}
+.social-link-icon.instagram svg {
+    color: #e4405f;
+}
+.social-link-icon.tiktok svg {
+    color: #ffffff;
+}
 
 .social-link-info {
     flex: 1;
@@ -94,7 +106,9 @@
     color: var(--text-white);
     font-family: inherit;
     font-size: 0.85rem;
-    transition: border-color var(--transition-base), box-shadow var(--transition-base);
+    transition:
+        border-color var(--transition-base),
+        box-shadow var(--transition-base);
 }
 
 .social-link-url-input:focus {

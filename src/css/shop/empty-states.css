@@ -11,7 +11,7 @@
     align-items: center;
     gap: 16px;
     color: var(--text-gray);
-    font-family: 'Manrope', sans-serif;
+    font-family: "Manrope", sans-serif;
     font-size: 1.1rem;
 }
 
@@ -30,7 +30,7 @@
 }
 
 .empty-title {
-    font-family: 'Manrope', sans-serif;
+    font-family: "Manrope", sans-serif;
     font-size: 1.25rem;
     font-weight: 600;
     color: var(--text-white);
@@ -38,7 +38,7 @@
 }
 
 .empty-subtitle {
-    font-family: 'Manrope', sans-serif;
+    font-family: "Manrope", sans-serif;
     font-size: 1rem;
     color: var(--text-gray);
     margin: 0;
@@ -51,11 +51,13 @@
     border: none;
     border-radius: var(--radius-md);
     color: var(--bg-dark);
-    font-family: 'Manrope', sans-serif;
+    font-family: "Manrope", sans-serif;
     font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
-    transition: transform var(--transition-base), box-shadow var(--transition-base);
+    transition:
+        transform var(--transition-base),
+        box-shadow var(--transition-base);
 }
 
 .empty-btn:hover {
@@ -76,7 +78,7 @@
 }
 
 .loading-spinner::after {
-    content: '';
+    content: "";
     width: 40px;
     height: 40px;
     border: 3px solid var(--border-subtle);
@@ -86,7 +88,9 @@
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* =================================================================

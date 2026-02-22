@@ -3,7 +3,7 @@
  * Рендеринг соцсетей и контактов
  */
 
-var AdminSocialRenderer = (function() {
+var AdminSocialRenderer = (function () {
     'use strict';
 
     var elements = {};
@@ -46,33 +46,58 @@ var AdminSocialRenderer = (function() {
         var socialLinks = social.social || [];
 
         if (socialLinks.length === 0) {
-            elements.socialLinksList.innerHTML = '<p class="empty-message">Нет настроенных соцсетей</p>';
+            elements.socialLinksList.innerHTML =
+                '<p class="empty-message">Нет настроенных соцсетей</p>';
             return;
         }
 
-        var html = socialLinks.map(function(link) {
-            var inactiveClass = link.active ? '' : 'inactive';
-            var toggleClass = link.active ? 'active' : '';
-            var toggleText = link.active ? 'Вкл' : 'Выкл';
+        var html = socialLinks
+            .map(function (link) {
+                var inactiveClass = link.active ? '' : 'inactive';
+                var toggleClass = link.active ? 'active' : '';
+                var toggleText = link.active ? 'Вкл' : 'Выкл';
 
-            return '<div class="social-link-item ' + inactiveClass + '" data-id="' + link.id + '">' +
-                '<div class="social-link-icon ' + link.icon + '">' +
+                return (
+                    '<div class="social-link-item ' +
+                    inactiveClass +
+                    '" data-id="' +
+                    link.id +
+                    '">' +
+                    '<div class="social-link-icon ' +
+                    link.icon +
+                    '">' +
                     SharedIcons.getSocial(link.icon) +
-                '</div>' +
-                '<div class="social-link-info">' +
-                    '<div class="social-link-name">' + window.escapeHtml(link.name) + '</div>' +
+                    '</div>' +
+                    '<div class="social-link-info">' +
+                    '<div class="social-link-name">' +
+                    window.escapeHtml(link.name) +
+                    '</div>' +
                     '<input type="text" ' +
-                        'class="social-link-url-input" ' +
-                        'data-social-id="' + link.id + '" ' +
-                        'value="' + window.escapeHtml(link.url || '') + '" ' +
-                        'placeholder="Введите URL для ' + window.escapeHtml(link.name) + '">' +
-                '</div>' +
-                '<div class="social-link-toggle">' +
-                    '<div class="toggle ' + toggleClass + '" data-social-id="' + link.id + '" data-action="toggle-social"></div>' +
-                    '<span>' + toggleText + '</span>' +
-                '</div>' +
-            '</div>';
-        }).join('');
+                    'class="social-link-url-input" ' +
+                    'data-social-id="' +
+                    link.id +
+                    '" ' +
+                    'value="' +
+                    window.escapeHtml(link.url || '') +
+                    '" ' +
+                    'placeholder="Введите URL для ' +
+                    window.escapeHtml(link.name) +
+                    '">' +
+                    '</div>' +
+                    '<div class="social-link-toggle">' +
+                    '<div class="toggle ' +
+                    toggleClass +
+                    '" data-social-id="' +
+                    link.id +
+                    '" data-action="toggle-social"></div>' +
+                    '<span>' +
+                    toggleText +
+                    '</span>' +
+                    '</div>' +
+                    '</div>'
+                );
+            })
+            .join('');
 
         elements.socialLinksList.innerHTML = html;
     }
@@ -84,7 +109,7 @@ var AdminSocialRenderer = (function() {
         var social = AdminState.social;
         if (!social || !social.social) return;
 
-        var link = social.social.find(function(s) {
+        var link = social.social.find(function (s) {
             return s.id === id;
         });
 
@@ -113,10 +138,10 @@ var AdminSocialRenderer = (function() {
 
         // Собираем URL соцсетей из инпутов
         var urlInputs = document.querySelectorAll('.social-link-url-input');
-        urlInputs.forEach(function(input) {
+        urlInputs.forEach(function (input) {
             var socialId = input.dataset.socialId;
             if (social.social) {
-                var link = social.social.find(function(s) {
+                var link = social.social.find(function (s) {
                     return s.id === socialId;
                 });
                 if (link) {

@@ -226,7 +226,7 @@ class TestSaveAllResourceTypes:
 
         resources = {
             '/api/masters': {'masters': [{'id': 'master_1234567890', 'name': 'Test', 'badge': 'green'}]},
-            '/api/services': {'services': [{'name': 'Стрижка', 'priceGreen': 1000}]},
+            '/api/services': {'categories': [{'id': 'cat_1', 'name': 'Основные', 'services': [{'id': 1, 'name': 'Стрижка', 'priceGreen': 1000}]}]},
             '/api/articles': {'articles': [{'id': 'article_1234567890', 'title': 'Test'}]},
             '/api/faq': {'items': [{'id': 'faq_1234567890', 'question': 'Test?', 'answer': 'Yes'}]},
             '/api/social': {'social': [{'id': 'social_1', 'type': 'vk', 'url': 'https://vk.com'}]},

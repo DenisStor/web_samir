@@ -30,7 +30,7 @@
 
 .faq-item.active {
     border-color: var(--accent-green);
-    box-shadow: 0 8px 32px var(--accent-green-12);
+    box-shadow: 0 8px 32px var(--accent-green-subtle);
     transform: translateX(0);
 }
 
@@ -54,7 +54,9 @@
     font-weight: 600;
     margin: 0;
     color: var(--text-white);
-    transition: color 0.3s ease, transform 0.3s ease;
+    transition:
+        color 0.3s ease,
+        transform 0.3s ease;
 }
 
 .faq-item.active .faq-question h3 {

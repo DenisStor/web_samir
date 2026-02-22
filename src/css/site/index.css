@@ -4,14 +4,14 @@
    Импортирует все модули секций в правильном порядке.
    ===================================================================== */
 
-@import 'section-base.css';
-@import 'hero.css';
-@import 'services.css';
-@import 'podology.css';
-@import 'masters.css';
-@import 'location.css';
-@import 'social.css';
-@import 'blog.css';
-@import 'faq.css';
-@import 'booking.css';
-@import 'footer.css';
+@import "section-base.css";
+@import "hero.css";
+@import "services.css";
+@import "podology.css";
+@import "masters.css";
+@import "location.css";
+@import "social.css";
+@import "blog.css";
+@import "faq.css";
+@import "booking.css";
+@import "footer.css";

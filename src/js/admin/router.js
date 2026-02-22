@@ -3,7 +3,7 @@
  * Навигация между секциями админ-панели
  */
 
-var AdminRouter = (function() {
+var AdminRouter = (function () {
     'use strict';
 
     /**
@@ -76,52 +76,52 @@ var AdminRouter = (function() {
      * Рендереры секций
      */
     var SECTION_RENDERERS = {
-        stats: function() {
+        stats: function () {
             if (window.AdminStatsRenderer) {
                 AdminRouter.loadStats();
             }
         },
-        masters: function() {
+        masters: function () {
             if (window.AdminMastersRenderer) {
                 AdminMastersRenderer.render();
             }
         },
-        services: function() {
+        services: function () {
             if (window.AdminServicesRenderer) {
                 AdminServicesRenderer.render();
             }
         },
-        podology: function() {
+        podology: function () {
             if (window.AdminServicesRenderer) {
                 AdminServicesRenderer.renderPodology();
             }
         },
-        articles: function() {
+        articles: function () {
             if (window.AdminArticlesRenderer) {
                 AdminArticlesRenderer.render();
             }
         },
-        faq: function() {
+        faq: function () {
             if (window.AdminFaqRenderer) {
                 AdminFaqRenderer.render();
             }
         },
-        social: function() {
+        social: function () {
             if (window.AdminSocialRenderer) {
                 AdminSocialRenderer.render();
             }
         },
-        'shop-categories': function() {
+        'shop-categories': function () {
             if (window.AdminShopCategoriesRenderer) {
                 AdminShopCategoriesRenderer.render();
             }
         },
-        'shop-products': function() {
+        'shop-products': function () {
             if (window.AdminShopProductsRenderer) {
                 AdminShopProductsRenderer.render();
             }
         },
-        legal: function() {
+        legal: function () {
             if (window.AdminLegalRenderer) {
                 AdminLegalRenderer.render();
             }
@@ -172,14 +172,14 @@ var AdminRouter = (function() {
 
         // Обновляем навигацию
         if (elements && elements.navItems) {
-            elements.navItems.forEach(function(item) {
+            elements.navItems.forEach(function (item) {
                 item.classList.toggle('active', item.dataset.section === section);
             });
         }
 
         // Скрываем все секции
         if (elements && elements.sections) {
-            elements.sections.forEach(function(sec) {
+            elements.sections.forEach(function (sec) {
                 sec.classList.remove('active');
             });
         }
@@ -219,7 +219,7 @@ var AdminRouter = (function() {
         AdminState.currentCategory = category;
 
         if (elements && elements.serviceTabs) {
-            elements.serviceTabs.forEach(function(tab) {
+            elements.serviceTabs.forEach(function (tab) {
                 tab.classList.toggle('active', tab.dataset.category === category);
             });
         }
@@ -237,7 +237,7 @@ var AdminRouter = (function() {
         AdminState.currentPodologyCategory = category;
 
         var tabs = document.querySelectorAll('[data-podology-category]');
-        tabs.forEach(function(tab) {
+        tabs.forEach(function (tab) {
             tab.classList.toggle('active', tab.getAttribute('data-podology-category') === category);
         });
 

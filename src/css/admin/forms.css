@@ -29,7 +29,9 @@
     color: var(--text-white);
     font-family: inherit;
     font-size: 0.95rem;
-    transition: border-color var(--transition-base), box-shadow var(--transition-base);
+    transition:
+        border-color var(--transition-base),
+        box-shadow var(--transition-base);
 }
 
 .form-input:focus,
@@ -107,12 +109,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: border-color var(--transition-base), box-shadow var(--transition-base);
+    transition:
+        border-color var(--transition-base),
+        box-shadow var(--transition-base);
     flex-shrink: 0;
 }
 
 .checkbox-mark::after {
-    content: '';
+    content: "";
     width: 6px;
     height: 10px;
     border: solid var(--bg-dark);
@@ -223,7 +227,7 @@
 
 /* Required field indicator */
 .form-label.required::after {
-    content: '*';
+    content: "*";
     color: var(--color-danger);
     margin-left: 4px;
 }

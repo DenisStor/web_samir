@@ -3,7 +3,7 @@
  * Отображение списка категорий товаров
  */
 
-var AdminShopCategoriesRenderer = (function() {
+var AdminShopCategoriesRenderer = (function () {
     'use strict';
 
     var container = null;
@@ -21,17 +21,20 @@ var AdminShopCategoriesRenderer = (function() {
         var categories = AdminState.shopCategories || [];
 
         if (categories.length === 0) {
-            container.innerHTML = '<div class="empty-state">' +
+            container.innerHTML =
+                '<div class="empty-state">' +
                 '<p>Категории ещё не добавлены</p>' +
                 '<p class="empty-hint">Нажмите "Добавить" для создания первой категории</p>' +
-            '</div>';
+                '</div>';
             return;
         }
 
         var html = categories
-            .sort(function(a, b) { return (a.order || 0) - (b.order || 0); })
-            .map(function(cat) {
-                var productsCount = (AdminState.products || []).filter(function(p) {
+            .sort(function (a, b) {
+                return (a.order || 0) - (b.order || 0);
+            })
+            .map(function (cat) {
+                var productsCount = (AdminState.products || []).filter(function (p) {
                     return p.categoryId === cat.id;
                 }).length;
 
@@ -46,29 +49,44 @@ var AdminShopCategoriesRenderer = (function() {
                     ? '<p class="category-card-description">' + escapeHtml(cat.description) + '</p>'
                     : '';
 
-                return '<div class="shop-category-card' + (isInactive ? ' inactive' : '') + '" data-id="' + escapeAttr(cat.id) + '">' +
-                    '<div class="category-card-icon">' + iconHtml + '</div>' +
+                return (
+                    '<div class="shop-category-card' +
+                    (isInactive ? ' inactive' : '') +
+                    '" data-id="' +
+                    escapeAttr(cat.id) +
+                    '">' +
+                    '<div class="category-card-icon">' +
+                    iconHtml +
+                    '</div>' +
                     '<div class="category-card-info">' +
-                        '<h3 class="category-card-name">' +
-                            escapeHtml(cat.name) +
-                            statusBadge +
-                        '</h3>' +
-                        descriptionHtml +
-                        '<span class="category-card-count">' +
-                            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>' +
-                            productsCount + ' ' + productWord +
-                        '</span>' +
+                    '<h3 class="category-card-name">' +
+                    escapeHtml(cat.name) +
+                    statusBadge +
+                    '</h3>' +
+                    descriptionHtml +
+                    '<span class="category-card-count">' +
+                    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>' +
+                    productsCount +
+                    ' ' +
+                    productWord +
+                    '</span>' +
                     '</div>' +
                     '<div class="category-card-actions">' +
-                        '<button class="btn btn-icon" data-action="edit-shop-category" data-id="' + escapeAttr(cat.id) + '" title="Редактировать">' +
-                            SharedIcons.get('edit') +
-                        '</button>' +
-                        '<button class="btn btn-icon danger" data-action="delete-shop-category" data-id="' + escapeAttr(cat.id) + '" title="Удалить">' +
-                            SharedIcons.get('delete') +
-                        '</button>' +
+                    '<button class="btn btn-icon" data-action="edit-shop-category" data-id="' +
+                    escapeAttr(cat.id) +
+                    '" title="Редактировать">' +
+                    SharedIcons.get('edit') +
+                    '</button>' +
+                    '<button class="btn btn-icon danger" data-action="delete-shop-category" data-id="' +
+                    escapeAttr(cat.id) +
+                    '" title="Удалить">' +
+                    SharedIcons.get('delete') +
+                    '</button>' +
                     '</div>' +
-                '</div>';
-            }).join('');
+                    '</div>'
+                );
+            })
+            .join('');
 
         container.innerHTML = html;
     }

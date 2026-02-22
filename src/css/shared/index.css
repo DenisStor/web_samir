@@ -5,8 +5,8 @@
    Использовать: @import 'shared/index.css' или подключить напрямую.
    ===================================================================== */
 
-@import 'variables.css';
-@import 'base.css';
-@import 'utilities.css';
-@import 'navigation.css';
-@import 'components.css';
+@import "variables.css";
+@import "base.css";
+@import "utilities.css";
+@import "navigation.css";
+@import "components.css";

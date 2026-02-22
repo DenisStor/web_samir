@@ -2,7 +2,7 @@
  * Page Loader
  * Прелоадер с минимальным временем показа и fallback-таймаутом
  */
-(function() {
+(function () {
     'use strict';
 
     var MINIMUM_SHOW_TIME = 300;
@@ -20,7 +20,7 @@
             loader.classList.add('hidden');
         }
 
-        setTimeout(function() {
+        setTimeout(function () {
             if (loader && loader.parentNode) {
                 loader.parentNode.removeChild(loader);
             }

@@ -2,11 +2,11 @@
  * Image Loader
  * Плавная загрузка изображений с поддержкой prefers-reduced-motion
  */
-(function() {
+(function () {
     'use strict';
 
-    var prefersReducedMotion = window.matchMedia &&
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var prefersReducedMotion =
+        window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     function setupImage(img) {
         if (!img || img.dataset.loadSetup) return;
@@ -17,11 +17,11 @@
             return;
         }
 
-        img.addEventListener('load', function() {
+        img.addEventListener('load', function () {
             img.classList.add('loaded');
         });
 
-        img.addEventListener('error', function() {
+        img.addEventListener('error', function () {
             img.classList.add('loaded');
         });
     }

@@ -3,7 +3,7 @@
  * Загрузка и обработка изображений
  */
 
-var AdminImageUpload = (function() {
+var AdminImageUpload = (function () {
     'use strict';
 
     var MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -32,12 +32,12 @@ var AdminImageUpload = (function() {
      * Преобразовать файл в base64
      */
     function fileToBase64(file) {
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             var reader = new FileReader();
-            reader.onload = function() {
+            reader.onload = function () {
                 resolve(reader.result);
             };
-            reader.onerror = function() {
+            reader.onerror = function () {
                 reject(new Error('Ошибка чтения файла'));
             };
             reader.readAsDataURL(file);
@@ -94,7 +94,7 @@ var AdminImageUpload = (function() {
 
         if (!input) return;
 
-        input.addEventListener('change', async function(e) {
+        input.addEventListener('change', async function (e) {
             var file = e.target.files[0];
             if (!file) return;
 
@@ -111,7 +111,7 @@ var AdminImageUpload = (function() {
             // Показать превью локально
             if (preview) {
                 var reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     if (preview.tagName === 'IMG') {
                         preview.src = e.target.result;
                         preview.style.display = 'block';
@@ -136,10 +136,11 @@ var AdminImageUpload = (function() {
         var btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'btn btn-icon danger image-remove-btn';
-        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+        btn.innerHTML =
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
         btn.title = 'Удалить изображение';
 
-        btn.addEventListener('click', function(e) {
+        btn.addEventListener('click', function (e) {
             e.preventDefault();
             if (typeof onRemove === 'function') {
                 onRemove();

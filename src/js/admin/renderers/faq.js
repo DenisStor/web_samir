@@ -3,7 +3,7 @@
  * Рендеринг списка FAQ с поддержкой drag & drop
  */
 
-var AdminFaqRenderer = (function() {
+var AdminFaqRenderer = (function () {
     'use strict';
 
     var container = null;
@@ -23,7 +23,7 @@ var AdminFaqRenderer = (function() {
     function initDragDrop() {
         if (dragDropInitialized || !window.AdminDragDrop) return;
 
-        AdminDragDrop.init('faqList', '.faq-admin-item', function(newOrder) {
+        AdminDragDrop.init('faqList', '.faq-admin-item', function (newOrder) {
             reorderFaq(newOrder);
         });
 
@@ -36,22 +36,26 @@ var AdminFaqRenderer = (function() {
     function reorderFaq(newOrder) {
         var faq = AdminState.faq || [];
 
-        var reordered = newOrder.map(function(id) {
-            return faq.find(function(f) { return f.id === id; });
-        }).filter(Boolean);
+        var reordered = newOrder
+            .map(function (id) {
+                return faq.find(function (f) {
+                    return f.id === id;
+                });
+            })
+            .filter(Boolean);
 
-        reordered.forEach(function(item, index) {
+        reordered.forEach(function (item, index) {
             item.order = index;
         });
 
         AdminAPI.save('faq', { faq: reordered })
-            .then(function() {
+            .then(function () {
                 AdminState.setFaq(reordered);
                 if (window.showToast) {
                     showToast('Порядок сохранён', 'success');
                 }
             })
-            .catch(function(error) {
+            .catch(function (error) {
                 if (window.showToast) {
                     showToast('Ошибка сохранения порядка', 'error');
                 }
@@ -71,30 +75,53 @@ var AdminFaqRenderer = (function() {
         var faq = AdminState.faq || [];
 
         if (faq.length === 0) {
-            container.innerHTML = '<p class="empty-message">Нет вопросов. Нажмите "Добавить" чтобы создать.</p>';
+            container.innerHTML =
+                '<p class="empty-message">Нет вопросов. Нажмите "Добавить" чтобы создать.</p>';
             return;
         }
 
-        var html = faq.map(function(item, index) {
-            var searchText = [item.question, item.answer].join(' ');
+        var html = faq
+            .map(function (item, index) {
+                var searchText = [item.question, item.answer].join(' ');
 
-            return '<div class="faq-admin-item has-drag" data-id="' + item.id + '" data-index="' + index + '" data-search="' + escapeAttr(searchText) + '" draggable="true">' +
-                '<div class="drag-handle" title="Перетащите для изменения порядка">' + SharedIcons.get('grip') + '</div>' +
-                '<div class="faq-admin-content">' +
-                    '<h3 class="faq-admin-question">' + escapeHtml(item.question) + '</h3>' +
-                    '<p class="faq-admin-answer">' + escapeHtml(item.answer) + '</p>' +
-                '</div>' +
-                '<div class="faq-admin-actions">' +
-                    '<button class="btn btn-secondary" data-action="edit-faq" data-id="' + item.id + '">' +
-                        SharedIcons.get('edit') +
-                        'Редактировать' +
+                return (
+                    '<div class="faq-admin-item has-drag" data-id="' +
+                    item.id +
+                    '" data-index="' +
+                    index +
+                    '" data-search="' +
+                    escapeAttr(searchText) +
+                    '" draggable="true">' +
+                    '<div class="drag-handle" title="Перетащите для изменения порядка">' +
+                    SharedIcons.get('grip') +
+                    '</div>' +
+                    '<div class="faq-admin-content">' +
+                    '<h3 class="faq-admin-question">' +
+                    escapeHtml(item.question) +
+                    '</h3>' +
+                    '<p class="faq-admin-answer">' +
+                    escapeHtml(item.answer) +
+                    '</p>' +
+                    '</div>' +
+                    '<div class="faq-admin-actions">' +
+                    '<button class="btn btn-secondary" data-action="edit-faq" data-id="' +
+                    item.id +
+                    '">' +
+                    SharedIcons.get('edit') +
+                    'Редактировать' +
                     '</button>' +
-                    '<button class="btn btn-icon danger" data-action="delete-faq" data-id="' + item.id + '" data-name="' + escapeAttr(item.question) + '" title="Удалить">' +
-                        SharedIcons.get('delete') +
+                    '<button class="btn btn-icon danger" data-action="delete-faq" data-id="' +
+                    item.id +
+                    '" data-name="' +
+                    escapeAttr(item.question) +
+                    '" title="Удалить">' +
+                    SharedIcons.get('delete') +
                     '</button>' +
-                '</div>' +
-            '</div>';
-        }).join('');
+                    '</div>' +
+                    '</div>'
+                );
+            })
+            .join('');
 
         container.innerHTML = html;
 

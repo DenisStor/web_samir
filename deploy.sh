@@ -12,8 +12,8 @@
 
 set -e
 
-DATA_DIR="/var/www/saysbarbers-data"
-PROJECT_DIR="/var/www/saysbarbers"
+DATA_DIR="/var/www/web_samir-data"
+PROJECT_DIR="/var/www/web_samir"
 
 echo "=== Деплой Say's Barbers ==="
 
@@ -56,7 +56,7 @@ ln -sfn "$DATA_DIR/data" "$PROJECT_DIR/data"
 
 # 7. Перезапустить сервер (если используется systemd)
 # echo "→ Перезапуск сервера..."
-# sudo systemctl restart saysbarbers
+# sudo systemctl restart web_samir
 
 echo ""
 echo "✓ Деплой завершён успешно!"

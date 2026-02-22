@@ -3,8 +3,10 @@
  * Главный модуль магазина — инициализация и оркестрация
  * @module ShopApp
  */
-var ShopApp = (function() {
+var ShopApp = (function () {
     'use strict';
+
+    var debounce = window.SharedHelpers ? SharedHelpers.debounce : window.debounce;
 
     // =================================================================
     // INITIALIZATION
@@ -37,16 +39,22 @@ var ShopApp = (function() {
 
         // Search with debounce
         if (elements.searchInput) {
-            elements.searchInput.addEventListener('input', debounce(function(e) {
-                ShopState.setSearchQuery(e.target.value.toLowerCase().trim());
-                ShopFilters.updateSearchClearButton();
-                ShopFilters.renderProducts();
-            }, 300));
+            elements.searchInput.addEventListener(
+                'input',
+                debounce(
+                    function (e) {
+                        ShopState.setSearchQuery(e.target.value.toLowerCase().trim());
+                        ShopFilters.updateSearchClearButton();
+                        ShopFilters.renderProducts();
+                    },
+                    AppConfig.get('ui.debounceDelay', 300)
+                )
+            );
         }
 
         // Search clear button
         if (elements.searchClear) {
-            elements.searchClear.addEventListener('click', function() {
+            elements.searchClear.addEventListener('click', function () {
                 if (elements.searchInput) {
                     elements.searchInput.value = '';
                     ShopState.setSearchQuery('');
@@ -60,14 +68,14 @@ var ShopApp = (function() {
         // Sort select
         if (elements.sortSelect) {
             elements.sortSelect.value = ShopState.getCurrentSort();
-            elements.sortSelect.addEventListener('change', function(e) {
+            elements.sortSelect.addEventListener('change', function (e) {
                 ShopState.setCurrentSort(e.target.value);
                 ShopFilters.renderProducts();
             });
         }
 
         // Keyboard events (Escape for lightbox)
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             var lightbox = elements.lightbox;
             if (e.key === 'Escape' && lightbox && lightbox.style.display !== 'none') {
                 ShopLightbox.closeLightbox();
@@ -170,7 +178,7 @@ var ShopApp = (function() {
         if (progressBar) {
             progressBar.classList.remove('loading');
             progressBar.classList.add('complete');
-            setTimeout(function() {
+            setTimeout(function () {
                 if (progressBar) {
                     progressBar.classList.remove('active', 'complete');
                 }
@@ -190,22 +198,26 @@ var ShopApp = (function() {
         showProgress();
 
         Promise.all([
-            fetch(ShopState.API_BASE + '/categories').then(function(r) { return r.json(); }),
-            fetch(ShopState.API_BASE + '/products').then(function(r) { return r.json(); })
+            fetch(ShopState.API_BASE + '/categories').then(function (r) {
+                return r.json();
+            }),
+            fetch(ShopState.API_BASE + '/products').then(function (r) {
+                return r.json();
+            })
         ])
-        .then(function(results) {
-            ShopState.setCategories(results[0].categories || []);
-            ShopState.setProducts(results[1].products || []);
+            .then(function (results) {
+                ShopState.setCategories(results[0].categories || []);
+                ShopState.setProducts(results[1].products || []);
 
-            ShopFilters.renderCategories();
-            ShopFilters.renderProducts();
-            hideProgress();
-        })
-        .catch(function(error) {
-            console.error('Error loading shop data:', error);
-            hideProgress();
-            elements.productsGrid.innerHTML = ShopRenderer.renderError();
-        });
+                ShopFilters.renderCategories();
+                ShopFilters.renderProducts();
+                hideProgress();
+            })
+            .catch(function (error) {
+                console.error('Error loading shop data:', error);
+                hideProgress();
+                elements.productsGrid.innerHTML = ShopRenderer.renderError();
+            });
     }
 
     // =================================================================

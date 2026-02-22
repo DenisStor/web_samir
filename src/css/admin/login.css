@@ -40,13 +40,27 @@
 }
 
 @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
-    20%, 40%, 60%, 80% { transform: translateX(8px); }
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translateX(-8px);
+    }
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translateX(8px);
+    }
 }
 
 .login-logo {
-    font-family: 'Unbounded', sans-serif;
+    font-family: "Unbounded", sans-serif;
     font-size: 2rem;
     font-weight: 700;
     color: var(--text-white);
@@ -90,7 +104,9 @@
     color: var(--text-white);
     font-family: inherit;
     font-size: 1rem;
-    transition: border-color var(--transition-base), box-shadow var(--transition-base);
+    transition:
+        border-color var(--transition-base),
+        box-shadow var(--transition-base);
 }
 
 .password-input-wrapper input:focus {
@@ -118,7 +134,9 @@
     align-items: center;
     justify-content: center;
     border-radius: var(--radius-sm);
-    transition: color var(--transition-base), background var(--transition-base);
+    transition:
+        color var(--transition-base),
+        background var(--transition-base);
 }
 
 .password-toggle:hover {

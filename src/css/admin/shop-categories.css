@@ -17,13 +17,15 @@
     display: flex;
     gap: 16px;
     align-items: flex-start;
-    transition: border-color var(--transition-base), box-shadow var(--transition-base);
+    transition:
+        border-color var(--transition-base),
+        box-shadow var(--transition-base);
     position: relative;
     overflow: hidden;
 }
 
 .shop-category-card::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;

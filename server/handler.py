@@ -16,10 +16,19 @@ from urllib.parse import urlparse, parse_qs
 from datetime import datetime, timedelta
 import subprocess
 import sys
+import logging
+import threading
+
+logger = logging.getLogger('saysbarbers')
 
 # Импорт модулей из пакета
-from .validators import is_valid_slug, is_valid_filename, validate_image_bytes
-from .storage import JSONStorage
+from .validators import (
+    is_valid_slug, is_valid_filename, validate_image_bytes,
+    SchemaValidator,
+    MASTER_SCHEMA, SERVICE_SCHEMA, ARTICLE_SCHEMA, FAQ_SCHEMA,
+    PRODUCT_SCHEMA, CATEGORY_SCHEMA, sanitize_html_content
+)
+from .database import Database
 from .auth import SessionManager, RateLimiter, UploadRateLimiter, verify_password
 from .routes import get_router
 
@@ -74,14 +83,13 @@ def load_config():
                     file_config.pop('admin_password', None)
                     default_config.update(file_config)
         except json.JSONDecodeError as e:
-            print(f"⚠️  Ошибка парсинга config.json: {e}")
+            logger.warning("Ошибка парсинга config.json: %s", e)
         except Exception as e:
-            print(f"⚠️  Ошибка загрузки config.json: {e}")
+            logger.warning("Ошибка загрузки config.json: %s", e)
 
     admin_password = os.environ.get('ADMIN_PASSWORD')
     if not admin_password:
-        print("⚠️  ВНИМАНИЕ: ADMIN_PASSWORD не установлен!")
-        print("   Установите переменную окружения ADMIN_PASSWORD или добавьте в .env файл")
+        logger.warning("ADMIN_PASSWORD не установлен! Установите переменную окружения или добавьте в .env файл")
         admin_password = None
 
     return {
@@ -95,7 +103,7 @@ def load_config():
 CONFIG = load_config()
 
 # Инициализация сервисов (thread-safe)
-storage = JSONStorage()
+storage = Database()
 session_manager = SessionManager(timeout_hours=CONFIG['session_timeout_hours'])
 login_limiter = RateLimiter(
     max_attempts=CONFIG['max_login_attempts'],
@@ -104,7 +112,26 @@ login_limiter = RateLimiter(
 upload_limiter = UploadRateLimiter(max_uploads=10, window_seconds=60)
 router = get_router()
 
+SESSION_CLEANUP_INTERVAL = 3600  # 1 час
+
+
+def _schedule_session_cleanup():
+    """Периодическая очистка истёкших сессий и старых rate limit записей."""
+    try:
+        expired = session_manager.cleanup_expired()
+        old = login_limiter.cleanup_old()
+        if expired or old:
+            logger.info("Session cleanup: %d expired sessions, %d old rate limits", expired, old)
+    except Exception:
+        logger.exception("Session cleanup error")
+
+    timer = threading.Timer(SESSION_CLEANUP_INTERVAL, _schedule_session_cleanup)
+    timer.daemon = True
+    timer.start()
+
 # CORS настройки
+CACHE_MAX_AGE_WEEK = 604800
+
 ALLOWED_ORIGINS = {
     'http://localhost:8000',
     'http://127.0.0.1:8000',
@@ -132,6 +159,16 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
     COMPRESSIBLE_TYPES = {'.html', '.css', '.js', '.json', '.svg', '.xml', '.txt'}
     CACHEABLE_EXTENSIONS = {'.css', '.js', '.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.woff', '.woff2', '.ttf', '.eot'}
 
+    # Маппинг файлов на схемы валидации и ключи массивов
+    VALIDATION_MAP = {
+        'masters.json': ('masters', MASTER_SCHEMA),
+        'services.json': ('services', SERVICE_SCHEMA),
+        'articles.json': ('articles', ARTICLE_SCHEMA),
+        'faq.json': ('items', FAQ_SCHEMA),
+        'products.json': ('products', PRODUCT_SCHEMA),
+        'shop-categories.json': ('categories', CATEGORY_SCHEMA),
+    }
+
     def get_cache_header(self):
         """Определяет правильный Cache-Control заголовок."""
         path = self.path.split('?')[0]
@@ -142,7 +179,7 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
         if ext == '.js':
             return 'no-cache, must-revalidate'
         if ext in self.CACHEABLE_EXTENSIONS:
-            return 'public, max-age=604800, immutable'
+            return f'public, max-age={CACHE_MAX_AGE_WEEK}, immutable'
         if ext == '.html' or path in ('/', ''):
             return 'no-cache, must-revalidate'
         return 'public, max-age=300, must-revalidate'
@@ -260,19 +297,19 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
         """Обработка POST запросов."""
         result = self._handle_request('POST')
         if result is None:
-            self.send_error(404, 'Not Found')
+            self.send_error_response(404, 'Not Found')
 
     def do_PUT(self):
         """Обработка PUT запросов."""
         result = self._handle_request('PUT')
         if result is None:
-            self.send_error(404, 'Not Found')
+            self.send_error_response(404, 'Not Found')
 
     def do_DELETE(self):
         """Обработка DELETE запросов."""
         result = self._handle_request('DELETE')
         if result is None:
-            self.send_error(404, 'Not Found')
+            self.send_error_response(404, 'Not Found')
 
     # === Auth handlers ===
 
@@ -307,7 +344,7 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_error_response(401, 'Invalid password')
 
         except Exception as e:
-            print(f"Server error: {e}")
+            logger.exception("Server error")
             self.send_error_response(500, 'Internal server error')
 
     def handle_logout(self):
@@ -318,7 +355,7 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
                 session_manager.delete(token)
             self.send_json_response({'success': True, 'message': 'Logged out'})
         except Exception as e:
-            print(f"Server error: {e}")
+            logger.exception("Server error")
             self.send_error_response(500, 'Internal server error')
 
     def handle_auth_check(self):
@@ -341,13 +378,17 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
             data = storage.read(filename, {})
             self.send_json_response(data)
         except Exception as e:
-            print(f"Server error: {e}")
+            logger.exception("Server error")
             self.send_error_response(500, 'Internal server error')
 
     def _handle_save_data(self, filename):
         """Сохранение данных в JSON файл."""
         try:
-            content_length = int(self.headers['Content-Length'])
+            content_length = int(self.headers.get('Content-Length', 0))
+            if content_length == 0:
+                self.send_error_response(400, 'Missing request body')
+                return
+
             max_post_size = 5 * 1024 * 1024
             if content_length > max_post_size:
                 self.send_error_response(413, 'Request too large. Max size is 5MB.')
@@ -355,56 +396,59 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
 
             post_data = self.rfile.read(content_length)
             data = json.loads(post_data.decode('utf-8'))
+
+            if not isinstance(data, dict):
+                self.send_error_response(400, 'Expected JSON object')
+                return
+
+            # Валидация элементов если есть схема
+            validation = self.VALIDATION_MAP.get(filename)
+            if validation:
+                list_key, schema = validation
+                items = data.get(list_key, [])
+                if isinstance(items, list):
+                    for item in items:
+                        if isinstance(item, dict):
+                            is_valid, error = SchemaValidator.validate(item, schema)
+                            if not is_valid:
+                                self.send_error_response(400, error)
+                                return
+
             storage.write(filename, data)
             self.send_json_response({'success': True, 'message': 'Данные сохранены'})
+        except json.JSONDecodeError:
+            self.send_error_response(400, 'Invalid JSON')
         except Exception as e:
-            print(f"Server error: {e}")
+            logger.exception("Server error")
             self.send_error_response(500, 'Internal server error')
 
-    def handle_get_masters(self):
-        self._handle_get_data('masters.json')
+    # Маппинг ресурсов на файлы JSON
+    RESOURCE_MAP = {
+        'masters': 'masters.json',
+        'services': 'services.json',
+        'articles': 'articles.json',
+        'faq': 'faq.json',
+        'social': 'social.json',
+        'legal': 'legal.json',
+        'shop-categories': 'shop-categories.json',
+        'shop-products': 'products.json',
+    }
 
-    def handle_save_masters(self):
-        self._handle_save_data('masters.json')
+    def handle_generic_get(self, resource):
+        """Generic GET handler для ресурсов из RESOURCE_MAP."""
+        filename = self.RESOURCE_MAP.get(resource)
+        if filename:
+            self._handle_get_data(filename)
+        else:
+            self.send_error_response(404, 'Resource not found')
 
-    def handle_get_services(self):
-        self._handle_get_data('services.json')
-
-    def handle_save_services(self):
-        self._handle_save_data('services.json')
-
-    def handle_get_articles(self):
-        self._handle_get_data('articles.json')
-
-    def handle_save_articles(self):
-        self._handle_save_data('articles.json')
-
-    def handle_get_faq(self):
-        self._handle_get_data('faq.json')
-
-    def handle_save_faq(self):
-        self._handle_save_data('faq.json')
-
-    def handle_get_social(self):
-        self._handle_get_data('social.json')
-
-    def handle_save_social(self):
-        self._handle_save_data('social.json')
-
-    def handle_get_legal(self):
-        self._handle_get_data('legal.json')
-
-    def handle_save_legal(self):
-        self._handle_save_data('legal.json')
-
-    def handle_get_shop_categories(self):
-        self._handle_get_data('shop-categories.json')
-
-    def handle_save_shop_categories(self):
-        self._handle_save_data('shop-categories.json')
-
-    def handle_save_products(self):
-        self._handle_save_data('products.json')
+    def handle_generic_save(self, resource):
+        """Generic POST/PUT handler для ресурсов из RESOURCE_MAP."""
+        filename = self.RESOURCE_MAP.get(resource)
+        if filename:
+            self._handle_save_data(filename)
+        else:
+            self.send_error_response(404, 'Resource not found')
 
     def handle_get_legal_document(self, slug):
         """Получение юридического документа по slug."""
@@ -413,19 +457,14 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_error_response(400, 'Invalid slug format')
                 return
 
-            data = storage.read('legal.json', {})
-            document = next(
-                (d for d in data.get('documents', [])
-                 if d.get('slug') == slug and d.get('active', True)),
-                None
-            )
+            document = storage.get_legal_by_slug(slug)
 
             if document:
                 self.send_json_response(document)
             else:
                 self.send_error_response(404, 'Document not found')
         except Exception as e:
-            print(f"Server error: {e}")
+            logger.exception("Server error")
             self.send_error_response(500, 'Internal server error')
 
     def handle_get_products(self):
@@ -435,40 +474,29 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
             query = parse_qs(parsed.query)
             category_slug = query.get('category', [None])[0]
 
-            data = storage.read('products.json', {})
-            products = data.get('products', [])
+            if category_slug == 'all':
+                category_slug = None
 
-            if category_slug and category_slug != 'all':
-                cat_data = storage.read('shop-categories.json', {})
-                category = next(
-                    (c for c in cat_data.get('categories', [])
-                     if c.get('slug') == category_slug),
-                    None
-                )
-                if category:
-                    products = [p for p in products if p.get('categoryId') == category.get('id')]
-
-            products = [p for p in products if p.get('status') == 'active']
+            products = storage.get_products_filtered(
+                category_slug=category_slug,
+                status='active'
+            )
             self.send_json_response({'products': products})
         except Exception as e:
-            print(f"Server error: {e}")
+            logger.exception("Server error")
             self.send_error_response(500, 'Internal server error')
 
     def handle_get_product(self, id):
         """Получение товара по ID."""
         try:
-            data = storage.read('products.json', {})
-            product = next(
-                (p for p in data.get('products', []) if p.get('id') == id),
-                None
-            )
+            product = storage.get_product_by_id(id)
 
             if product:
                 self.send_json_response(product)
             else:
                 self.send_error_response(404, 'Product not found')
         except Exception as e:
-            print(f"Server error: {e}")
+            logger.exception("Server error")
             self.send_error_response(500, 'Internal server error')
 
     # === Stats handlers ===
@@ -503,7 +531,7 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
 
             self.send_json_response(stats)
         except Exception as e:
-            print(f"Server error: {e}")
+            logger.exception("Server error")
             self.send_error_response(500, 'Internal server error')
 
     def handle_record_visit(self):
@@ -556,7 +584,7 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
             storage.update('stats.json', update_stats, self._init_stats())
             self.send_json_response({'success': True})
         except Exception as e:
-            print(f"Server error: {e}")
+            logger.exception("Server error")
             self.send_error_response(500, 'Internal server error')
 
     def _init_stats(self):
@@ -616,7 +644,7 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
                 'url': f'/uploads/{filename}'
             })
         except Exception as e:
-            print(f"Server error: {e}")
+            logger.exception("Server error")
             self.send_error_response(500, 'Internal server error')
 
     def handle_delete_upload(self, filename):
@@ -640,7 +668,7 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
             except FileNotFoundError:
                 self.send_error_response(404, 'Файл не найден')
         except Exception as e:
-            print(f"Server error: {e}")
+            logger.exception("Server error")
             self.send_error_response(500, 'Internal server error')
 
 
@@ -651,6 +679,9 @@ def main():
         print(f"Ошибка: Файл {FILENAME} не найден в текущей директории!")
         print(f"Текущая директория: {os.getcwd()}")
         return
+
+    # Запуск периодической очистки сессий
+    _schedule_session_cleanup()
 
     socketserver.TCPServer.allow_reuse_address = True
     with socketserver.TCPServer((HOST, PORT), AdminAPIHandler) as httpd:

@@ -12,7 +12,7 @@
  * Config Module - Централизованный доступ к конфигурации
  * @module AppConfig
  */
-(function() {
+(function () {
     'use strict';
 
     // Дефолтные значения (fallback если config.json не загружен)
@@ -37,7 +37,8 @@
             debounceDelay: 300,
             animationDuration: 300,
             maxImageSize: 5242880,
-            maxUploadImages: 10
+            maxUploadImages: 10,
+            articlesPerPage: 3
         },
         colors: {
             danger: '#ff4757',
@@ -112,18 +113,18 @@
         if (loadPromise) return loadPromise;
 
         loadPromise = fetch('/config.json')
-            .then(function(response) {
+            .then(function (response) {
                 if (!response.ok) {
                     throw new Error('Config not found');
                 }
                 return response.json();
             })
-            .then(function(data) {
+            .then(function (data) {
                 config = data;
                 loaded = true;
                 return config;
             })
-            .catch(function(error) {
+            .catch(function (error) {
                 console.warn('AppConfig: Using defaults, config.json not loaded:', error.message);
                 config = defaults;
                 loaded = true;
@@ -156,7 +157,6 @@
         isLoaded: isLoaded,
         getDefaults: getDefaults
     };
-
 })();
 
 
@@ -167,7 +167,7 @@
  * Общие утилиты для всех частей приложения
  * @module SharedHelpers
  */
-(function() {
+(function () {
     'use strict';
 
     // =================================================================
@@ -238,17 +238,45 @@
         if (!text) return '';
 
         var translitMap = {
-            'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo',
-            'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
-            'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
-            'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch',
-            'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya'
+            а: 'a',
+            б: 'b',
+            в: 'v',
+            г: 'g',
+            д: 'd',
+            е: 'e',
+            ё: 'yo',
+            ж: 'zh',
+            з: 'z',
+            и: 'i',
+            й: 'y',
+            к: 'k',
+            л: 'l',
+            м: 'm',
+            н: 'n',
+            о: 'o',
+            п: 'p',
+            р: 'r',
+            с: 's',
+            т: 't',
+            у: 'u',
+            ф: 'f',
+            х: 'h',
+            ц: 'ts',
+            ч: 'ch',
+            ш: 'sh',
+            щ: 'sch',
+            ъ: '',
+            ы: 'y',
+            ь: '',
+            э: 'e',
+            ю: 'yu',
+            я: 'ya'
         };
 
         return text
             .toLowerCase()
             .split('')
-            .map(function(char) {
+            .map(function (char) {
                 return translitMap[char] !== undefined ? translitMap[char] : char;
             })
             .join('')
@@ -272,11 +300,11 @@
      */
     function debounce(func, wait) {
         var timeout;
-        return function() {
+        return function () {
             var context = this;
             var args = arguments;
             clearTimeout(timeout);
-            timeout = setTimeout(function() {
+            timeout = setTimeout(function () {
                 func.apply(context, args);
             }, wait);
         };
@@ -292,11 +320,11 @@
      */
     function throttleRAF(func) {
         var rafId = null;
-        return function() {
+        return function () {
             var context = this;
             var args = arguments;
             if (rafId) return;
-            rafId = requestAnimationFrame(function() {
+            rafId = requestAnimationFrame(function () {
                 func.apply(context, args);
                 rafId = null;
             });
@@ -328,16 +356,20 @@
      */
     function formatDate(date, options) {
         if (!date) return '';
-        var d = typeof date === 'string' ? new Date(date) : date;
-        if (isNaN(d.getTime())) return '';
+        try {
+            var d = typeof date === 'string' ? new Date(date) : date;
+            if (isNaN(d.getTime())) return String(date);
 
-        var defaultOptions = {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric'
-        };
+            var defaultOptions = {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            };
 
-        return d.toLocaleDateString('ru-RU', options || defaultOptions);
+            return d.toLocaleDateString('ru-RU', options || defaultOptions);
+        } catch (e) {
+            return String(date);
+        }
     }
 
     // =================================================================
@@ -368,7 +400,6 @@
     window.generateId = generateId;
     window.generateSlug = generateSlug;
     window.debounce = debounce;
-
 })();
 
 
@@ -404,7 +435,7 @@ var AdminState = {
     /**
      * Сброс состояния к начальным значениям
      */
-    reset: function() {
+    reset: function () {
         this.masters = [];
         this.services = { categories: [], podology: { categories: [], consultation: null } };
         this.articles = [];
@@ -423,32 +454,32 @@ var AdminState = {
      * @returns {Array} Отсортированный массив
      * @private
      */
-    _sortByOrder: function(items) {
+    _sortByOrder: function (items) {
         if (!items || !Array.isArray(items)) return items;
-        return items.slice().sort(function(a, b) {
+        return items.slice().sort(function (a, b) {
             var orderA = typeof a.order === 'number' ? a.order : Infinity;
             var orderB = typeof b.order === 'number' ? b.order : Infinity;
             return orderA - orderB;
         });
     },
 
-    setMasters: function(data) {
+    setMasters: function (data) {
         this.masters = this._sortByOrder(data || []);
     },
 
-    setServices: function(data) {
+    setServices: function (data) {
         this.services = data || { categories: [], podology: { services: [] } };
     },
 
-    setArticles: function(data) {
+    setArticles: function (data) {
         this.articles = this._sortByOrder(data || []);
     },
 
-    setFaq: function(data) {
+    setFaq: function (data) {
         this.faq = this._sortByOrder(data || []);
     },
 
-    setSocial: function(data) {
+    setSocial: function (data) {
         this.social = data || { social: [], phone: '', email: '', address: '' };
     },
 
@@ -457,47 +488,61 @@ var AdminState = {
      * @param {string} id - ID мастера
      * @returns {Object|undefined} Найденный мастер или undefined
      */
-    findMaster: function(id) {
-        return this.masters.find(function(m) { return m.id === id; });
+    findMaster: function (id) {
+        return this.masters.find(function (m) {
+            return m.id === id;
+        });
     },
 
-    findArticle: function(id) {
-        return this.articles.find(function(a) { return a.id === id; });
+    findArticle: function (id) {
+        return this.articles.find(function (a) {
+            return a.id === id;
+        });
     },
 
-    findFaq: function(id) {
-        return this.faq.find(function(f) { return f.id === id; });
+    findFaq: function (id) {
+        return this.faq.find(function (f) {
+            return f.id === id;
+        });
     },
 
-    findSocialLink: function(id) {
+    findSocialLink: function (id) {
         var links = this.social.social || [];
-        return links.find(function(s) { return s.id === id; });
+        return links.find(function (s) {
+            return s.id === id;
+        });
     },
 
     // Shop методы
-    setShopCategories: function(data) {
+    setShopCategories: function (data) {
         this.shopCategories = this._sortByOrder(data || []);
     },
 
-    setProducts: function(data) {
+    setProducts: function (data) {
         this.products = this._sortByOrder(data || []);
     },
 
-    findShopCategory: function(id) {
-        return this.shopCategories.find(function(c) { return c.id === id; });
+    findShopCategory: function (id) {
+        return this.shopCategories.find(function (c) {
+            return c.id === id;
+        });
     },
 
-    findProduct: function(id) {
-        return this.products.find(function(p) { return p.id === id; });
+    findProduct: function (id) {
+        return this.products.find(function (p) {
+            return p.id === id;
+        });
     },
 
     // Legal методы
-    setLegalDocuments: function(data) {
+    setLegalDocuments: function (data) {
         this.legalDocuments = data || [];
     },
 
-    findLegalDocument: function(id) {
-        return this.legalDocuments.find(function(d) { return d.id === id; });
+    findLegalDocument: function (id) {
+        return this.legalDocuments.find(function (d) {
+            return d.id === id;
+        });
     }
 };
 
@@ -512,7 +557,7 @@ window.AdminState = AdminState;
  * Система уведомлений для админ-панели
  */
 
-var AdminToast = (function() {
+var AdminToast = (function () {
     'use strict';
 
     var container = null;
@@ -546,20 +591,25 @@ var AdminToast = (function() {
         toast.className = 'toast toast-' + type;
 
         var icon = getIcon(type);
-        toast.innerHTML = '<span class="toast-icon">' + icon + '</span>' +
-                          '<span class="toast-message">' + window.escapeHtml(message) + '</span>';
+        toast.innerHTML =
+            '<span class="toast-icon">' +
+            icon +
+            '</span>' +
+            '<span class="toast-message">' +
+            window.escapeHtml(message) +
+            '</span>';
 
         container.appendChild(toast);
 
         // Анимация появления
-        setTimeout(function() {
+        setTimeout(function () {
             toast.classList.add('show');
         }, 10);
 
         // Автоматическое скрытие
-        setTimeout(function() {
+        setTimeout(function () {
             toast.classList.remove('show');
-            setTimeout(function() {
+            setTimeout(function () {
                 if (toast.parentNode) {
                     toast.parentNode.removeChild(toast);
                 }
@@ -574,9 +624,11 @@ var AdminToast = (function() {
      */
     function getIcon(type) {
         var icons = {
-            success: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>',
+            success:
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>',
             error: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>',
-            warning: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
+            warning:
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
             info: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>'
         };
         return icons[type] || icons.info;
@@ -627,7 +679,7 @@ window.showToast = showToast;
  * Клиент для работы с серверным API
  */
 
-var AdminAPI = (function() {
+var AdminAPI = (function () {
     'use strict';
 
     var AUTH_TOKEN_KEY = 'says_admin_token';
@@ -667,7 +719,7 @@ var AdminAPI = (function() {
             AdminAuth.showLoginForm();
         } else {
             // Fallback: показываем модальное окно или перезагружаем страницу с задержкой
-            setTimeout(function() {
+            setTimeout(function () {
                 sessionExpiredHandled = false;
                 location.reload();
             }, 2000);
@@ -702,7 +754,9 @@ var AdminAPI = (function() {
      */
     async function handleHttpError(response) {
         if (!response.ok) {
-            var errorData = await response.json().catch(function() { return {}; });
+            var errorData = await response.json().catch(function () {
+                return {};
+            });
             throw new Error(errorData.error || 'HTTP ' + response.status);
         }
     }
@@ -933,7 +987,7 @@ window.AdminAPI = AdminAPI;
  * Управление входом и выходом из админ-панели
  */
 
-var AdminAuth = (function() {
+var AdminAuth = (function () {
     'use strict';
 
     /**
@@ -963,7 +1017,7 @@ var AdminAuth = (function() {
 
         // Toggle password visibility
         if (togglePassword) {
-            togglePassword.addEventListener('click', function() {
+            togglePassword.addEventListener('click', function () {
                 var type = passwordInput.type === 'password' ? 'text' : 'password';
                 passwordInput.type = type;
 
@@ -981,7 +1035,7 @@ var AdminAuth = (function() {
         }
 
         // Handle login form submit
-        loginForm.addEventListener('submit', async function(e) {
+        loginForm.addEventListener('submit', async function (e) {
             e.preventDefault();
 
             var password = passwordInput.value;
@@ -1030,7 +1084,7 @@ var AdminAuth = (function() {
         });
 
         // Enter key handler
-        passwordInput.addEventListener('keydown', function(e) {
+        passwordInput.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
                 loginForm.dispatchEvent(new Event('submit'));
             }
@@ -1043,7 +1097,7 @@ var AdminAuth = (function() {
     function initLogoutButton() {
         var logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
-            logoutBtn.addEventListener('click', async function() {
+            logoutBtn.addEventListener('click', async function () {
                 if (confirm('Вы уверены, что хотите выйти?')) {
                     await AdminAPI.logout();
                     hideAdminPanel();
@@ -1093,18 +1147,18 @@ window.AdminAuth = AdminAuth;
  * Управление навигацией между секциями админ-панели
  */
 
-var AdminNavigation = (function() {
+var AdminNavigation = (function () {
     'use strict';
 
     var currentSection = 'stats';
     var sectionTitles = {
-        'stats': 'Статистика',
-        'masters': 'Мастера',
-        'services': 'Услуги',
-        'articles': 'Статьи',
-        'principles': 'Принципы',
-        'faq': 'FAQ',
-        'social': 'Соцсети'
+        stats: 'Статистика',
+        masters: 'Мастера',
+        services: 'Услуги',
+        articles: 'Статьи',
+        principles: 'Принципы',
+        faq: 'FAQ',
+        social: 'Соцсети'
     };
 
     /**
@@ -1113,7 +1167,7 @@ var AdminNavigation = (function() {
     function switchSection(sectionId) {
         // Скрыть все секции
         var sections = document.querySelectorAll('.admin-section');
-        sections.forEach(function(section) {
+        sections.forEach(function (section) {
             section.classList.remove('active');
         });
 
@@ -1125,7 +1179,7 @@ var AdminNavigation = (function() {
 
         // Обновить активный пункт меню
         var navItems = document.querySelectorAll('.sidebar-nav a');
-        navItems.forEach(function(item) {
+        navItems.forEach(function (item) {
             item.classList.remove('active');
             if (item.getAttribute('data-section') === sectionId) {
                 item.classList.add('active');
@@ -1158,8 +1212,8 @@ var AdminNavigation = (function() {
      */
     function init() {
         var navItems = document.querySelectorAll('.sidebar-nav a[data-section]');
-        navItems.forEach(function(item) {
-            item.addEventListener('click', function(e) {
+        navItems.forEach(function (item) {
+            item.addEventListener('click', function (e) {
                 e.preventDefault();
                 var sectionId = this.getAttribute('data-section');
                 if (sectionId) {
@@ -1189,22 +1243,26 @@ window.AdminNavigation = AdminNavigation;
  * Управление модальными окнами
  */
 
-var AdminModals = (function() {
+var AdminModals = (function () {
     'use strict';
 
     var currentModal = null;
     var escapeHandlerBound = false;
     var overlayClickHandlerBound = false;
     var boundCloseHandlers = []; // Хранение ссылок на обработчики для cleanup
-    var boundOpenHandlers = [];  // Хранение ссылок на обработчики для cleanup
+    var boundOpenHandlers = []; // Хранение ссылок на обработчики для cleanup
 
     /**
      * Открыть модальное окно
      */
     function open(modalId) {
         // Для modal и deleteModal - активируем overlay
-        var overlayId = modalId === 'modal' ? 'modalOverlay' :
-                        modalId === 'deleteModal' ? 'deleteModalOverlay' : modalId;
+        var overlayId =
+            modalId === 'modal'
+                ? 'modalOverlay'
+                : modalId === 'deleteModal'
+                  ? 'deleteModalOverlay'
+                  : modalId;
         var overlay = document.getElementById(overlayId);
         if (!overlay) {
             console.error('Modal overlay not found:', overlayId);
@@ -1234,8 +1292,12 @@ var AdminModals = (function() {
     function close(modalId) {
         var overlay;
         if (modalId) {
-            var overlayId = modalId === 'modal' ? 'modalOverlay' :
-                            modalId === 'deleteModal' ? 'deleteModalOverlay' : modalId;
+            var overlayId =
+                modalId === 'modal'
+                    ? 'modalOverlay'
+                    : modalId === 'deleteModal'
+                      ? 'deleteModalOverlay'
+                      : modalId;
             overlay = document.getElementById(overlayId);
         } else {
             overlay = currentModal;
@@ -1400,8 +1462,8 @@ var AdminModals = (function() {
 
         // Инициализация кнопок закрытия
         var closeButtons = document.querySelectorAll('.modal-close, [data-modal-close]');
-        closeButtons.forEach(function(btn) {
-            var handler = function(e) {
+        closeButtons.forEach(function (btn) {
+            var handler = function (e) {
                 e.preventDefault();
                 closeCurrent();
             };
@@ -1411,8 +1473,8 @@ var AdminModals = (function() {
 
         // Инициализация кнопок открытия
         var openButtons = document.querySelectorAll('[data-modal-open]');
-        openButtons.forEach(function(btn) {
-            var handler = function(e) {
+        openButtons.forEach(function (btn) {
+            var handler = function (e) {
                 e.preventDefault();
                 var modalId = btn.getAttribute('data-modal-open');
                 if (modalId) {
@@ -1434,13 +1496,13 @@ var AdminModals = (function() {
         }
 
         // Удаляем обработчики кнопок закрытия
-        boundCloseHandlers.forEach(function(item) {
+        boundCloseHandlers.forEach(function (item) {
             item.element.removeEventListener('click', item.handler);
         });
         boundCloseHandlers = [];
 
         // Удаляем обработчики кнопок открытия
-        boundOpenHandlers.forEach(function(item) {
+        boundOpenHandlers.forEach(function (item) {
             item.element.removeEventListener('click', item.handler);
         });
         boundOpenHandlers = [];
@@ -1487,7 +1549,7 @@ window.closeModal = closeModal;
  * Загрузка и обработка изображений
  */
 
-var AdminImageUpload = (function() {
+var AdminImageUpload = (function () {
     'use strict';
 
     var MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -1516,12 +1578,12 @@ var AdminImageUpload = (function() {
      * Преобразовать файл в base64
      */
     function fileToBase64(file) {
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             var reader = new FileReader();
-            reader.onload = function() {
+            reader.onload = function () {
                 resolve(reader.result);
             };
-            reader.onerror = function() {
+            reader.onerror = function () {
                 reject(new Error('Ошибка чтения файла'));
             };
             reader.readAsDataURL(file);
@@ -1578,7 +1640,7 @@ var AdminImageUpload = (function() {
 
         if (!input) return;
 
-        input.addEventListener('change', async function(e) {
+        input.addEventListener('change', async function (e) {
             var file = e.target.files[0];
             if (!file) return;
 
@@ -1595,7 +1657,7 @@ var AdminImageUpload = (function() {
             // Показать превью локально
             if (preview) {
                 var reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     if (preview.tagName === 'IMG') {
                         preview.src = e.target.result;
                         preview.style.display = 'block';
@@ -1620,10 +1682,11 @@ var AdminImageUpload = (function() {
         var btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'btn btn-icon danger image-remove-btn';
-        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+        btn.innerHTML =
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
         btn.title = 'Удалить изображение';
 
-        btn.addEventListener('click', function(e) {
+        btn.addEventListener('click', function (e) {
             e.preventDefault();
             if (typeof onRemove === 'function') {
                 onRemove();
@@ -1658,7 +1721,7 @@ window.AdminImageUpload = AdminImageUpload;
  * Обработка загрузки и удаления изображений
  */
 
-var AdminImageHandler = (function() {
+var AdminImageHandler = (function () {
     'use strict';
 
     /**
@@ -1731,7 +1794,8 @@ var AdminImageHandler = (function() {
                 removeBtn.className = 'remove-image';
                 removeBtn.setAttribute('data-action', 'remove-image');
                 removeBtn.setAttribute('data-target', inputId);
-                removeBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+                removeBtn.innerHTML =
+                    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
                 uploadDiv.appendChild(removeBtn);
             }
         }
@@ -1783,7 +1847,7 @@ window.AdminImageHandler = AdminImageHandler;
  *        undo/redo, переключатель HTML режима
  */
 
-var AdminWYSIWYG = (function() {
+var AdminWYSIWYG = (function () {
     'use strict';
 
     // =================================================================
@@ -1796,7 +1860,29 @@ var AdminWYSIWYG = (function() {
 
     // Конфигурация DOMPurify для всех операций
     var PURIFY_CONFIG = {
-        ALLOWED_TAGS: ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'span', 'div', 'font'],
+        ALLOWED_TAGS: [
+            'p',
+            'br',
+            'strong',
+            'b',
+            'em',
+            'i',
+            'u',
+            'a',
+            'ul',
+            'ol',
+            'li',
+            'h1',
+            'h2',
+            'h3',
+            'h4',
+            'h5',
+            'h6',
+            'blockquote',
+            'span',
+            'div',
+            'font'
+        ],
         ALLOWED_ATTR: ['href', 'target', 'class', 'style', 'color']
     };
 
@@ -2061,12 +2147,12 @@ var AdminWYSIWYG = (function() {
         modal.innerHTML =
             '<div class="wysiwyg-link-modal-backdrop"></div>' +
             '<div class="wysiwyg-link-modal-content">' +
-                '<div class="wysiwyg-link-modal-header">Вставить ссылку</div>' +
-                '<input type="url" class="wysiwyg-link-input" placeholder="https://example.com" autocomplete="off">' +
-                '<div class="wysiwyg-link-modal-actions">' +
-                    '<button type="button" class="wysiwyg-link-cancel">Отмена</button>' +
-                    '<button type="button" class="wysiwyg-link-confirm">Вставить</button>' +
-                '</div>' +
+            '<div class="wysiwyg-link-modal-header">Вставить ссылку</div>' +
+            '<input type="url" class="wysiwyg-link-input" placeholder="https://example.com" autocomplete="off">' +
+            '<div class="wysiwyg-link-modal-actions">' +
+            '<button type="button" class="wysiwyg-link-cancel">Отмена</button>' +
+            '<button type="button" class="wysiwyg-link-confirm">Вставить</button>' +
+            '</div>' +
             '</div>';
 
         document.body.appendChild(modal);
@@ -2080,11 +2166,11 @@ var AdminWYSIWYG = (function() {
         backdrop.addEventListener('click', hideLinkModal);
         cancelBtn.addEventListener('click', hideLinkModal);
 
-        confirmBtn.addEventListener('click', function() {
+        confirmBtn.addEventListener('click', function () {
             insertLinkFromModal();
         });
 
-        input.addEventListener('keydown', function(e) {
+        input.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 insertLinkFromModal();
@@ -2113,7 +2199,7 @@ var AdminWYSIWYG = (function() {
         modal.classList.add('visible');
 
         // Фокус на input с небольшой задержкой
-        setTimeout(function() {
+        setTimeout(function () {
             input.focus();
             input.setSelectionRange(input.value.length, input.value.length);
         }, 50);
@@ -2158,7 +2244,12 @@ var AdminWYSIWYG = (function() {
         if (selectedText) {
             execFormat('createLink', url);
         } else {
-            var linkHtml = '<a href="' + SharedHelpers.escapeHtml(url) + '">' + SharedHelpers.escapeHtml(url) + '</a>';
+            var linkHtml =
+                '<a href="' +
+                SharedHelpers.escapeHtml(url) +
+                '">' +
+                SharedHelpers.escapeHtml(url) +
+                '</a>';
             execFormat('insertHTML', linkHtml);
         }
 
@@ -2228,7 +2319,7 @@ var AdminWYSIWYG = (function() {
 
         // Отключаем другие кнопки в режиме исходного кода
         var buttons = state.toolbar.querySelectorAll('[data-command]');
-        buttons.forEach(function(b) {
+        buttons.forEach(function (b) {
             var cmd = b.getAttribute('data-command');
             if (cmd !== 'toggleSource') {
                 if (isActive) {
@@ -2259,21 +2350,29 @@ var AdminWYSIWYG = (function() {
             picker.className = 'color-picker-dropdown visible';
 
             var html = '<div class="color-picker-colors">';
-            COLORS.forEach(function(c) {
-                html += '<button type="button" class="color-swatch" data-color="' + c.value + '" title="' + c.name + '" style="background-color: ' + c.value + '"></button>';
+            COLORS.forEach(function (c) {
+                html +=
+                    '<button type="button" class="color-swatch" data-color="' +
+                    c.value +
+                    '" title="' +
+                    c.name +
+                    '" style="background-color: ' +
+                    c.value +
+                    '"></button>';
             });
             html += '</div>';
-            html += '<button type="button" class="color-remove-btn" data-color-remove>Убрать цвет</button>';
+            html +=
+                '<button type="button" class="color-remove-btn" data-color-remove>Убрать цвет</button>';
 
             picker.innerHTML = html;
             btn.appendChild(picker);
 
-            picker.querySelectorAll('.color-swatch').forEach(function(swatch) {
-                swatch.addEventListener('mousedown', function(e) {
+            picker.querySelectorAll('.color-swatch').forEach(function (swatch) {
+                swatch.addEventListener('mousedown', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                 });
-                swatch.addEventListener('click', function(e) {
+                swatch.addEventListener('click', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     var color = this.getAttribute('data-color');
@@ -2281,14 +2380,14 @@ var AdminWYSIWYG = (function() {
                 });
             });
 
-            picker.querySelector('[data-color-remove]').addEventListener('click', function(e) {
+            picker.querySelector('[data-color-remove]').addEventListener('click', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
                 removeColor(editorId);
             });
         }
 
-        document.querySelectorAll('.color-picker-dropdown.visible').forEach(function(p) {
+        document.querySelectorAll('.color-picker-dropdown.visible').forEach(function (p) {
             if (p !== picker) p.classList.remove('visible');
         });
     }
@@ -2297,7 +2396,7 @@ var AdminWYSIWYG = (function() {
      * Скрыть все палитры цветов
      */
     function hideColorPicker() {
-        document.querySelectorAll('.color-picker-dropdown').forEach(function(p) {
+        document.querySelectorAll('.color-picker-dropdown').forEach(function (p) {
             p.classList.remove('visible');
         });
     }
@@ -2317,7 +2416,7 @@ var AdminWYSIWYG = (function() {
         if (state.isSourceMode) return;
 
         var buttons = state.toolbar.querySelectorAll('.toolbar-btn:not(.disabled)');
-        buttons.forEach(function(btn) {
+        buttons.forEach(function (btn) {
             var cmd = btn.getAttribute('data-command');
             // Не трогаем toggleSource
             if (cmd !== 'toggleSource') {
@@ -2393,12 +2492,12 @@ var AdminWYSIWYG = (function() {
         toolbar.dataset.initialized = 'true';
 
         var buttons = toolbar.querySelectorAll('[data-command]');
-        buttons.forEach(function(btn) {
-            btn.addEventListener('mousedown', function(e) {
+        buttons.forEach(function (btn) {
+            btn.addEventListener('mousedown', function (e) {
                 e.preventDefault();
             });
 
-            btn.addEventListener('click', function(e) {
+            btn.addEventListener('click', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
 
@@ -2423,7 +2522,7 @@ var AdminWYSIWYG = (function() {
             });
         });
 
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (!e.target.closest('.toolbar-btn-color')) {
                 hideColorPicker();
             }
@@ -2499,26 +2598,26 @@ var AdminWYSIWYG = (function() {
         }
 
         // События
-        editorEl.addEventListener('blur', function() {
+        editorEl.addEventListener('blur', function () {
             saveSelection(id);
         });
 
-        editorEl.addEventListener('focus', function() {
+        editorEl.addEventListener('focus', function () {
             setActiveEditor(id);
         });
 
-        editorEl.addEventListener('keyup', function() {
+        editorEl.addEventListener('keyup', function () {
             saveSelection(id);
             updateToolbarState(id);
         });
 
-        editorEl.addEventListener('mouseup', function() {
+        editorEl.addEventListener('mouseup', function () {
             saveSelection(id);
             updateToolbarState(id);
         });
 
         // Горячие клавиши
-        editorEl.addEventListener('keydown', function(e) {
+        editorEl.addEventListener('keydown', function (e) {
             var state = getEditorState(id);
             if (state && state.isSourceMode) return;
 
@@ -2551,7 +2650,7 @@ var AdminWYSIWYG = (function() {
             }
         });
 
-        editorEl.addEventListener('paste', function(e) {
+        editorEl.addEventListener('paste', function (e) {
             handlePaste(e, id);
         });
 
@@ -2643,13 +2742,14 @@ var AdminWYSIWYG = (function() {
      * Генерировать HTML тулбара
      */
     function getToolbarHTML() {
-        return '<div class="editor-toolbar">' +
+        return (
+            '<div class="editor-toolbar">' +
             // Undo/Redo
             '<button type="button" class="toolbar-btn" data-command="undo" title="Отменить (Ctrl+Z)">' +
-                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h10a5 5 0 0 1 0 10H7"/><path d="M3 10l4-4"/><path d="M3 10l4 4"/></svg>' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h10a5 5 0 0 1 0 10H7"/><path d="M3 10l4-4"/><path d="M3 10l4 4"/></svg>' +
             '</button>' +
             '<button type="button" class="toolbar-btn" data-command="redo" title="Повторить (Ctrl+Y)">' +
-                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10H11a5 5 0 0 0 0 10h6"/><path d="M21 10l-4-4"/><path d="M21 10l-4 4"/></svg>' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10H11a5 5 0 0 0 0 10h6"/><path d="M21 10l-4-4"/><path d="M21 10l-4 4"/></svg>' +
             '</button>' +
             '<span class="toolbar-divider"></span>' +
             // Bold/Italic/Underline
@@ -2664,51 +2764,59 @@ var AdminWYSIWYG = (function() {
             '<span class="toolbar-divider"></span>' +
             // Lists
             '<button type="button" class="toolbar-btn" data-command="ul" title="Маркированный список">' +
-                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.5" fill="currentColor"/><circle cx="4" cy="12" r="1.5" fill="currentColor"/><circle cx="4" cy="18" r="1.5" fill="currentColor"/></svg>' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.5" fill="currentColor"/><circle cx="4" cy="12" r="1.5" fill="currentColor"/><circle cx="4" cy="18" r="1.5" fill="currentColor"/></svg>' +
             '</button>' +
             '<button type="button" class="toolbar-btn" data-command="ol" title="Нумерованный список">' +
-                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="10" y1="6" x2="20" y2="6"/><line x1="10" y1="12" x2="20" y2="12"/><line x1="10" y1="18" x2="20" y2="18"/><text x="4" y="8" font-size="8" fill="currentColor">1</text><text x="4" y="14" font-size="8" fill="currentColor">2</text><text x="4" y="20" font-size="8" fill="currentColor">3</text></svg>' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="10" y1="6" x2="20" y2="6"/><line x1="10" y1="12" x2="20" y2="12"/><line x1="10" y1="18" x2="20" y2="18"/><text x="4" y="8" font-size="8" fill="currentColor">1</text><text x="4" y="14" font-size="8" fill="currentColor">2</text><text x="4" y="20" font-size="8" fill="currentColor">3</text></svg>' +
             '</button>' +
             '<span class="toolbar-divider"></span>' +
             // Link/Quote
             '<button type="button" class="toolbar-btn" data-command="link" title="Вставить ссылку">' +
-                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>' +
             '</button>' +
             '<button type="button" class="toolbar-btn" data-command="quote" title="Цитата">' +
-                '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>' +
             '</button>' +
             '<span class="toolbar-divider"></span>' +
             // Color/Clear
             '<button type="button" class="toolbar-btn toolbar-btn-color" data-command="showColorPicker" title="Цвет текста">' +
-                '<span class="color-indicator">A</span>' +
+            '<span class="color-indicator">A</span>' +
             '</button>' +
             '<button type="button" class="toolbar-btn" data-command="removeFormat" title="Очистить форматирование">' +
-                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
             '</button>' +
             '<span class="toolbar-divider"></span>' +
             // Source mode
             '<button type="button" class="toolbar-btn" data-command="toggleSource" title="Исходный код HTML">' +
-                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>' +
             '</button>' +
-        '</div>';
+            '</div>'
+        );
     }
 
     /**
      * Генерировать HTML редактора с тулбаром
      */
     function getEditorHTML(id, content, placeholder) {
-        return '<div class="wysiwyg-wrapper">' +
+        return (
+            '<div class="wysiwyg-wrapper">' +
             getToolbarHTML() +
-            '<div class="wysiwyg-editor" id="' + id + '" contenteditable="true" data-placeholder="' + (placeholder || 'Начните писать...') + '">' +
-                (content || '') +
+            '<div class="wysiwyg-editor" id="' +
+            id +
+            '" contenteditable="true" data-placeholder="' +
+            (placeholder || 'Начните писать...') +
+            '">' +
+            (content || '') +
             '</div>' +
-        '</div>';
+            '</div>'
+        );
     }
 
     // Legacy init function for backwards compatibility
     function init(editorId, toolbarId) {
         var editorEl = typeof editorId === 'string' ? document.getElementById(editorId) : editorId;
-        var toolbarEl = typeof toolbarId === 'string' ? document.getElementById(toolbarId) : toolbarId;
+        var toolbarEl =
+            typeof toolbarId === 'string' ? document.getElementById(toolbarId) : toolbarId;
 
         if (!editorEl) return;
 
@@ -2730,18 +2838,18 @@ var AdminWYSIWYG = (function() {
             initToolbar(id);
         }
 
-        editorEl.addEventListener('paste', function(e) {
+        editorEl.addEventListener('paste', function (e) {
             handlePaste(e, id);
         });
-        editorEl.addEventListener('keyup', function() {
+        editorEl.addEventListener('keyup', function () {
             saveSelection(id);
             updateToolbarState(id);
         });
-        editorEl.addEventListener('mouseup', function() {
+        editorEl.addEventListener('mouseup', function () {
             saveSelection(id);
             updateToolbarState(id);
         });
-        editorEl.addEventListener('focus', function() {
+        editorEl.addEventListener('focus', function () {
             setActiveEditor(id);
         });
 
@@ -2780,7 +2888,7 @@ window.AdminWYSIWYG = AdminWYSIWYG;
  * Admin Drag & Drop Module
  * Универсальный модуль для сортировки элементов перетаскиванием
  */
-var AdminDragDrop = (function() {
+var AdminDragDrop = (function () {
     'use strict';
 
     var draggedItem = null;
@@ -2823,7 +2931,7 @@ var AdminDragDrop = (function() {
         if (!container) return;
 
         var items = container.querySelectorAll(config.selector);
-        items.forEach(function(item, index) {
+        items.forEach(function (item, index) {
             item.setAttribute('draggable', 'true');
             item.dataset.index = index;
         });
@@ -2837,8 +2945,9 @@ var AdminDragDrop = (function() {
 
         var handle = document.createElement('div');
         handle.className = 'drag-handle';
-        handle.innerHTML = window.SharedIcons ? window.SharedIcons.get('grip') :
-            '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg>';
+        handle.innerHTML = window.SharedIcons
+            ? window.SharedIcons.get('grip')
+            : '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg>';
         handle.title = 'Перетащите для изменения порядка';
 
         // Вставляем в начало элемента
@@ -2853,7 +2962,7 @@ var AdminDragDrop = (function() {
         draggedIndex = parseInt(item.dataset.index, 10);
 
         // Добавляем класс с небольшой задержкой для анимации
-        setTimeout(function() {
+        setTimeout(function () {
             if (draggedItem) {
                 draggedItem.classList.add('dragging');
             }
@@ -2926,13 +3035,13 @@ var AdminDragDrop = (function() {
 
         // Обновляем индексы
         var items = container.querySelectorAll(config.selector);
-        items.forEach(function(item, index) {
+        items.forEach(function (item, index) {
             item.dataset.index = index;
         });
 
         // Собираем новый порядок ID
         var newOrder = [];
-        items.forEach(function(item) {
+        items.forEach(function (item) {
             var id = item.dataset.id;
             if (id) {
                 newOrder.push(id);
@@ -2962,6 +3071,13 @@ var AdminDragDrop = (function() {
             container.removeEventListener('drop', handleDrop);
         }
         delete containers[containerId];
+
+        // Обнулить состояние drag если удалён последний контейнер
+        if (Object.keys(containers).length === 0) {
+            draggedItem = null;
+            draggedIndex = -1;
+            currentDragOver = null;
+        }
     }
 
     // Публичный API
@@ -2983,27 +3099,27 @@ window.AdminDragDrop = AdminDragDrop;
  * Admin Form Validation Module
  * Валидация форм перед отправкой
  */
-var AdminValidation = (function() {
+var AdminValidation = (function () {
     'use strict';
 
     /**
      * Правила валидации
      */
     var rules = {
-        required: function(value) {
+        required: function (value) {
             return value !== null && value !== undefined && String(value).trim() !== '';
         },
-        minLength: function(value, min) {
+        minLength: function (value, min) {
             return String(value).trim().length >= min;
         },
-        maxLength: function(value, max) {
+        maxLength: function (value, max) {
             return String(value).trim().length <= max;
         },
-        email: function(value) {
+        email: function (value) {
             var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return !value || emailRegex.test(value);
         },
-        url: function(value) {
+        url: function (value) {
             if (!value) return true;
             try {
                 new URL(value);
@@ -3012,11 +3128,11 @@ var AdminValidation = (function() {
                 return false;
             }
         },
-        number: function(value) {
+        number: function (value) {
             return !value || !isNaN(parseFloat(value));
         },
-        positiveNumber: function(value) {
-            return !value || (parseFloat(value) >= 0);
+        positiveNumber: function (value) {
+            return !value || parseFloat(value) >= 0;
         }
     };
 
@@ -3075,7 +3191,7 @@ var AdminValidation = (function() {
         var errors = {};
         var isValid = true;
 
-        Object.keys(fieldsConfig).forEach(function(fieldId) {
+        Object.keys(fieldsConfig).forEach(function (fieldId) {
             var result = validateField(fieldId, fieldsConfig[fieldId]);
             if (!result.valid) {
                 errors[fieldId] = result.error;
@@ -3106,7 +3222,9 @@ var AdminValidation = (function() {
         if (message) {
             var errorEl = document.createElement('div');
             errorEl.className = 'form-error-message';
-            errorEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' + window.escapeHtml(message);
+            errorEl.innerHTML =
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
+                window.escapeHtml(message);
             field.parentElement.appendChild(errorEl);
         }
     }
@@ -3130,7 +3248,7 @@ var AdminValidation = (function() {
      * Показать все ошибки формы
      */
     function showFormErrors(errors) {
-        Object.keys(errors).forEach(function(fieldId) {
+        Object.keys(errors).forEach(function (fieldId) {
             showFieldError(fieldId, errors[fieldId]);
         });
 
@@ -3149,7 +3267,7 @@ var AdminValidation = (function() {
      * Очистить все ошибки формы
      */
     function clearFormErrors(fieldsConfig) {
-        Object.keys(fieldsConfig).forEach(function(fieldId) {
+        Object.keys(fieldsConfig).forEach(function (fieldId) {
             clearFieldError(fieldId);
         });
     }
@@ -3186,7 +3304,7 @@ var AdminValidation = (function() {
         var field = document.getElementById(fieldId);
         if (!field) return;
 
-        field.addEventListener('blur', function() {
+        field.addEventListener('blur', function () {
             var result = validateField(fieldId, fieldRules);
             if (!result.valid) {
                 showFieldError(fieldId, result.error);
@@ -3195,7 +3313,7 @@ var AdminValidation = (function() {
             }
         });
 
-        field.addEventListener('input', function() {
+        field.addEventListener('input', function () {
             // Убираем ошибку при вводе
             clearFieldError(fieldId);
         });
@@ -3226,7 +3344,7 @@ window.AdminValidation = AdminValidation;
  * Admin Search Module
  * Поиск и фильтрация элементов в списках
  */
-var AdminSearch = (function() {
+var AdminSearch = (function () {
     'use strict';
 
     var searchConfigs = {};
@@ -3259,7 +3377,7 @@ var AdminSearch = (function() {
         searchConfigs[inputId] = config;
 
         // Обработчик ввода
-        input.addEventListener('input', function() {
+        input.addEventListener('input', function () {
             handleInput(inputId, input.value);
         });
 
@@ -3268,7 +3386,7 @@ var AdminSearch = (function() {
         if (searchBox) {
             var clearBtn = searchBox.querySelector('.search-clear');
             if (clearBtn) {
-                clearBtn.addEventListener('click', function() {
+                clearBtn.addEventListener('click', function () {
                     input.value = '';
                     handleInput(inputId, '');
                     input.focus();
@@ -3299,7 +3417,7 @@ var AdminSearch = (function() {
             clearTimeout(debounceTimers[inputId]);
         }
 
-        debounceTimers[inputId] = setTimeout(function() {
+        debounceTimers[inputId] = setTimeout(function () {
             filterItems(config, value);
         }, config.debounce);
     }
@@ -3327,9 +3445,12 @@ var AdminSearch = (function() {
         var visibleCount = 0;
         var totalCount = items.length;
 
-        items.forEach(function(item) {
+        items.forEach(function (item) {
             // Пропускаем сообщения о пустом списке
-            if (item.classList.contains('empty-message') || item.classList.contains('empty-state')) {
+            if (
+                item.classList.contains('empty-message') ||
+                item.classList.contains('empty-state')
+            ) {
                 return;
             }
 
@@ -3440,7 +3561,7 @@ window.AdminSearch = AdminSearch;
  * Навигация между секциями админ-панели
  */
 
-var AdminRouter = (function() {
+var AdminRouter = (function () {
     'use strict';
 
     /**
@@ -3513,52 +3634,52 @@ var AdminRouter = (function() {
      * Рендереры секций
      */
     var SECTION_RENDERERS = {
-        stats: function() {
+        stats: function () {
             if (window.AdminStatsRenderer) {
                 AdminRouter.loadStats();
             }
         },
-        masters: function() {
+        masters: function () {
             if (window.AdminMastersRenderer) {
                 AdminMastersRenderer.render();
             }
         },
-        services: function() {
+        services: function () {
             if (window.AdminServicesRenderer) {
                 AdminServicesRenderer.render();
             }
         },
-        podology: function() {
+        podology: function () {
             if (window.AdminServicesRenderer) {
                 AdminServicesRenderer.renderPodology();
             }
         },
-        articles: function() {
+        articles: function () {
             if (window.AdminArticlesRenderer) {
                 AdminArticlesRenderer.render();
             }
         },
-        faq: function() {
+        faq: function () {
             if (window.AdminFaqRenderer) {
                 AdminFaqRenderer.render();
             }
         },
-        social: function() {
+        social: function () {
             if (window.AdminSocialRenderer) {
                 AdminSocialRenderer.render();
             }
         },
-        'shop-categories': function() {
+        'shop-categories': function () {
             if (window.AdminShopCategoriesRenderer) {
                 AdminShopCategoriesRenderer.render();
             }
         },
-        'shop-products': function() {
+        'shop-products': function () {
             if (window.AdminShopProductsRenderer) {
                 AdminShopProductsRenderer.render();
             }
         },
-        legal: function() {
+        legal: function () {
             if (window.AdminLegalRenderer) {
                 AdminLegalRenderer.render();
             }
@@ -3609,14 +3730,14 @@ var AdminRouter = (function() {
 
         // Обновляем навигацию
         if (elements && elements.navItems) {
-            elements.navItems.forEach(function(item) {
+            elements.navItems.forEach(function (item) {
                 item.classList.toggle('active', item.dataset.section === section);
             });
         }
 
         // Скрываем все секции
         if (elements && elements.sections) {
-            elements.sections.forEach(function(sec) {
+            elements.sections.forEach(function (sec) {
                 sec.classList.remove('active');
             });
         }
@@ -3656,7 +3777,7 @@ var AdminRouter = (function() {
         AdminState.currentCategory = category;
 
         if (elements && elements.serviceTabs) {
-            elements.serviceTabs.forEach(function(tab) {
+            elements.serviceTabs.forEach(function (tab) {
                 tab.classList.toggle('active', tab.dataset.category === category);
             });
         }
@@ -3674,7 +3795,7 @@ var AdminRouter = (function() {
         AdminState.currentPodologyCategory = category;
 
         var tabs = document.querySelectorAll('[data-podology-category]');
-        tabs.forEach(function(tab) {
+        tabs.forEach(function (tab) {
             tab.classList.toggle('active', tab.getAttribute('data-podology-category') === category);
         });
 
@@ -3706,7 +3827,7 @@ window.AdminRouter = AdminRouter;
  * Обработчики событий админ-панели
  */
 
-var AdminEventHandlers = (function() {
+var AdminEventHandlers = (function () {
     'use strict';
 
     // Кэшированные элементы
@@ -3958,30 +4079,96 @@ var AdminEventHandlers = (function() {
      * Карта обработчиков действий
      */
     var ACTION_ROUTES = {
-        'edit-master': function(t) { handleMasterAction('edit-master', t.getAttribute('data-id')); },
-        'delete-master': function(t) { handleMasterAction('delete-master', t.getAttribute('data-id')); },
-        'edit-service': function(t) { handleServiceAction('edit-service', t.getAttribute('data-category'), t.getAttribute('data-index')); },
-        'delete-service': function(t) { handleServiceAction('delete-service', t.getAttribute('data-category'), t.getAttribute('data-index')); },
-        'edit-podology': function(t) { handleServiceAction('edit-podology', t.getAttribute('data-category'), t.getAttribute('data-index')); },
-        'delete-podology': function(t) { handleServiceAction('delete-podology', t.getAttribute('data-category'), t.getAttribute('data-index')); },
-        'add-podology-category': function() { handlePodologyCategoryAction('add-podology-category'); },
-        'edit-podology-category': function(t) { handlePodologyCategoryAction('edit-podology-category', t.getAttribute('data-id')); },
-        'delete-podology-category': function(t) { handlePodologyCategoryAction('delete-podology-category', t.getAttribute('data-id')); },
-        'edit-article': function(t) { handleArticleAction('edit-article', t.getAttribute('data-id')); },
-        'delete-article': function(t) { handleArticleAction('delete-article', t.getAttribute('data-id')); },
-        'edit-faq': function(t) { handleFaqAction('edit-faq', t.getAttribute('data-id')); },
-        'delete-faq': function(t) { handleFaqAction('delete-faq', t.getAttribute('data-id')); },
-        'toggle-social': function(t) { if (window.AdminSocialRenderer) AdminSocialRenderer.toggleActive(t.getAttribute('data-social-id')); },
-        'remove-image': function(t) { if (window.AdminImageHandler) AdminImageHandler.removeImage(t.getAttribute('data-target')); },
-        'add-principle': function() { AdminMasterForm.addPrinciple(); },
-        'remove-principle': function(t) { AdminMasterForm.removePrinciple(t); },
-        'edit-shop-category': function(t) { handleShopCategoryAction('edit-shop-category', t.getAttribute('data-id')); },
-        'delete-shop-category': function(t) { handleShopCategoryAction('delete-shop-category', t.getAttribute('data-id')); },
-        'edit-product': function(t) { handleProductAction('edit-product', t.getAttribute('data-id')); },
-        'delete-product': function(t) { handleProductAction('delete-product', t.getAttribute('data-id')); },
-        'edit-legal': function(t) { handleLegalAction('edit-legal', t.getAttribute('data-id')); },
-        'delete-legal': function(t) { handleLegalAction('delete-legal', t.getAttribute('data-id')); },
-        'toggle-legal': function(t) { handleLegalAction('toggle-legal', t.getAttribute('data-id')); }
+        'edit-master': function (t) {
+            handleMasterAction('edit-master', t.getAttribute('data-id'));
+        },
+        'delete-master': function (t) {
+            handleMasterAction('delete-master', t.getAttribute('data-id'));
+        },
+        'edit-service': function (t) {
+            handleServiceAction(
+                'edit-service',
+                t.getAttribute('data-category'),
+                t.getAttribute('data-index')
+            );
+        },
+        'delete-service': function (t) {
+            handleServiceAction(
+                'delete-service',
+                t.getAttribute('data-category'),
+                t.getAttribute('data-index')
+            );
+        },
+        'edit-podology': function (t) {
+            handleServiceAction(
+                'edit-podology',
+                t.getAttribute('data-category'),
+                t.getAttribute('data-index')
+            );
+        },
+        'delete-podology': function (t) {
+            handleServiceAction(
+                'delete-podology',
+                t.getAttribute('data-category'),
+                t.getAttribute('data-index')
+            );
+        },
+        'add-podology-category': function () {
+            handlePodologyCategoryAction('add-podology-category');
+        },
+        'edit-podology-category': function (t) {
+            handlePodologyCategoryAction('edit-podology-category', t.getAttribute('data-id'));
+        },
+        'delete-podology-category': function (t) {
+            handlePodologyCategoryAction('delete-podology-category', t.getAttribute('data-id'));
+        },
+        'edit-article': function (t) {
+            handleArticleAction('edit-article', t.getAttribute('data-id'));
+        },
+        'delete-article': function (t) {
+            handleArticleAction('delete-article', t.getAttribute('data-id'));
+        },
+        'edit-faq': function (t) {
+            handleFaqAction('edit-faq', t.getAttribute('data-id'));
+        },
+        'delete-faq': function (t) {
+            handleFaqAction('delete-faq', t.getAttribute('data-id'));
+        },
+        'toggle-social': function (t) {
+            if (window.AdminSocialRenderer)
+                AdminSocialRenderer.toggleActive(t.getAttribute('data-social-id'));
+        },
+        'remove-image': function (t) {
+            if (window.AdminImageHandler)
+                AdminImageHandler.removeImage(t.getAttribute('data-target'));
+        },
+        'add-principle': function () {
+            AdminMasterForm.addPrinciple();
+        },
+        'remove-principle': function (t) {
+            AdminMasterForm.removePrinciple(t);
+        },
+        'edit-shop-category': function (t) {
+            handleShopCategoryAction('edit-shop-category', t.getAttribute('data-id'));
+        },
+        'delete-shop-category': function (t) {
+            handleShopCategoryAction('delete-shop-category', t.getAttribute('data-id'));
+        },
+        'edit-product': function (t) {
+            handleProductAction('edit-product', t.getAttribute('data-id'));
+        },
+        'delete-product': function (t) {
+            handleProductAction('delete-product', t.getAttribute('data-id'));
+        },
+        'edit-legal': function (t) {
+            handleLegalAction('edit-legal', t.getAttribute('data-id'));
+        },
+        'delete-legal': function (t) {
+            handleLegalAction('delete-legal', t.getAttribute('data-id'));
+        },
+        'toggle-legal': function (t) {
+            handleLegalAction('toggle-legal', t.getAttribute('data-id'));
+        }
     };
 
     /**
@@ -4002,7 +4189,7 @@ var AdminEventHandlers = (function() {
      * Инициализация делегирования событий
      */
     function initEventDelegation() {
-        boundHandlers.documentClick = function(e) {
+        boundHandlers.documentClick = function (e) {
             // Обработка табов подологии
             var podologyTab = e.target.closest('[data-podology-category]');
             if (podologyTab) {
@@ -4017,7 +4204,7 @@ var AdminEventHandlers = (function() {
         document.addEventListener('click', boundHandlers.documentClick);
 
         // Обработчик загрузки изображений
-        boundHandlers.documentChange = function(e) {
+        boundHandlers.documentChange = function (e) {
             var target = e.target;
             if (target.matches('[data-upload-target]')) {
                 var inputId = target.getAttribute('data-upload-target');
@@ -4047,37 +4234,49 @@ var AdminEventHandlers = (function() {
         if (!elements) return;
 
         // Navigation items
-        (elements.navItems || []).forEach(function(item) {
-            item.addEventListener('click', function() { AdminRouter.switchSection(item.dataset.section); });
+        (elements.navItems || []).forEach(function (item) {
+            item.addEventListener('click', function () {
+                AdminRouter.switchSection(item.dataset.section);
+            });
         });
 
         // Service tabs
-        (elements.serviceTabs || []).forEach(function(tab) {
-            tab.addEventListener('click', function() { AdminRouter.switchServiceCategory(tab.dataset.category); });
+        (elements.serviceTabs || []).forEach(function (tab) {
+            tab.addEventListener('click', function () {
+                AdminRouter.switchServiceCategory(tab.dataset.category);
+            });
         });
 
         // Buttons
         bindClick(elements.addNewBtn, handleAddNew);
-        bindClick(elements.modalClose, function() { AdminModals.close('modal'); });
-        bindClick(elements.modalCancel, function() { AdminModals.close('modal'); });
+        bindClick(elements.modalClose, function () {
+            AdminModals.close('modal');
+        });
+        bindClick(elements.modalCancel, function () {
+            AdminModals.close('modal');
+        });
         bindClick(elements.modalSave, handleModalSave);
-        bindClick(elements.saveSocialBtn, function() { if (window.AdminSocialRenderer) AdminSocialRenderer.save(); });
+        bindClick(elements.saveSocialBtn, function () {
+            if (window.AdminSocialRenderer) AdminSocialRenderer.save();
+        });
 
         // Podology categories button
         var managePodologyCategoriesBtn = document.getElementById('managePodologyCategoriesBtn');
-        bindClick(managePodologyCategoriesBtn, function() {
+        bindClick(managePodologyCategoriesBtn, function () {
             if (window.AdminPodologyCategoryForm) {
                 AdminPodologyCategoryForm.showList();
             }
         });
 
         // Modal overlay click
-        bindClick(elements.modalOverlay, function(e) {
+        bindClick(elements.modalOverlay, function (e) {
             if (e.target === elements.modalOverlay) AdminModals.close('modal');
         });
 
         // Escape key
-        boundHandlers.documentKeydown = function(e) { if (e.key === 'Escape') AdminModals.closeCurrent(); };
+        boundHandlers.documentKeydown = function (e) {
+            if (e.key === 'Escape') AdminModals.closeCurrent();
+        };
         document.addEventListener('keydown', boundHandlers.documentKeydown);
     }
 
@@ -4123,7 +4322,7 @@ window.AdminEventHandlers = AdminEventHandlers;
  * Базовые функции для renderers
  */
 
-var BaseRenderer = (function() {
+var BaseRenderer = (function () {
     'use strict';
 
     /**
@@ -4139,14 +4338,16 @@ var BaseRenderer = (function() {
         var items = getItems() || [];
 
         // Создаем новый порядок элементов
-        var reordered = newOrder.map(function(id) {
-            return items.find(function(item) {
-                return String(item.id) === String(id);
-            });
-        }).filter(Boolean);
+        var reordered = newOrder
+            .map(function (id) {
+                return items.find(function (item) {
+                    return String(item.id) === String(id);
+                });
+            })
+            .filter(Boolean);
 
         // Обновляем поле order
-        reordered.forEach(function(item, index) {
+        reordered.forEach(function (item, index) {
             item.order = index;
         });
 
@@ -4155,7 +4356,7 @@ var BaseRenderer = (function() {
         data[entityName] = reordered;
 
         return AdminAPI.save(entityName, data)
-            .then(function() {
+            .then(function () {
                 setItems(reordered);
                 if (window.showToast) {
                     showToast('Порядок сохранён', 'success');
@@ -4164,7 +4365,7 @@ var BaseRenderer = (function() {
                     onSuccess();
                 }
             })
-            .catch(function(error) {
+            .catch(function (error) {
                 if (window.showToast) {
                     showToast('Ошибка сохранения порядка', 'error');
                 }
@@ -4195,21 +4396,27 @@ var BaseRenderer = (function() {
         }
 
         if (options.extraAttrs) {
-            Object.keys(options.extraAttrs).forEach(function(key) {
+            Object.keys(options.extraAttrs).forEach(function (key) {
                 var value = escapeAttr(options.extraAttrs[key]);
                 editAttrs += ' data-' + key + '="' + value + '"';
                 deleteAttrs += ' data-' + key + '="' + value + '"';
             });
         }
 
-        return '<div class="item-actions">' +
-            '<button class="btn btn-icon" ' + editAttrs + ' title="Редактировать">' +
-                SharedIcons.get('edit') +
+        return (
+            '<div class="item-actions">' +
+            '<button class="btn btn-icon" ' +
+            editAttrs +
+            ' title="Редактировать">' +
+            SharedIcons.get('edit') +
             '</button>' +
-            '<button class="btn btn-icon danger" ' + deleteAttrs + ' title="Удалить">' +
-                SharedIcons.get('delete') +
+            '<button class="btn btn-icon danger" ' +
+            deleteAttrs +
+            ' title="Удалить">' +
+            SharedIcons.get('delete') +
             '</button>' +
-        '</div>';
+            '</div>'
+        );
     }
 
     /**
@@ -4217,9 +4424,11 @@ var BaseRenderer = (function() {
      * @returns {string} HTML строка
      */
     function createDragHandle() {
-        return '<div class="drag-handle" title="Перетащите для изменения порядка">' +
+        return (
+            '<div class="drag-handle" title="Перетащите для изменения порядка">' +
             SharedIcons.get('grip') +
-        '</div>';
+            '</div>'
+        );
     }
 
     /**
@@ -4229,8 +4438,7 @@ var BaseRenderer = (function() {
      * @returns {string} HTML строка
      */
     function renderEmptyState(message, hint) {
-        var html = '<div class="empty-state">' +
-            '<p>' + escapeHtml(message) + '</p>';
+        var html = '<div class="empty-state">' + '<p>' + escapeHtml(message) + '</p>';
 
         if (hint) {
             html += '<p class="empty-hint">' + escapeHtml(hint) + '</p>';
@@ -4284,7 +4492,7 @@ window.BaseRenderer = BaseRenderer;
  * Рендеринг статистики посещений
  */
 
-var AdminStatsRenderer = (function() {
+var AdminStatsRenderer = (function () {
     'use strict';
 
     var elements = {};
@@ -4339,20 +4547,22 @@ var AdminStatsRenderer = (function() {
      */
     function renderTopSections(sections) {
         var sectionNames = {
-            'hero': 'Главная',
-            'services': 'Услуги',
-            'masters': 'Мастера',
-            'quality': 'Качество',
-            'blog': 'Блог',
-            'faq': 'FAQ',
-            'booking': 'Запись',
-            'podology': 'Подология',
-            'location': 'Контакты',
-            'social': 'Соцсети'
+            hero: 'Главная',
+            services: 'Услуги',
+            masters: 'Мастера',
+            quality: 'Качество',
+            blog: 'Блог',
+            faq: 'FAQ',
+            booking: 'Запись',
+            podology: 'Подология',
+            location: 'Контакты',
+            social: 'Соцсети'
         };
 
         var sortedSections = Object.entries(sections)
-            .sort(function(a, b) { return b[1] - a[1]; })
+            .sort(function (a, b) {
+                return b[1] - a[1];
+            })
             .slice(0, 6);
 
         if (sortedSections.length === 0) {
@@ -4362,20 +4572,30 @@ var AdminStatsRenderer = (function() {
 
         var maxViews = sortedSections[0][1];
 
-        var html = sortedSections.map(function(item, index) {
-            var key = item[0];
-            var views = item[1];
-            var name = sectionNames[key] || key;
-            var percent = maxViews > 0 ? Math.round((views / maxViews) * 100) : 0;
+        var html = sortedSections
+            .map(function (item, index) {
+                var key = item[0];
+                var views = item[1];
+                var name = sectionNames[key] || key;
+                var percent = maxViews > 0 ? Math.round((views / maxViews) * 100) : 0;
 
-            return '<div class="page-stat-row">' +
-                '<span class="page-stat-name">' + escapeHtml(name) + '</span>' +
-                '<div class="page-stat-bar-wrap">' +
-                    '<div class="page-stat-bar" style="width: ' + percent + '%"></div>' +
-                '</div>' +
-                '<span class="page-stat-count">' + views + '</span>' +
-            '</div>';
-        }).join('');
+                return (
+                    '<div class="page-stat-row">' +
+                    '<span class="page-stat-name">' +
+                    escapeHtml(name) +
+                    '</span>' +
+                    '<div class="page-stat-bar-wrap">' +
+                    '<div class="page-stat-bar" style="width: ' +
+                    percent +
+                    '%"></div>' +
+                    '</div>' +
+                    '<span class="page-stat-count">' +
+                    views +
+                    '</span>' +
+                    '</div>'
+                );
+            })
+            .join('');
 
         elements.topSections.innerHTML = html;
     }
@@ -4403,7 +4623,7 @@ var AdminStatsRenderer = (function() {
         ctx.textAlign = 'right';
 
         for (var j = 0; j <= 4; j++) {
-            var value = Math.round(dims.maxViews * (4 - j) / 4);
+            var value = Math.round((dims.maxViews * (4 - j)) / 4);
             var labelY = dims.padding + (dims.chartHeight / 4) * j;
             ctx.fillText(formatNumber(value), dims.padding - 10, labelY + 4);
         }
@@ -4419,7 +4639,7 @@ var AdminStatsRenderer = (function() {
         var barWidth = dims.chartWidth / chartData.length;
         var barGap = 4;
 
-        chartData.forEach(function(data, index) {
+        chartData.forEach(function (data, index) {
             var barHeight = Math.max(2, (data.views / dims.maxViews) * dims.chartHeight);
             var x = dims.padding + index * barWidth + barGap;
             var y = dims.height - dims.paddingBottom - barHeight;
@@ -4466,7 +4686,7 @@ var AdminStatsRenderer = (function() {
         ctx.font = '10px Manrope, sans-serif';
         ctx.textAlign = 'center';
 
-        chartData.forEach(function(data, index) {
+        chartData.forEach(function (data, index) {
             var x = dims.padding + index * barWidth + barWidth / 2;
             var date = new Date(data.date);
             var label = date.getDate() + '/' + (date.getMonth() + 1);
@@ -4518,7 +4738,9 @@ var AdminStatsRenderer = (function() {
         }
 
         // Вычисляем размеры
-        var views = chartData.map(function(d) { return d.views || 0; });
+        var views = chartData.map(function (d) {
+            return d.views || 0;
+        });
         var maxViews = views.length > 0 ? Math.max.apply(null, views) : 0;
         if (maxViews === 0) maxViews = 1;
 
@@ -4569,7 +4791,7 @@ window.AdminStatsRenderer = AdminStatsRenderer;
  * Рендеринг списка мастеров с поддержкой drag & drop
  */
 
-var AdminMastersRenderer = (function() {
+var AdminMastersRenderer = (function () {
     'use strict';
 
     var container = null;
@@ -4589,7 +4811,7 @@ var AdminMastersRenderer = (function() {
     function initDragDrop() {
         if (dragDropInitialized || !window.AdminDragDrop) return;
 
-        AdminDragDrop.init('mastersGrid', '.master-card', function(newOrder) {
+        AdminDragDrop.init('mastersGrid', '.master-card', function (newOrder) {
             reorderMasters(newOrder);
         });
 
@@ -4603,24 +4825,28 @@ var AdminMastersRenderer = (function() {
         var masters = AdminState.masters || [];
 
         // Создаём новый порядок
-        var reordered = newOrder.map(function(id) {
-            return masters.find(function(m) { return m.id === id; });
-        }).filter(Boolean);
+        var reordered = newOrder
+            .map(function (id) {
+                return masters.find(function (m) {
+                    return m.id === id;
+                });
+            })
+            .filter(Boolean);
 
         // Добавляем поле order
-        reordered.forEach(function(master, index) {
+        reordered.forEach(function (master, index) {
             master.order = index;
         });
 
         // Сохраняем
         AdminAPI.save('masters', { masters: reordered })
-            .then(function() {
+            .then(function () {
                 AdminState.setMasters(reordered);
                 if (window.showToast) {
                     showToast('Порядок сохранён', 'success');
                 }
             })
-            .catch(function(error) {
+            .catch(function (error) {
                 if (window.showToast) {
                     showToast('Ошибка сохранения порядка', 'error');
                 }
@@ -4633,9 +4859,9 @@ var AdminMastersRenderer = (function() {
      */
     function getBadgeLabel(badge) {
         var labels = {
-            'green': 'Green',
-            'pink': 'Pink',
-            'blue': 'Dark Blue'
+            green: 'Green',
+            pink: 'Pink',
+            blue: 'Dark Blue'
         };
         return labels[badge] || 'Green';
     }
@@ -4652,41 +4878,76 @@ var AdminMastersRenderer = (function() {
         var masters = AdminState.masters || [];
 
         if (masters.length === 0) {
-            container.innerHTML = '<p class="empty-message">Нет мастеров. Нажмите "Добавить" чтобы создать.</p>';
+            container.innerHTML =
+                '<p class="empty-message">Нет мастеров. Нажмите "Добавить" чтобы создать.</p>';
             return;
         }
 
-        var html = masters.map(function(master, index) {
-            var photoHtml = master.photo
-                ? '<img src="' + master.photo + '" alt="' + window.escapeHtml(master.name) + '">'
-                : (master.initial || master.name.charAt(0));
+        var html = masters
+            .map(function (master, index) {
+                var photoHtml = master.photo
+                    ? '<img src="' +
+                      master.photo +
+                      '" alt="' +
+                      window.escapeHtml(master.name) +
+                      '">'
+                    : master.initial || master.name.charAt(0);
 
-            var searchText = [master.name, master.role, master.specialization].join(' ');
+                var searchText = [master.name, master.role, master.specialization].join(' ');
 
-            return '<div class="master-card has-drag" data-id="' + master.id + '" data-index="' + index + '" data-search="' + window.escapeHtml(searchText) + '" draggable="true">' +
-                '<div class="master-card-header">' +
-                    '<div class="master-avatar ' + (master.photo ? 'has-photo' : '') + '">' +
-                        photoHtml +
+                return (
+                    '<div class="master-card has-drag" data-id="' +
+                    master.id +
+                    '" data-index="' +
+                    index +
+                    '" data-search="' +
+                    window.escapeHtml(searchText) +
+                    '" draggable="true">' +
+                    '<div class="master-card-header">' +
+                    '<div class="master-avatar ' +
+                    (master.photo ? 'has-photo' : '') +
+                    '">' +
+                    photoHtml +
                     '</div>' +
                     '<div class="master-info">' +
-                        '<h3 class="master-name">' + window.escapeHtml(master.name) + '</h3>' +
-                        '<div class="master-role">' + window.escapeHtml(master.role || 'Мастер') + '</div>' +
-                        '<span class="master-badge badge-' + (master.badge || 'green') + '">' + getBadgeLabel(master.badge) + '</span>' +
+                    '<h3 class="master-name">' +
+                    window.escapeHtml(master.name) +
+                    '</h3>' +
+                    '<div class="master-role">' +
+                    window.escapeHtml(master.role || 'Мастер') +
                     '</div>' +
-                '</div>' +
-                '<p class="master-specialization">' + window.escapeHtml(master.specialization || '') + '</p>' +
-                '<div class="master-card-actions">' +
-                    '<button class="btn btn-secondary" data-action="edit-master" data-id="' + master.id + '">' +
-                        SharedIcons.get('edit') +
-                        'Редактировать' +
+                    '<span class="master-badge badge-' +
+                    (master.badge || 'green') +
+                    '">' +
+                    getBadgeLabel(master.badge) +
+                    '</span>' +
+                    '</div>' +
+                    '</div>' +
+                    '<p class="master-specialization">' +
+                    window.escapeHtml(master.specialization || '') +
+                    '</p>' +
+                    '<div class="master-card-actions">' +
+                    '<button class="btn btn-secondary" data-action="edit-master" data-id="' +
+                    master.id +
+                    '">' +
+                    SharedIcons.get('edit') +
+                    'Редактировать' +
                     '</button>' +
-                    '<button class="btn btn-icon danger" data-action="delete-master" data-id="' + master.id + '" data-name="' + window.escapeHtml(master.name) + '" title="Удалить">' +
-                        SharedIcons.get('delete') +
+                    '<button class="btn btn-icon danger" data-action="delete-master" data-id="' +
+                    master.id +
+                    '" data-name="' +
+                    window.escapeHtml(master.name) +
+                    '" title="Удалить">' +
+                    SharedIcons.get('delete') +
                     '</button>' +
-                '</div>' +
-                '<div class="drag-handle" title="Перетащите для изменения порядка">' + SharedIcons.get('grip') + '</div>' +
-            '</div>';
-        }).join('');
+                    '</div>' +
+                    '<div class="drag-handle" title="Перетащите для изменения порядка">' +
+                    SharedIcons.get('grip') +
+                    '</div>' +
+                    '</div>'
+                );
+            })
+            .join('');
 
         container.innerHTML = html;
 
@@ -4716,7 +4977,7 @@ window.AdminMastersRenderer = AdminMastersRenderer;
  * Рендеринг списка услуг с поддержкой drag & drop
  */
 
-var AdminServicesRenderer = (function() {
+var AdminServicesRenderer = (function () {
     'use strict';
 
     var servicesList = null;
@@ -4739,14 +5000,14 @@ var AdminServicesRenderer = (function() {
         if (!window.AdminDragDrop) return;
 
         if (!dragDropInitialized.services) {
-            AdminDragDrop.init('servicesList', '.service-item', function(newOrder) {
+            AdminDragDrop.init('servicesList', '.service-item', function (newOrder) {
                 reorderServices(newOrder);
             });
             dragDropInitialized.services = true;
         }
 
         if (!dragDropInitialized.podology) {
-            AdminDragDrop.init('podologyList', '.service-item', function(newOrder) {
+            AdminDragDrop.init('podologyList', '.service-item', function (newOrder) {
                 reorderPodology(newOrder);
             });
             dragDropInitialized.podology = true;
@@ -4762,27 +5023,31 @@ var AdminServicesRenderer = (function() {
 
         if (!services.categories) return;
 
-        var categoryIndex = services.categories.findIndex(function(c) {
+        var categoryIndex = services.categories.findIndex(function (c) {
             return c.id === currentCategory;
         });
 
         if (categoryIndex === -1) return;
 
         var category = services.categories[categoryIndex];
-        var reordered = newOrder.map(function(id) {
-            return category.services.find(function(s) { return String(s.id) === String(id); });
-        }).filter(Boolean);
+        var reordered = newOrder
+            .map(function (id) {
+                return category.services.find(function (s) {
+                    return String(s.id) === String(id);
+                });
+            })
+            .filter(Boolean);
 
         services.categories[categoryIndex].services = reordered;
 
         AdminAPI.save('services', services)
-            .then(function() {
+            .then(function () {
                 AdminState.setServices(services);
                 if (window.showToast) {
                     showToast('Порядок сохранён', 'success');
                 }
             })
-            .catch(function(error) {
+            .catch(function (error) {
                 if (window.showToast) {
                     showToast('Ошибка сохранения порядка', 'error');
                 }
@@ -4799,26 +5064,30 @@ var AdminServicesRenderer = (function() {
 
         if (!services.podology || !services.podology.categories) return;
 
-        var category = services.podology.categories.find(function(c) {
+        var category = services.podology.categories.find(function (c) {
             return c.id === currentCategory;
         });
 
         if (!category || !category.services) return;
 
-        var reordered = newOrder.map(function(id) {
-            return category.services.find(function(s) { return String(s.id) === String(id); });
-        }).filter(Boolean);
+        var reordered = newOrder
+            .map(function (id) {
+                return category.services.find(function (s) {
+                    return String(s.id) === String(id);
+                });
+            })
+            .filter(Boolean);
 
         category.services = reordered;
 
         AdminAPI.save('services', services)
-            .then(function() {
+            .then(function () {
                 AdminState.setServices(services);
                 if (window.showToast) {
                     showToast('Порядок сохранён', 'success');
                 }
             })
-            .catch(function(error) {
+            .catch(function (error) {
                 if (window.showToast) {
                     showToast('Ошибка сохранения порядка', 'error');
                 }
@@ -4840,7 +5109,7 @@ var AdminServicesRenderer = (function() {
         var category = null;
 
         if (services.categories) {
-            category = services.categories.find(function(c) {
+            category = services.categories.find(function (c) {
                 return c.id === currentCategory;
             });
         }
@@ -4850,25 +5119,55 @@ var AdminServicesRenderer = (function() {
             return;
         }
 
-        var html = category.services.map(function(service, index) {
-            return '<div class="service-item" data-id="' + service.id + '" data-index="' + index + '" data-search="' + escapeAttr(service.name) + '" draggable="true">' +
-                '<div class="drag-handle" title="Перетащите для изменения порядка">' + SharedIcons.get('grip') + '</div>' +
-                '<span class="service-name">' + escapeHtml(service.name) + '</span>' +
-                '<div class="service-prices">' +
-                    '<span class="price-tag price-green">' + (service.priceGreen || 0) + ' ₽</span>' +
-                    '<span class="price-tag price-pink">' + (service.pricePink || 0) + ' ₽</span>' +
-                    '<span class="price-tag price-blue">' + (service.priceBlue || 0) + ' ₽</span>' +
-                '</div>' +
-                '<div class="service-actions">' +
-                    '<button class="btn btn-icon" data-action="edit-service" data-category="' + currentCategory + '" data-index="' + index + '" title="Редактировать">' +
-                        SharedIcons.get('edit') +
+        var html = category.services
+            .map(function (service, index) {
+                return (
+                    '<div class="service-item" data-id="' +
+                    service.id +
+                    '" data-index="' +
+                    index +
+                    '" data-search="' +
+                    escapeAttr(service.name) +
+                    '" draggable="true">' +
+                    '<div class="drag-handle" title="Перетащите для изменения порядка">' +
+                    SharedIcons.get('grip') +
+                    '</div>' +
+                    '<span class="service-name">' +
+                    escapeHtml(service.name) +
+                    '</span>' +
+                    '<div class="service-prices">' +
+                    '<span class="price-tag price-green">' +
+                    (service.priceGreen || 0) +
+                    ' ₽</span>' +
+                    '<span class="price-tag price-pink">' +
+                    (service.pricePink || 0) +
+                    ' ₽</span>' +
+                    '<span class="price-tag price-blue">' +
+                    (service.priceBlue || 0) +
+                    ' ₽</span>' +
+                    '</div>' +
+                    '<div class="service-actions">' +
+                    '<button class="btn btn-icon" data-action="edit-service" data-category="' +
+                    currentCategory +
+                    '" data-index="' +
+                    index +
+                    '" title="Редактировать">' +
+                    SharedIcons.get('edit') +
                     '</button>' +
-                    '<button class="btn btn-icon danger" data-action="delete-service" data-category="' + currentCategory + '" data-index="' + index + '" data-name="' + escapeAttr(service.name) + '" title="Удалить">' +
-                        SharedIcons.get('delete') +
+                    '<button class="btn btn-icon danger" data-action="delete-service" data-category="' +
+                    currentCategory +
+                    '" data-index="' +
+                    index +
+                    '" data-name="' +
+                    escapeAttr(service.name) +
+                    '" title="Удалить">' +
+                    SharedIcons.get('delete') +
                     '</button>' +
-                '</div>' +
-            '</div>';
-        }).join('');
+                    '</div>' +
+                    '</div>'
+                );
+            })
+            .join('');
 
         servicesList.innerHTML = html;
 
@@ -4895,12 +5194,20 @@ var AdminServicesRenderer = (function() {
 
         var currentCategory = AdminState.currentPodologyCategory || categories[0].id;
 
-        var html = categories.map(function(cat) {
-            var activeClass = cat.id === currentCategory ? ' active' : '';
-            return '<button class="tab' + activeClass + '" data-podology-category="' + cat.id + '">' +
-                escapeHtml(cat.name) +
-            '</button>';
-        }).join('');
+        var html = categories
+            .map(function (cat) {
+                var activeClass = cat.id === currentCategory ? ' active' : '';
+                return (
+                    '<button class="tab' +
+                    activeClass +
+                    '" data-podology-category="' +
+                    cat.id +
+                    '">' +
+                    escapeHtml(cat.name) +
+                    '</button>'
+                );
+            })
+            .join('');
 
         tabsContainer.innerHTML = html;
     }
@@ -4922,12 +5229,15 @@ var AdminServicesRenderer = (function() {
         var categories = podology.categories || [];
 
         if (categories.length === 0) {
-            podologyList.innerHTML = '<p class="empty-message">Нет категорий. Добавьте категорию через кнопку "Категории".</p>';
+            podologyList.innerHTML =
+                '<p class="empty-message">Нет категорий. Добавьте категорию через кнопку "Категории".</p>';
             return;
         }
 
         var currentCategory = AdminState.currentPodologyCategory || categories[0].id;
-        var category = categories.find(function(c) { return c.id === currentCategory; });
+        var category = categories.find(function (c) {
+            return c.id === currentCategory;
+        });
 
         if (!category) {
             category = categories[0];
@@ -4941,26 +5251,57 @@ var AdminServicesRenderer = (function() {
             return;
         }
 
-        var html = categoryServices.map(function(service, index) {
-            var featuredClass = service.featured ? ' featured' : '';
-            var durationHtml = service.duration ? '<span class="service-duration">' + escapeHtml(service.duration) + '</span>' : '';
+        var html = categoryServices
+            .map(function (service, index) {
+                var featuredClass = service.featured ? ' featured' : '';
+                var durationHtml = service.duration
+                    ? '<span class="service-duration">' + escapeHtml(service.duration) + '</span>'
+                    : '';
 
-            return '<div class="service-item' + featuredClass + '" data-id="' + service.id + '" data-index="' + index + '" data-search="' + escapeAttr(service.name) + '" draggable="true">' +
-                '<div class="drag-handle" title="Перетащите для изменения порядка">' + SharedIcons.get('grip') + '</div>' +
-                '<span class="service-name">' + escapeHtml(service.name) + durationHtml + '</span>' +
-                '<div class="service-prices">' +
-                    '<span class="price-tag price-single">' + escapeHtml(service.price) + '</span>' +
-                '</div>' +
-                '<div class="service-actions">' +
-                    '<button class="btn btn-icon" data-action="edit-podology" data-category="' + currentCategory + '" data-index="' + index + '" title="Редактировать">' +
-                        SharedIcons.get('edit') +
+                return (
+                    '<div class="service-item' +
+                    featuredClass +
+                    '" data-id="' +
+                    service.id +
+                    '" data-index="' +
+                    index +
+                    '" data-search="' +
+                    escapeAttr(service.name) +
+                    '" draggable="true">' +
+                    '<div class="drag-handle" title="Перетащите для изменения порядка">' +
+                    SharedIcons.get('grip') +
+                    '</div>' +
+                    '<span class="service-name">' +
+                    escapeHtml(service.name) +
+                    durationHtml +
+                    '</span>' +
+                    '<div class="service-prices">' +
+                    '<span class="price-tag price-single">' +
+                    escapeHtml(service.price) +
+                    '</span>' +
+                    '</div>' +
+                    '<div class="service-actions">' +
+                    '<button class="btn btn-icon" data-action="edit-podology" data-category="' +
+                    currentCategory +
+                    '" data-index="' +
+                    index +
+                    '" title="Редактировать">' +
+                    SharedIcons.get('edit') +
                     '</button>' +
-                    '<button class="btn btn-icon danger" data-action="delete-podology" data-category="' + currentCategory + '" data-index="' + index + '" data-name="' + escapeAttr(service.name) + '" title="Удалить">' +
-                        SharedIcons.get('delete') +
+                    '<button class="btn btn-icon danger" data-action="delete-podology" data-category="' +
+                    currentCategory +
+                    '" data-index="' +
+                    index +
+                    '" data-name="' +
+                    escapeAttr(service.name) +
+                    '" title="Удалить">' +
+                    SharedIcons.get('delete') +
                     '</button>' +
-                '</div>' +
-            '</div>';
-        }).join('');
+                    '</div>' +
+                    '</div>'
+                );
+            })
+            .join('');
 
         podologyList.innerHTML = html;
 
@@ -4990,7 +5331,7 @@ window.AdminServicesRenderer = AdminServicesRenderer;
  * Рендеринг списка статей с поддержкой drag & drop
  */
 
-var AdminArticlesRenderer = (function() {
+var AdminArticlesRenderer = (function () {
     'use strict';
 
     var container = null;
@@ -5010,7 +5351,7 @@ var AdminArticlesRenderer = (function() {
     function initDragDrop() {
         if (dragDropInitialized || !window.AdminDragDrop) return;
 
-        AdminDragDrop.init('articlesGrid', '.article-card', function(newOrder) {
+        AdminDragDrop.init('articlesGrid', '.article-card', function (newOrder) {
             reorderArticles(newOrder);
         });
 
@@ -5023,22 +5364,26 @@ var AdminArticlesRenderer = (function() {
     function reorderArticles(newOrder) {
         var articles = AdminState.articles || [];
 
-        var reordered = newOrder.map(function(id) {
-            return articles.find(function(a) { return a.id === id; });
-        }).filter(Boolean);
+        var reordered = newOrder
+            .map(function (id) {
+                return articles.find(function (a) {
+                    return a.id === id;
+                });
+            })
+            .filter(Boolean);
 
-        reordered.forEach(function(article, index) {
+        reordered.forEach(function (article, index) {
             article.order = index;
         });
 
         AdminAPI.save('articles', { articles: reordered })
-            .then(function() {
+            .then(function () {
                 AdminState.setArticles(reordered);
                 if (window.showToast) {
                     showToast('Порядок сохранён', 'success');
                 }
             })
-            .catch(function(error) {
+            .catch(function (error) {
                 if (window.showToast) {
                     showToast('Ошибка сохранения порядка', 'error');
                 }
@@ -5058,41 +5403,68 @@ var AdminArticlesRenderer = (function() {
         var articles = AdminState.articles || [];
 
         if (articles.length === 0) {
-            container.innerHTML = '<p class="empty-message">Нет статей. Нажмите "Добавить" чтобы создать.</p>';
+            container.innerHTML =
+                '<p class="empty-message">Нет статей. Нажмите "Добавить" чтобы создать.</p>';
             return;
         }
 
-        var html = articles.map(function(article, index) {
-            var imageHtml = article.image
-                ? '<img src="' + article.image + '" alt="' + escapeHtml(article.title) + '">'
-                : SharedIcons.get('image');
+        var html = articles
+            .map(function (article, index) {
+                var imageHtml = article.image
+                    ? '<img src="' + article.image + '" alt="' + escapeHtml(article.title) + '">'
+                    : SharedIcons.get('image');
 
-            var searchText = [article.title, article.tag, article.excerpt].join(' ');
+                var searchText = [article.title, article.tag, article.excerpt].join(' ');
 
-            return '<div class="article-card has-drag" data-id="' + article.id + '" data-index="' + index + '" data-search="' + escapeAttr(searchText) + '" draggable="true">' +
-                '<div class="article-image">' +
+                return (
+                    '<div class="article-card has-drag" data-id="' +
+                    article.id +
+                    '" data-index="' +
+                    index +
+                    '" data-search="' +
+                    escapeAttr(searchText) +
+                    '" draggable="true">' +
+                    '<div class="article-image">' +
                     imageHtml +
-                '</div>' +
-                '<div class="article-content">' +
+                    '</div>' +
+                    '<div class="article-content">' +
                     '<div class="article-meta">' +
-                        '<span class="article-tag">' + escapeHtml(article.tag || 'Статья') + '</span>' +
-                        '<span class="article-date">' + SharedHelpers.formatDate(article.date) + '</span>' +
+                    '<span class="article-tag">' +
+                    escapeHtml(article.tag || 'Статья') +
+                    '</span>' +
+                    '<span class="article-date">' +
+                    SharedHelpers.formatDate(article.date) +
+                    '</span>' +
                     '</div>' +
-                    '<h3 class="article-title">' + escapeHtml(article.title) + '</h3>' +
-                    '<p class="article-excerpt">' + escapeHtml(article.excerpt || '') + '</p>' +
+                    '<h3 class="article-title">' +
+                    escapeHtml(article.title) +
+                    '</h3>' +
+                    '<p class="article-excerpt">' +
+                    escapeHtml(article.excerpt || '') +
+                    '</p>' +
                     '<div class="article-actions">' +
-                        '<button class="btn btn-secondary" data-action="edit-article" data-id="' + article.id + '">' +
-                            SharedIcons.get('edit') +
-                            'Редактировать' +
-                        '</button>' +
-                        '<button class="btn btn-icon danger" data-action="delete-article" data-id="' + article.id + '" data-name="' + escapeAttr(article.title) + '" title="Удалить">' +
-                            SharedIcons.get('delete') +
-                        '</button>' +
+                    '<button class="btn btn-secondary" data-action="edit-article" data-id="' +
+                    article.id +
+                    '">' +
+                    SharedIcons.get('edit') +
+                    'Редактировать' +
+                    '</button>' +
+                    '<button class="btn btn-icon danger" data-action="delete-article" data-id="' +
+                    article.id +
+                    '" data-name="' +
+                    escapeAttr(article.title) +
+                    '" title="Удалить">' +
+                    SharedIcons.get('delete') +
+                    '</button>' +
                     '</div>' +
-                '</div>' +
-                '<div class="drag-handle" title="Перетащите для изменения порядка">' + SharedIcons.get('grip') + '</div>' +
-            '</div>';
-        }).join('');
+                    '</div>' +
+                    '<div class="drag-handle" title="Перетащите для изменения порядка">' +
+                    SharedIcons.get('grip') +
+                    '</div>' +
+                    '</div>'
+                );
+            })
+            .join('');
 
         container.innerHTML = html;
 
@@ -5122,7 +5494,7 @@ window.AdminArticlesRenderer = AdminArticlesRenderer;
  * Рендеринг списка FAQ с поддержкой drag & drop
  */
 
-var AdminFaqRenderer = (function() {
+var AdminFaqRenderer = (function () {
     'use strict';
 
     var container = null;
@@ -5142,7 +5514,7 @@ var AdminFaqRenderer = (function() {
     function initDragDrop() {
         if (dragDropInitialized || !window.AdminDragDrop) return;
 
-        AdminDragDrop.init('faqList', '.faq-admin-item', function(newOrder) {
+        AdminDragDrop.init('faqList', '.faq-admin-item', function (newOrder) {
             reorderFaq(newOrder);
         });
 
@@ -5155,22 +5527,26 @@ var AdminFaqRenderer = (function() {
     function reorderFaq(newOrder) {
         var faq = AdminState.faq || [];
 
-        var reordered = newOrder.map(function(id) {
-            return faq.find(function(f) { return f.id === id; });
-        }).filter(Boolean);
+        var reordered = newOrder
+            .map(function (id) {
+                return faq.find(function (f) {
+                    return f.id === id;
+                });
+            })
+            .filter(Boolean);
 
-        reordered.forEach(function(item, index) {
+        reordered.forEach(function (item, index) {
             item.order = index;
         });
 
         AdminAPI.save('faq', { faq: reordered })
-            .then(function() {
+            .then(function () {
                 AdminState.setFaq(reordered);
                 if (window.showToast) {
                     showToast('Порядок сохранён', 'success');
                 }
             })
-            .catch(function(error) {
+            .catch(function (error) {
                 if (window.showToast) {
                     showToast('Ошибка сохранения порядка', 'error');
                 }
@@ -5190,30 +5566,53 @@ var AdminFaqRenderer = (function() {
         var faq = AdminState.faq || [];
 
         if (faq.length === 0) {
-            container.innerHTML = '<p class="empty-message">Нет вопросов. Нажмите "Добавить" чтобы создать.</p>';
+            container.innerHTML =
+                '<p class="empty-message">Нет вопросов. Нажмите "Добавить" чтобы создать.</p>';
             return;
         }
 
-        var html = faq.map(function(item, index) {
-            var searchText = [item.question, item.answer].join(' ');
+        var html = faq
+            .map(function (item, index) {
+                var searchText = [item.question, item.answer].join(' ');
 
-            return '<div class="faq-admin-item has-drag" data-id="' + item.id + '" data-index="' + index + '" data-search="' + escapeAttr(searchText) + '" draggable="true">' +
-                '<div class="drag-handle" title="Перетащите для изменения порядка">' + SharedIcons.get('grip') + '</div>' +
-                '<div class="faq-admin-content">' +
-                    '<h3 class="faq-admin-question">' + escapeHtml(item.question) + '</h3>' +
-                    '<p class="faq-admin-answer">' + escapeHtml(item.answer) + '</p>' +
-                '</div>' +
-                '<div class="faq-admin-actions">' +
-                    '<button class="btn btn-secondary" data-action="edit-faq" data-id="' + item.id + '">' +
-                        SharedIcons.get('edit') +
-                        'Редактировать' +
+                return (
+                    '<div class="faq-admin-item has-drag" data-id="' +
+                    item.id +
+                    '" data-index="' +
+                    index +
+                    '" data-search="' +
+                    escapeAttr(searchText) +
+                    '" draggable="true">' +
+                    '<div class="drag-handle" title="Перетащите для изменения порядка">' +
+                    SharedIcons.get('grip') +
+                    '</div>' +
+                    '<div class="faq-admin-content">' +
+                    '<h3 class="faq-admin-question">' +
+                    escapeHtml(item.question) +
+                    '</h3>' +
+                    '<p class="faq-admin-answer">' +
+                    escapeHtml(item.answer) +
+                    '</p>' +
+                    '</div>' +
+                    '<div class="faq-admin-actions">' +
+                    '<button class="btn btn-secondary" data-action="edit-faq" data-id="' +
+                    item.id +
+                    '">' +
+                    SharedIcons.get('edit') +
+                    'Редактировать' +
                     '</button>' +
-                    '<button class="btn btn-icon danger" data-action="delete-faq" data-id="' + item.id + '" data-name="' + escapeAttr(item.question) + '" title="Удалить">' +
-                        SharedIcons.get('delete') +
+                    '<button class="btn btn-icon danger" data-action="delete-faq" data-id="' +
+                    item.id +
+                    '" data-name="' +
+                    escapeAttr(item.question) +
+                    '" title="Удалить">' +
+                    SharedIcons.get('delete') +
                     '</button>' +
-                '</div>' +
-            '</div>';
-        }).join('');
+                    '</div>' +
+                    '</div>'
+                );
+            })
+            .join('');
 
         container.innerHTML = html;
 
@@ -5243,7 +5642,7 @@ window.AdminFaqRenderer = AdminFaqRenderer;
  * Рендеринг соцсетей и контактов
  */
 
-var AdminSocialRenderer = (function() {
+var AdminSocialRenderer = (function () {
     'use strict';
 
     var elements = {};
@@ -5286,33 +5685,58 @@ var AdminSocialRenderer = (function() {
         var socialLinks = social.social || [];
 
         if (socialLinks.length === 0) {
-            elements.socialLinksList.innerHTML = '<p class="empty-message">Нет настроенных соцсетей</p>';
+            elements.socialLinksList.innerHTML =
+                '<p class="empty-message">Нет настроенных соцсетей</p>';
             return;
         }
 
-        var html = socialLinks.map(function(link) {
-            var inactiveClass = link.active ? '' : 'inactive';
-            var toggleClass = link.active ? 'active' : '';
-            var toggleText = link.active ? 'Вкл' : 'Выкл';
+        var html = socialLinks
+            .map(function (link) {
+                var inactiveClass = link.active ? '' : 'inactive';
+                var toggleClass = link.active ? 'active' : '';
+                var toggleText = link.active ? 'Вкл' : 'Выкл';
 
-            return '<div class="social-link-item ' + inactiveClass + '" data-id="' + link.id + '">' +
-                '<div class="social-link-icon ' + link.icon + '">' +
+                return (
+                    '<div class="social-link-item ' +
+                    inactiveClass +
+                    '" data-id="' +
+                    link.id +
+                    '">' +
+                    '<div class="social-link-icon ' +
+                    link.icon +
+                    '">' +
                     SharedIcons.getSocial(link.icon) +
-                '</div>' +
-                '<div class="social-link-info">' +
-                    '<div class="social-link-name">' + window.escapeHtml(link.name) + '</div>' +
+                    '</div>' +
+                    '<div class="social-link-info">' +
+                    '<div class="social-link-name">' +
+                    window.escapeHtml(link.name) +
+                    '</div>' +
                     '<input type="text" ' +
-                        'class="social-link-url-input" ' +
-                        'data-social-id="' + link.id + '" ' +
-                        'value="' + window.escapeHtml(link.url || '') + '" ' +
-                        'placeholder="Введите URL для ' + window.escapeHtml(link.name) + '">' +
-                '</div>' +
-                '<div class="social-link-toggle">' +
-                    '<div class="toggle ' + toggleClass + '" data-social-id="' + link.id + '" data-action="toggle-social"></div>' +
-                    '<span>' + toggleText + '</span>' +
-                '</div>' +
-            '</div>';
-        }).join('');
+                    'class="social-link-url-input" ' +
+                    'data-social-id="' +
+                    link.id +
+                    '" ' +
+                    'value="' +
+                    window.escapeHtml(link.url || '') +
+                    '" ' +
+                    'placeholder="Введите URL для ' +
+                    window.escapeHtml(link.name) +
+                    '">' +
+                    '</div>' +
+                    '<div class="social-link-toggle">' +
+                    '<div class="toggle ' +
+                    toggleClass +
+                    '" data-social-id="' +
+                    link.id +
+                    '" data-action="toggle-social"></div>' +
+                    '<span>' +
+                    toggleText +
+                    '</span>' +
+                    '</div>' +
+                    '</div>'
+                );
+            })
+            .join('');
 
         elements.socialLinksList.innerHTML = html;
     }
@@ -5324,7 +5748,7 @@ var AdminSocialRenderer = (function() {
         var social = AdminState.social;
         if (!social || !social.social) return;
 
-        var link = social.social.find(function(s) {
+        var link = social.social.find(function (s) {
             return s.id === id;
         });
 
@@ -5353,10 +5777,10 @@ var AdminSocialRenderer = (function() {
 
         // Собираем URL соцсетей из инпутов
         var urlInputs = document.querySelectorAll('.social-link-url-input');
-        urlInputs.forEach(function(input) {
+        urlInputs.forEach(function (input) {
             var socialId = input.dataset.socialId;
             if (social.social) {
-                var link = social.social.find(function(s) {
+                var link = social.social.find(function (s) {
                     return s.id === socialId;
                 });
                 if (link) {
@@ -5394,7 +5818,7 @@ window.AdminSocialRenderer = AdminSocialRenderer;
  * Отображение списка категорий товаров
  */
 
-var AdminShopCategoriesRenderer = (function() {
+var AdminShopCategoriesRenderer = (function () {
     'use strict';
 
     var container = null;
@@ -5412,17 +5836,20 @@ var AdminShopCategoriesRenderer = (function() {
         var categories = AdminState.shopCategories || [];
 
         if (categories.length === 0) {
-            container.innerHTML = '<div class="empty-state">' +
+            container.innerHTML =
+                '<div class="empty-state">' +
                 '<p>Категории ещё не добавлены</p>' +
                 '<p class="empty-hint">Нажмите "Добавить" для создания первой категории</p>' +
-            '</div>';
+                '</div>';
             return;
         }
 
         var html = categories
-            .sort(function(a, b) { return (a.order || 0) - (b.order || 0); })
-            .map(function(cat) {
-                var productsCount = (AdminState.products || []).filter(function(p) {
+            .sort(function (a, b) {
+                return (a.order || 0) - (b.order || 0);
+            })
+            .map(function (cat) {
+                var productsCount = (AdminState.products || []).filter(function (p) {
                     return p.categoryId === cat.id;
                 }).length;
 
@@ -5437,29 +5864,44 @@ var AdminShopCategoriesRenderer = (function() {
                     ? '<p class="category-card-description">' + escapeHtml(cat.description) + '</p>'
                     : '';
 
-                return '<div class="shop-category-card' + (isInactive ? ' inactive' : '') + '" data-id="' + escapeAttr(cat.id) + '">' +
-                    '<div class="category-card-icon">' + iconHtml + '</div>' +
+                return (
+                    '<div class="shop-category-card' +
+                    (isInactive ? ' inactive' : '') +
+                    '" data-id="' +
+                    escapeAttr(cat.id) +
+                    '">' +
+                    '<div class="category-card-icon">' +
+                    iconHtml +
+                    '</div>' +
                     '<div class="category-card-info">' +
-                        '<h3 class="category-card-name">' +
-                            escapeHtml(cat.name) +
-                            statusBadge +
-                        '</h3>' +
-                        descriptionHtml +
-                        '<span class="category-card-count">' +
-                            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>' +
-                            productsCount + ' ' + productWord +
-                        '</span>' +
+                    '<h3 class="category-card-name">' +
+                    escapeHtml(cat.name) +
+                    statusBadge +
+                    '</h3>' +
+                    descriptionHtml +
+                    '<span class="category-card-count">' +
+                    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>' +
+                    productsCount +
+                    ' ' +
+                    productWord +
+                    '</span>' +
                     '</div>' +
                     '<div class="category-card-actions">' +
-                        '<button class="btn btn-icon" data-action="edit-shop-category" data-id="' + escapeAttr(cat.id) + '" title="Редактировать">' +
-                            SharedIcons.get('edit') +
-                        '</button>' +
-                        '<button class="btn btn-icon danger" data-action="delete-shop-category" data-id="' + escapeAttr(cat.id) + '" title="Удалить">' +
-                            SharedIcons.get('delete') +
-                        '</button>' +
+                    '<button class="btn btn-icon" data-action="edit-shop-category" data-id="' +
+                    escapeAttr(cat.id) +
+                    '" title="Редактировать">' +
+                    SharedIcons.get('edit') +
+                    '</button>' +
+                    '<button class="btn btn-icon danger" data-action="delete-shop-category" data-id="' +
+                    escapeAttr(cat.id) +
+                    '" title="Удалить">' +
+                    SharedIcons.get('delete') +
+                    '</button>' +
                     '</div>' +
-                '</div>';
-            }).join('');
+                    '</div>'
+                );
+            })
+            .join('');
 
         container.innerHTML = html;
     }
@@ -5491,7 +5933,7 @@ window.AdminShopCategoriesRenderer = AdminShopCategoriesRenderer;
  * Отображение таблицы товаров с пагинацией
  */
 
-var AdminShopProductsRenderer = (function() {
+var AdminShopProductsRenderer = (function () {
     'use strict';
 
     var container = null;
@@ -5505,7 +5947,7 @@ var AdminShopProductsRenderer = (function() {
         // Filter change handler
         var filterSelect = document.getElementById('productsFilterCategory');
         if (filterSelect) {
-            filterSelect.addEventListener('change', function(e) {
+            filterSelect.addEventListener('change', function (e) {
                 setFilter(e.target.value);
             });
         }
@@ -5524,13 +5966,15 @@ var AdminShopProductsRenderer = (function() {
 
         // Filter by category
         if (filterCategory !== 'all') {
-            products = products.filter(function(p) {
+            products = products.filter(function (p) {
                 return p.categoryId === filterCategory;
             });
         }
 
         // Sort by order
-        products.sort(function(a, b) { return (a.order || 0) - (b.order || 0); });
+        products.sort(function (a, b) {
+            return (a.order || 0) - (b.order || 0);
+        });
 
         // Pagination
         var total = products.length;
@@ -5540,57 +5984,85 @@ var AdminShopProductsRenderer = (function() {
         var pageProducts = products.slice(start, end);
 
         if (pageProducts.length === 0) {
-            container.innerHTML = '<tr><td colspan="5" class="empty-cell">' +
+            container.innerHTML =
+                '<tr><td colspan="5" class="empty-cell">' +
                 '<div class="empty-state">' +
-                    '<p>Товары ещё не добавлены</p>' +
-                    '<p class="empty-hint">Нажмите "Добавить" для создания первого товара</p>' +
+                '<p>Товары ещё не добавлены</p>' +
+                '<p class="empty-hint">Нажмите "Добавить" для создания первого товара</p>' +
                 '</div>' +
-            '</td></tr>';
+                '</td></tr>';
             renderPagination(0, 0);
             return;
         }
 
-        var html = pageProducts.map(function(product) {
-            var category = AdminState.findShopCategory(product.categoryId);
-            var mainImage = null;
-            if (product.images && product.images.length > 0) {
-                mainImage = product.images.find(function(img) { return img.isMain; }) || product.images[0];
-            }
+        var html = pageProducts
+            .map(function (product) {
+                var category = AdminState.findShopCategory(product.categoryId);
+                var mainImage = null;
+                if (product.images && product.images.length > 0) {
+                    mainImage =
+                        product.images.find(function (img) {
+                            return img.isMain;
+                        }) || product.images[0];
+                }
 
-            var statusClass = {
-                active: 'success',
-                draft: 'warning',
-                archived: 'secondary'
-            }[product.status] || 'secondary';
+                var statusClass =
+                    {
+                        active: 'success',
+                        draft: 'warning',
+                        archived: 'secondary'
+                    }[product.status] || 'secondary';
 
-            var statusText = {
-                active: 'Активен',
-                draft: 'Черновик',
-                archived: 'В архиве'
-            }[product.status] || product.status;
+                var statusText =
+                    {
+                        active: 'Активен',
+                        draft: 'Черновик',
+                        archived: 'В архиве'
+                    }[product.status] || product.status;
 
-            return '<tr>' +
-                '<td>' +
+                return (
+                    '<tr>' +
+                    '<td>' +
                     '<div class="product-cell">' +
-                        (mainImage
-                            ? '<img src="' + escapeHtml(mainImage.url) + '" class="product-thumb" alt="">'
-                            : '<div class="product-thumb-placeholder">' + SharedIcons.get('box') + '</div>') +
-                        '<span class="product-cell-name">' + escapeHtml(product.name) + '</span>' +
+                    (mainImage
+                        ? '<img src="' +
+                          escapeHtml(mainImage.url) +
+                          '" class="product-thumb" alt="">'
+                        : '<div class="product-thumb-placeholder">' +
+                          SharedIcons.get('box') +
+                          '</div>') +
+                    '<span class="product-cell-name">' +
+                    escapeHtml(product.name) +
+                    '</span>' +
                     '</div>' +
-                '</td>' +
-                '<td>' + (category ? escapeHtml(category.name) : '-') + '</td>' +
-                '<td class="price-cell">' + SharedHelpers.formatPrice(product.price) + '</td>' +
-                '<td><span class="status-badge ' + statusClass + '">' + statusText + '</span></td>' +
-                '<td class="actions-cell">' +
-                    '<button class="btn btn-icon" data-action="edit-product" data-id="' + escapeAttr(product.id) + '" title="Редактировать">' +
-                        SharedIcons.get('edit') +
+                    '</td>' +
+                    '<td>' +
+                    (category ? escapeHtml(category.name) : '-') +
+                    '</td>' +
+                    '<td class="price-cell">' +
+                    SharedHelpers.formatPrice(product.price) +
+                    '</td>' +
+                    '<td><span class="status-badge ' +
+                    statusClass +
+                    '">' +
+                    statusText +
+                    '</span></td>' +
+                    '<td class="actions-cell">' +
+                    '<button class="btn btn-icon" data-action="edit-product" data-id="' +
+                    escapeAttr(product.id) +
+                    '" title="Редактировать">' +
+                    SharedIcons.get('edit') +
                     '</button>' +
-                    '<button class="btn btn-icon danger" data-action="delete-product" data-id="' + escapeAttr(product.id) + '" title="Удалить">' +
-                        SharedIcons.get('delete') +
+                    '<button class="btn btn-icon danger" data-action="delete-product" data-id="' +
+                    escapeAttr(product.id) +
+                    '" title="Удалить">' +
+                    SharedIcons.get('delete') +
                     '</button>' +
-                '</td>' +
-            '</tr>';
-        }).join('');
+                    '</td>' +
+                    '</tr>'
+                );
+            })
+            .join('');
 
         container.innerHTML = html;
         renderPagination(totalPages, total);
@@ -5603,11 +6075,16 @@ var AdminShopProductsRenderer = (function() {
         var categories = AdminState.shopCategories || [];
         var html = '<option value="all">Все категории</option>';
 
-        categories.forEach(function(cat) {
+        categories.forEach(function (cat) {
             var selected = filterCategory === cat.id ? ' selected' : '';
-            html += '<option value="' + escapeHtml(cat.id) + '"' + selected + '>' +
+            html +=
+                '<option value="' +
+                escapeHtml(cat.id) +
+                '"' +
+                selected +
+                '>' +
                 escapeHtml(cat.name) +
-            '</option>';
+                '</option>';
         });
 
         filterSelect.innerHTML = html;
@@ -5622,13 +6099,25 @@ var AdminShopProductsRenderer = (function() {
             return;
         }
 
-        var html = '<div class="pagination">' +
-            '<span class="pagination-info">Показано ' + Math.min(itemsPerPage, total) + ' из ' + total + '</span>' +
+        var html =
+            '<div class="pagination">' +
+            '<span class="pagination-info">Показано ' +
+            Math.min(itemsPerPage, total) +
+            ' из ' +
+            total +
+            '</span>' +
             '<div class="pagination-buttons">';
 
         for (var i = 1; i <= totalPages; i++) {
             var activeClass = i === currentPage ? ' active' : '';
-            html += '<button class="pagination-btn' + activeClass + '" onclick="AdminShopProductsRenderer.goToPage(' + i + ')">' + i + '</button>';
+            html +=
+                '<button class="pagination-btn' +
+                activeClass +
+                '" onclick="AdminShopProductsRenderer.goToPage(' +
+                i +
+                ')">' +
+                i +
+                '</button>';
         }
 
         html += '</div></div>';
@@ -5664,7 +6153,7 @@ window.AdminShopProductsRenderer = AdminShopProductsRenderer;
  * Рендеринг юридических документов (политики, соглашения)
  */
 
-var AdminLegalRenderer = (function() {
+var AdminLegalRenderer = (function () {
     'use strict';
 
     var elements = {};
@@ -5690,43 +6179,70 @@ var AdminLegalRenderer = (function() {
         var documents = AdminState.legalDocuments || [];
 
         if (documents.length === 0) {
-            elements.legalDocumentsList.innerHTML = '<p class="empty-message">Нет юридических документов</p>';
+            elements.legalDocumentsList.innerHTML =
+                '<p class="empty-message">Нет юридических документов</p>';
             return;
         }
 
-        var html = documents.map(function(doc) {
-            var statusClass = doc.active ? 'active' : 'inactive';
-            var statusText = doc.active ? 'Активен' : 'Скрыт';
-            var updatedAt = doc.updatedAt ? new Date(doc.updatedAt).toLocaleDateString('ru-RU') : '';
+        var html = documents
+            .map(function (doc) {
+                var statusClass = doc.active ? 'active' : 'inactive';
+                var statusText = doc.active ? 'Активен' : 'Скрыт';
+                var updatedAt = doc.updatedAt
+                    ? new Date(doc.updatedAt).toLocaleDateString('ru-RU')
+                    : '';
 
-            return '<div class="legal-document-card ' + statusClass + '" data-id="' + doc.id + '">' +
-                '<div class="legal-document-header">' +
+                return (
+                    '<div class="legal-document-card ' +
+                    statusClass +
+                    '" data-id="' +
+                    doc.id +
+                    '">' +
+                    '<div class="legal-document-header">' +
                     '<div class="legal-document-info">' +
-                        '<h3 class="legal-document-title">' + window.escapeHtml(doc.title) + '</h3>' +
-                        '<div class="legal-document-meta">' +
-                            '<span class="legal-document-slug">/legal/' + window.escapeHtml(doc.slug) + '</span>' +
-                            (updatedAt ? '<span class="legal-document-date">Обновлён: ' + updatedAt + '</span>' : '') +
-                        '</div>' +
+                    '<h3 class="legal-document-title">' +
+                    window.escapeHtml(doc.title) +
+                    '</h3>' +
+                    '<div class="legal-document-meta">' +
+                    '<span class="legal-document-slug">/legal/' +
+                    window.escapeHtml(doc.slug) +
+                    '</span>' +
+                    (updatedAt
+                        ? '<span class="legal-document-date">Обновлён: ' + updatedAt + '</span>'
+                        : '') +
+                    '</div>' +
                     '</div>' +
                     '<div class="legal-document-status">' +
-                        '<span class="status-badge ' + statusClass + '">' + statusText + '</span>' +
+                    '<span class="status-badge ' +
+                    statusClass +
+                    '">' +
+                    statusText +
+                    '</span>' +
                     '</div>' +
-                '</div>' +
-                '<div class="legal-document-preview">' +
+                    '</div>' +
+                    '<div class="legal-document-preview">' +
                     getPreviewText(doc.content) +
-                '</div>' +
-                '<div class="legal-document-actions">' +
-                    '<button class="btn btn-secondary btn-sm" data-action="edit-legal" data-id="' + doc.id + '">' +
-                        SharedIcons.get('edit') +
-                        '<span>Редактировать</span>' +
+                    '</div>' +
+                    '<div class="legal-document-actions">' +
+                    '<button class="btn btn-secondary btn-sm" data-action="edit-legal" data-id="' +
+                    doc.id +
+                    '">' +
+                    SharedIcons.get('edit') +
+                    '<span>Редактировать</span>' +
                     '</button>' +
-                    '<button class="btn btn-outline btn-sm" data-action="toggle-legal" data-id="' + doc.id + '">' +
-                        (doc.active ? SharedIcons.get('eyeOff') : SharedIcons.get('eye')) +
-                        '<span>' + (doc.active ? 'Скрыть' : 'Показать') + '</span>' +
+                    '<button class="btn btn-outline btn-sm" data-action="toggle-legal" data-id="' +
+                    doc.id +
+                    '">' +
+                    (doc.active ? SharedIcons.get('eyeOff') : SharedIcons.get('eye')) +
+                    '<span>' +
+                    (doc.active ? 'Скрыть' : 'Показать') +
+                    '</span>' +
                     '</button>' +
-                '</div>' +
-            '</div>';
-        }).join('');
+                    '</div>' +
+                    '</div>'
+                );
+            })
+            .join('');
 
         elements.legalDocumentsList.innerHTML = html;
     }
@@ -5747,7 +6263,9 @@ var AdminLegalRenderer = (function() {
      */
     async function toggleActive(id) {
         var documents = AdminState.legalDocuments || [];
-        var doc = documents.find(function(d) { return d.id === id; });
+        var doc = documents.find(function (d) {
+            return d.id === id;
+        });
 
         if (doc) {
             doc.active = !doc.active;
@@ -5783,7 +6301,7 @@ window.AdminLegalRenderer = AdminLegalRenderer;
  * Форма добавления/редактирования мастера
  */
 
-var AdminMasterForm = (function() {
+var AdminMasterForm = (function () {
     'use strict';
 
     /**
@@ -5795,64 +6313,95 @@ var AdminMasterForm = (function() {
         var title = master ? 'Редактировать мастера' : 'Добавить мастера';
         var principles = (master && master.principles) || ['', '', '', ''];
 
-        var principlesHtml = principles.map(function(p, i) {
-            return '<div class="principle-item">' +
-                '<input type="text" class="form-input principle-input" value="' + window.escapeHtml(p) + '" placeholder="Принцип ' + (i + 1) + '">' +
-                '<button type="button" class="btn btn-icon danger" data-action="remove-principle">' +
+        var principlesHtml = principles
+            .map(function (p, i) {
+                return (
+                    '<div class="principle-item">' +
+                    '<input type="text" class="form-input principle-input" value="' +
+                    window.escapeHtml(p) +
+                    '" placeholder="Принцип ' +
+                    (i + 1) +
+                    '">' +
+                    '<button type="button" class="btn btn-icon danger" data-action="remove-principle">' +
                     SharedIcons.get('close') +
-                '</button>' +
-            '</div>';
-        }).join('');
+                    '</button>' +
+                    '</div>'
+                );
+            })
+            .join('');
 
-        var html = '<form id="masterForm" class="admin-form">' +
+        var html =
+            '<form id="masterForm" class="admin-form">' +
             '<div class="form-group">' +
-                '<label class="form-label">Фото</label>' +
-                '<div class="image-upload ' + (master && master.photo ? 'has-image' : '') + '" id="masterPhotoUpload">' +
-                    (master && master.photo ? '<img src="' + master.photo + '" alt="Фото">' : '') +
-                    '<input type="file" accept="image/*" data-upload-target="masterPhoto">' +
-                    SharedIcons.get('upload') +
-                    '<span>Нажмите для загрузки фото</span>' +
-                    (master && master.photo ? '<button type="button" class="remove-image" data-action="remove-image" data-target="masterPhoto">' + SharedIcons.get('close') + '</button>' : '') +
-                '</div>' +
-                '<input type="hidden" id="masterPhoto" value="' + (master && master.photo ? master.photo : '') + '">' +
+            '<label class="form-label">Фото</label>' +
+            '<div class="image-upload ' +
+            (master && master.photo ? 'has-image' : '') +
+            '" id="masterPhotoUpload">' +
+            (master && master.photo ? '<img src="' + master.photo + '" alt="Фото">' : '') +
+            '<input type="file" accept="image/*" data-upload-target="masterPhoto">' +
+            SharedIcons.get('upload') +
+            '<span>Нажмите для загрузки фото</span>' +
+            (master && master.photo
+                ? '<button type="button" class="remove-image" data-action="remove-image" data-target="masterPhoto">' +
+                  SharedIcons.get('close') +
+                  '</button>'
+                : '') +
+            '</div>' +
+            '<input type="hidden" id="masterPhoto" value="' +
+            (master && master.photo ? master.photo : '') +
+            '">' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Имя *</label>' +
-                '<input type="text" class="form-input" id="masterName" value="' + window.escapeHtml(master && master.name || '') + '" placeholder="Введите имя мастера" required>' +
+            '<label class="form-label">Имя *</label>' +
+            '<input type="text" class="form-input" id="masterName" value="' +
+            window.escapeHtml((master && master.name) || '') +
+            '" placeholder="Введите имя мастера" required>' +
             '</div>' +
             '<div class="form-row form-row-2">' +
-                '<div class="form-group">' +
-                    '<label class="form-label">Инициал</label>' +
-                    '<input type="text" class="form-input" id="masterInitial" value="' + window.escapeHtml(master && master.initial || '') + '" placeholder="С" maxlength="1">' +
-                '</div>' +
-                '<div class="form-group">' +
-                    '<label class="form-label">Уровень</label>' +
-                    '<select class="form-select" id="masterBadge">' +
-                        '<option value="green" ' + (master && master.badge === 'green' ? 'selected' : '') + '>Green (начальный)</option>' +
-                        '<option value="pink" ' + (master && master.badge === 'pink' ? 'selected' : '') + '>Pink (средний)</option>' +
-                        '<option value="blue" ' + (master && master.badge === 'blue' ? 'selected' : '') + '>Dark Blue (высший)</option>' +
-                    '</select>' +
-                '</div>' +
+            '<div class="form-group">' +
+            '<label class="form-label">Инициал</label>' +
+            '<input type="text" class="form-input" id="masterInitial" value="' +
+            window.escapeHtml((master && master.initial) || '') +
+            '" placeholder="С" maxlength="1">' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Должность</label>' +
-                '<input type="text" class="form-input" id="masterRole" value="' + window.escapeHtml(master && master.role || '') + '" placeholder="Мастер">' +
+            '<label class="form-label">Уровень</label>' +
+            '<select class="form-select" id="masterBadge">' +
+            '<option value="green" ' +
+            (master && master.badge === 'green' ? 'selected' : '') +
+            '>Green (начальный)</option>' +
+            '<option value="pink" ' +
+            (master && master.badge === 'pink' ? 'selected' : '') +
+            '>Pink (средний)</option>' +
+            '<option value="blue" ' +
+            (master && master.badge === 'blue' ? 'selected' : '') +
+            '>Dark Blue (высший)</option>' +
+            '</select>' +
+            '</div>' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Специализация</label>' +
-                '<textarea class="form-textarea" id="masterSpecialization" placeholder="Описание специализации мастера...">' + window.escapeHtml(master && master.specialization || '') + '</textarea>' +
+            '<label class="form-label">Должность</label>' +
+            '<input type="text" class="form-input" id="masterRole" value="' +
+            window.escapeHtml((master && master.role) || '') +
+            '" placeholder="Мастер">' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Принципы работы</label>' +
-                '<div class="principles-list" id="principlesList">' +
-                    principlesHtml +
-                '</div>' +
-                '<button type="button" class="btn btn-secondary add-principle" data-action="add-principle">' +
-                    SharedIcons.get('plus') +
-                    'Добавить принцип' +
-                '</button>' +
+            '<label class="form-label">Специализация</label>' +
+            '<textarea class="form-textarea" id="masterSpecialization" placeholder="Описание специализации мастера...">' +
+            window.escapeHtml((master && master.specialization) || '') +
+            '</textarea>' +
             '</div>' +
-        '</form>';
+            '<div class="form-group">' +
+            '<label class="form-label">Принципы работы</label>' +
+            '<div class="principles-list" id="principlesList">' +
+            principlesHtml +
+            '</div>' +
+            '<button type="button" class="btn btn-secondary add-principle" data-action="add-principle">' +
+            SharedIcons.get('plus') +
+            'Добавить принцип' +
+            '</button>' +
+            '</div>' +
+            '</form>';
 
         AdminModals.setTitle('modal', title);
         var modalBody = document.getElementById('modalBody');
@@ -5888,7 +6437,7 @@ var AdminMasterForm = (function() {
 
         var principles = [];
         var principleInputs = document.querySelectorAll('.principle-input');
-        principleInputs.forEach(function(input) {
+        principleInputs.forEach(function (input) {
             var val = input.value.trim();
             if (val) {
                 principles.push(val);
@@ -5896,7 +6445,9 @@ var AdminMasterForm = (function() {
         });
 
         var masterData = {
-            id: AdminState.editingItem ? AdminState.editingItem.id : SharedHelpers.generateId('master'),
+            id: AdminState.editingItem
+                ? AdminState.editingItem.id
+                : SharedHelpers.generateId('master'),
             name: name,
             initial: initial || name.charAt(0),
             badge: badge,
@@ -5910,7 +6461,7 @@ var AdminMasterForm = (function() {
         var masters = AdminState.masters || [];
 
         if (AdminState.editingItem) {
-            var index = masters.findIndex(function(m) {
+            var index = masters.findIndex(function (m) {
                 return m.id === AdminState.editingItem.id;
             });
             if (index !== -1) {
@@ -5939,7 +6490,7 @@ var AdminMasterForm = (function() {
             return;
         }
 
-        var masters = AdminState.masters.filter(function(m) {
+        var masters = AdminState.masters.filter(function (m) {
             return m.id !== id;
         });
 
@@ -5964,9 +6515,12 @@ var AdminMasterForm = (function() {
 
         var div = document.createElement('div');
         div.className = 'principle-item';
-        div.innerHTML = '<input type="text" class="form-input principle-input" value="" placeholder="Принцип ' + (count + 1) + '">' +
+        div.innerHTML =
+            '<input type="text" class="form-input principle-input" value="" placeholder="Принцип ' +
+            (count + 1) +
+            '">' +
             '<button type="button" class="btn btn-icon danger" data-action="remove-principle">' +
-                SharedIcons.get('close') +
+            SharedIcons.get('close') +
             '</button>';
 
         list.appendChild(div);
@@ -6003,7 +6557,7 @@ window.AdminMasterForm = AdminMasterForm;
  * Форма добавления/редактирования услуги
  */
 
-var AdminServiceForm = (function() {
+var AdminServiceForm = (function () {
     'use strict';
 
     /**
@@ -6017,7 +6571,7 @@ var AdminServiceForm = (function() {
         var service = null;
 
         if (services.categories) {
-            category = services.categories.find(function(c) {
+            category = services.categories.find(function (c) {
                 return c.id === categoryId;
             });
         }
@@ -6034,29 +6588,38 @@ var AdminServiceForm = (function() {
 
         var title = service ? 'Редактировать услугу' : 'Добавить услугу';
 
-        var html = '<form id="serviceForm" class="admin-form">' +
+        var html =
+            '<form id="serviceForm" class="admin-form">' +
             '<div class="form-group">' +
-                '<label class="form-label">Название услуги *</label>' +
-                '<input type="text" class="form-input" id="serviceName" value="' + window.escapeHtml(service && service.name || '') + '" placeholder="Введите название услуги" required>' +
+            '<label class="form-label">Название услуги *</label>' +
+            '<input type="text" class="form-input" id="serviceName" value="' +
+            window.escapeHtml((service && service.name) || '') +
+            '" placeholder="Введите название услуги" required>' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Цены по уровням мастеров</label>' +
-                '<div class="form-row">' +
-                    '<div class="form-group">' +
-                        '<label class="form-label price-label-green">Green</label>' +
-                        '<input type="number" class="form-input" id="priceGreen" value="' + (service && service.priceGreen || '') + '" placeholder="1000">' +
-                    '</div>' +
-                    '<div class="form-group">' +
-                        '<label class="form-label price-label-pink">Pink</label>' +
-                        '<input type="number" class="form-input" id="pricePink" value="' + (service && service.pricePink || '') + '" placeholder="1300">' +
-                    '</div>' +
-                    '<div class="form-group">' +
-                        '<label class="form-label price-label-blue">Dark Blue</label>' +
-                        '<input type="number" class="form-input" id="priceBlue" value="' + (service && service.priceBlue || '') + '" placeholder="1500">' +
-                    '</div>' +
-                '</div>' +
+            '<label class="form-label">Цены по уровням мастеров</label>' +
+            '<div class="form-row">' +
+            '<div class="form-group">' +
+            '<label class="form-label price-label-green">Green</label>' +
+            '<input type="number" class="form-input" id="priceGreen" value="' +
+            ((service && service.priceGreen) || '') +
+            '" placeholder="1000">' +
             '</div>' +
-        '</form>';
+            '<div class="form-group">' +
+            '<label class="form-label price-label-pink">Pink</label>' +
+            '<input type="number" class="form-input" id="pricePink" value="' +
+            ((service && service.pricePink) || '') +
+            '" placeholder="1300">' +
+            '</div>' +
+            '<div class="form-group">' +
+            '<label class="form-label price-label-blue">Dark Blue</label>' +
+            '<input type="number" class="form-input" id="priceBlue" value="' +
+            ((service && service.priceBlue) || '') +
+            '" placeholder="1500">' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '</form>';
 
         AdminModals.setTitle('modal', title);
         var modalBody = document.getElementById('modalBody');
@@ -6075,7 +6638,9 @@ var AdminServiceForm = (function() {
         var services = AdminState.services || {};
         var podology = services.podology || {};
         var categories = podology.categories || [];
-        var category = categories.find(function(c) { return c.id === categoryId; });
+        var category = categories.find(function (c) {
+            return c.id === categoryId;
+        });
         var service = null;
 
         if (category && index !== null && index !== undefined) {
@@ -6091,26 +6656,35 @@ var AdminServiceForm = (function() {
 
         var title = service ? 'Редактировать услугу' : 'Добавить услугу подологии';
 
-        var html = '<form id="podologyForm" class="admin-form">' +
+        var html =
+            '<form id="podologyForm" class="admin-form">' +
             '<div class="form-group">' +
-                '<label class="form-label">Название услуги *</label>' +
-                '<input type="text" class="form-input" id="podologyName" value="' + window.escapeHtml(service && service.name || '') + '" placeholder="Введите название услуги" required>' +
+            '<label class="form-label">Название услуги *</label>' +
+            '<input type="text" class="form-input" id="podologyName" value="' +
+            window.escapeHtml((service && service.name) || '') +
+            '" placeholder="Введите название услуги" required>' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Длительность</label>' +
-                '<input type="text" class="form-input" id="podologyDuration" value="' + window.escapeHtml(service && service.duration || '') + '" placeholder="1 час 30 минут">' +
+            '<label class="form-label">Длительность</label>' +
+            '<input type="text" class="form-input" id="podologyDuration" value="' +
+            window.escapeHtml((service && service.duration) || '') +
+            '" placeholder="1 час 30 минут">' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Цена</label>' +
-                '<input type="text" class="form-input" id="podologyPrice" value="' + window.escapeHtml(service && service.price || '') + '" placeholder="2500 ₽">' +
+            '<label class="form-label">Цена</label>' +
+            '<input type="text" class="form-input" id="podologyPrice" value="' +
+            window.escapeHtml((service && service.price) || '') +
+            '" placeholder="2500 ₽">' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-checkbox">' +
-                    '<input type="checkbox" id="podologyFeatured"' + (service && service.featured ? ' checked' : '') + '>' +
-                    '<span>Выделить услугу</span>' +
-                '</label>' +
+            '<label class="form-checkbox">' +
+            '<input type="checkbox" id="podologyFeatured"' +
+            (service && service.featured ? ' checked' : '') +
+            '>' +
+            '<span>Выделить услугу</span>' +
+            '</label>' +
             '</div>' +
-        '</form>';
+            '</form>';
 
         AdminModals.setTitle('modal', title);
         var modalBody = document.getElementById('modalBody');
@@ -6171,7 +6745,7 @@ var AdminServiceForm = (function() {
             services.categories = [];
         }
 
-        var category = services.categories.find(function(c) {
+        var category = services.categories.find(function (c) {
             return c.id === categoryId;
         });
 
@@ -6242,7 +6816,7 @@ var AdminServiceForm = (function() {
             services.podology.categories = [];
         }
 
-        var category = services.podology.categories.find(function(c) {
+        var category = services.podology.categories.find(function (c) {
             return c.id === categoryId;
         });
 
@@ -6281,9 +6855,11 @@ var AdminServiceForm = (function() {
         }
 
         var services = AdminState.services || {};
-        var category = services.categories && services.categories.find(function(c) {
-            return c.id === categoryId;
-        });
+        var category =
+            services.categories &&
+            services.categories.find(function (c) {
+                return c.id === categoryId;
+            });
 
         if (category && category.services) {
             category.services.splice(index, 1);
@@ -6310,7 +6886,7 @@ var AdminServiceForm = (function() {
         var services = AdminState.services || {};
 
         if (services.podology && services.podology.categories) {
-            var category = services.podology.categories.find(function(c) {
+            var category = services.podology.categories.find(function (c) {
                 return c.id === categoryId;
             });
             if (category && category.services) {
@@ -6350,7 +6926,7 @@ window.AdminServiceForm = AdminServiceForm;
  * Форма добавления/редактирования категорий подологии
  */
 
-var AdminPodologyCategoryForm = (function() {
+var AdminPodologyCategoryForm = (function () {
     'use strict';
 
     var availableIcons = [
@@ -6367,31 +6943,50 @@ var AdminPodologyCategoryForm = (function() {
         var podology = services.podology || {};
         var categories = podology.categories || [];
 
-        var listHtml = categories.length > 0
-            ? categories.map(function(cat, index) {
-                return '<div class="category-item" data-id="' + cat.id + '">' +
-                    '<div class="category-info">' +
-                        '<strong>' + escapeHtml(cat.name) + '</strong>' +
-                        '<span>' + (cat.services ? cat.services.length : 0) + ' услуг</span>' +
-                    '</div>' +
-                    '<div class="category-actions">' +
-                        '<button class="btn btn-icon" data-action="edit-podology-category" data-id="' + cat.id + '" title="Редактировать">' +
-                            SharedIcons.get('edit') +
-                        '</button>' +
-                        '<button class="btn btn-icon danger" data-action="delete-podology-category" data-id="' + cat.id + '" title="Удалить">' +
-                            SharedIcons.get('delete') +
-                        '</button>' +
-                    '</div>' +
-                '</div>';
-            }).join('')
-            : '<p class="empty-message">Нет категорий</p>';
+        var listHtml =
+            categories.length > 0
+                ? categories
+                      .map(function (cat, index) {
+                          return (
+                              '<div class="category-item" data-id="' +
+                              cat.id +
+                              '">' +
+                              '<div class="category-info">' +
+                              '<strong>' +
+                              escapeHtml(cat.name) +
+                              '</strong>' +
+                              '<span>' +
+                              (cat.services ? cat.services.length : 0) +
+                              ' услуг</span>' +
+                              '</div>' +
+                              '<div class="category-actions">' +
+                              '<button class="btn btn-icon" data-action="edit-podology-category" data-id="' +
+                              cat.id +
+                              '" title="Редактировать">' +
+                              SharedIcons.get('edit') +
+                              '</button>' +
+                              '<button class="btn btn-icon danger" data-action="delete-podology-category" data-id="' +
+                              cat.id +
+                              '" title="Удалить">' +
+                              SharedIcons.get('delete') +
+                              '</button>' +
+                              '</div>' +
+                              '</div>'
+                          );
+                      })
+                      .join('')
+                : '<p class="empty-message">Нет категорий</p>';
 
-        var html = '<div class="categories-manager">' +
-            '<div class="categories-list">' + listHtml + '</div>' +
+        var html =
+            '<div class="categories-manager">' +
+            '<div class="categories-list">' +
+            listHtml +
+            '</div>' +
             '<button class="btn btn-primary" data-action="add-podology-category" style="margin-top: 16px;">' +
-                SharedIcons.get('plus') + ' Добавить категорию' +
+            SharedIcons.get('plus') +
+            ' Добавить категорию' +
             '</button>' +
-        '</div>';
+            '</div>';
 
         AdminModals.setTitle('modal', 'Управление категориями');
         var modalBody = document.getElementById('modalBody');
@@ -6418,7 +7013,9 @@ var AdminPodologyCategoryForm = (function() {
         var category = null;
 
         if (categoryId) {
-            category = categories.find(function(c) { return c.id === categoryId; });
+            category = categories.find(function (c) {
+                return c.id === categoryId;
+            });
         }
 
         AdminState.editingItem = {
@@ -6429,31 +7026,42 @@ var AdminPodologyCategoryForm = (function() {
 
         var title = category ? 'Редактировать категорию' : 'Добавить категорию';
 
-        var iconsHtml = availableIcons.map(function(icon) {
-            var selected = category && category.icon === icon.id ? ' selected' : '';
-            return '<option value="' + icon.id + '"' + selected + '>' + icon.name + '</option>';
-        }).join('');
+        var iconsHtml = availableIcons
+            .map(function (icon) {
+                var selected = category && category.icon === icon.id ? ' selected' : '';
+                return '<option value="' + icon.id + '"' + selected + '>' + icon.name + '</option>';
+            })
+            .join('');
 
-        var html = '<form id="podologyCategoryForm" class="admin-form">' +
+        var html =
+            '<form id="podologyCategoryForm" class="admin-form">' +
             '<div class="form-group">' +
-                '<label class="form-label">Название категории *</label>' +
-                '<input type="text" class="form-input" id="podCategoryName" value="' + escapeHtml(category && category.name || '') + '" placeholder="Комплексные программы" required>' +
+            '<label class="form-label">Название категории *</label>' +
+            '<input type="text" class="form-input" id="podCategoryName" value="' +
+            escapeHtml((category && category.name) || '') +
+            '" placeholder="Комплексные программы" required>' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Описание</label>' +
-                '<input type="text" class="form-input" id="podCategoryDescription" value="' + escapeHtml(category && category.description || '') + '" placeholder="Выгодные пакеты услуг">' +
+            '<label class="form-label">Описание</label>' +
+            '<input type="text" class="form-input" id="podCategoryDescription" value="' +
+            escapeHtml((category && category.description) || '') +
+            '" placeholder="Выгодные пакеты услуг">' +
             '</div>' +
             '<div class="form-row">' +
-                '<div class="form-group">' +
-                    '<label class="form-label">Иконка</label>' +
-                    '<select class="form-select" id="podCategoryIcon">' + iconsHtml + '</select>' +
-                '</div>' +
-                '<div class="form-group">' +
-                    '<label class="form-label">Бейдж</label>' +
-                    '<input type="text" class="form-input" id="podCategoryBadge" value="' + escapeHtml(category && category.badge || '') + '" placeholder="Выгодно">' +
-                '</div>' +
+            '<div class="form-group">' +
+            '<label class="form-label">Иконка</label>' +
+            '<select class="form-select" id="podCategoryIcon">' +
+            iconsHtml +
+            '</select>' +
             '</div>' +
-        '</form>';
+            '<div class="form-group">' +
+            '<label class="form-label">Бейдж</label>' +
+            '<input type="text" class="form-input" id="podCategoryBadge" value="' +
+            escapeHtml((category && category.badge) || '') +
+            '" placeholder="Выгодно">' +
+            '</div>' +
+            '</div>' +
+            '</form>';
 
         AdminModals.setTitle('modal', title);
         var modalBody = document.getElementById('modalBody');
@@ -6490,7 +7098,12 @@ var AdminPodologyCategoryForm = (function() {
         var badgeEl = document.getElementById('podCategoryBadge');
 
         var categoryData = {
-            id: editing.category ? editing.category.id : name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+            id: editing.category
+                ? editing.category.id
+                : name
+                      .toLowerCase()
+                      .replace(/\s+/g, '-')
+                      .replace(/[^a-z0-9-]/g, ''),
             name: name,
             description: descEl ? descEl.value.trim() : '',
             icon: iconEl ? iconEl.value : 'heart',
@@ -6507,7 +7120,7 @@ var AdminPodologyCategoryForm = (function() {
         }
 
         if (editing.categoryId) {
-            var index = services.podology.categories.findIndex(function(c) {
+            var index = services.podology.categories.findIndex(function (c) {
                 return c.id === editing.categoryId;
             });
             if (index !== -1) {
@@ -6539,15 +7152,14 @@ var AdminPodologyCategoryForm = (function() {
         var services = AdminState.services || {};
         if (!services.podology || !services.podology.categories) return;
 
-        services.podology.categories = services.podology.categories.filter(function(c) {
+        services.podology.categories = services.podology.categories.filter(function (c) {
             return c.id !== categoryId;
         });
 
         // Если удалили текущую категорию, переключаемся на первую
         if (AdminState.currentPodologyCategory === categoryId) {
-            AdminState.currentPodologyCategory = services.podology.categories.length > 0
-                ? services.podology.categories[0].id
-                : '';
+            AdminState.currentPodologyCategory =
+                services.podology.categories.length > 0 ? services.podology.categories[0].id : '';
         }
 
         try {
@@ -6581,7 +7193,7 @@ window.AdminPodologyCategoryForm = AdminPodologyCategoryForm;
  * Форма добавления/редактирования статьи
  */
 
-var AdminArticleForm = (function() {
+var AdminArticleForm = (function () {
     'use strict';
 
     /**
@@ -6593,41 +7205,64 @@ var AdminArticleForm = (function() {
         var title = article ? 'Редактировать статью' : 'Добавить статью';
         var today = new Date().toISOString().split('T')[0];
 
-        var html = '<form id="articleForm" class="admin-form">' +
+        var html =
+            '<form id="articleForm" class="admin-form">' +
             '<div class="form-group">' +
-                '<label class="form-label">Изображение</label>' +
-                '<div class="image-upload ' + (article && article.image ? 'has-image' : '') + '" id="articleImageUpload">' +
-                    (article && article.image ? '<img src="' + article.image + '" alt="Изображение">' : '') +
-                    '<input type="file" accept="image/*" data-upload-target="articleImage">' +
-                    SharedIcons.get('upload') +
-                    '<span>Нажмите для загрузки изображения</span>' +
-                    (article && article.image ? '<button type="button" class="remove-image" data-action="remove-image" data-target="articleImage">' + SharedIcons.get('close') + '</button>' : '') +
-                '</div>' +
-                '<input type="hidden" id="articleImage" value="' + (article && article.image ? article.image : '') + '">' +
+            '<label class="form-label">Изображение</label>' +
+            '<div class="image-upload ' +
+            (article && article.image ? 'has-image' : '') +
+            '" id="articleImageUpload">' +
+            (article && article.image
+                ? '<img src="' + article.image + '" alt="Изображение">'
+                : '') +
+            '<input type="file" accept="image/*" data-upload-target="articleImage">' +
+            SharedIcons.get('upload') +
+            '<span>Нажмите для загрузки изображения</span>' +
+            (article && article.image
+                ? '<button type="button" class="remove-image" data-action="remove-image" data-target="articleImage">' +
+                  SharedIcons.get('close') +
+                  '</button>'
+                : '') +
+            '</div>' +
+            '<input type="hidden" id="articleImage" value="' +
+            (article && article.image ? article.image : '') +
+            '">' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Заголовок *</label>' +
-                '<input type="text" class="form-input" id="articleTitle" value="' + window.escapeHtml(article && article.title || '') + '" placeholder="Введите заголовок статьи" required>' +
+            '<label class="form-label">Заголовок *</label>' +
+            '<input type="text" class="form-input" id="articleTitle" value="' +
+            window.escapeHtml((article && article.title) || '') +
+            '" placeholder="Введите заголовок статьи" required>' +
             '</div>' +
             '<div class="form-row form-row-2">' +
-                '<div class="form-group">' +
-                    '<label class="form-label">Тег/Категория</label>' +
-                    '<input type="text" class="form-input" id="articleTag" value="' + window.escapeHtml(article && article.tag || '') + '" placeholder="Уход за волосами">' +
-                '</div>' +
-                '<div class="form-group">' +
-                    '<label class="form-label">Дата публикации</label>' +
-                    '<input type="date" class="form-input" id="articleDate" value="' + (article && article.date || today) + '">' +
-                '</div>' +
+            '<div class="form-group">' +
+            '<label class="form-label">Тег/Категория</label>' +
+            '<input type="text" class="form-input" id="articleTag" value="' +
+            window.escapeHtml((article && article.tag) || '') +
+            '" placeholder="Уход за волосами">' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Краткое описание</label>' +
-                '<textarea class="form-textarea" id="articleExcerpt" placeholder="Краткое описание для превью статьи...">' + window.escapeHtml(article && article.excerpt || '') + '</textarea>' +
+            '<label class="form-label">Дата публикации</label>' +
+            '<input type="date" class="form-input" id="articleDate" value="' +
+            ((article && article.date) || today) +
+            '">' +
+            '</div>' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Полный текст статьи</label>' +
-                AdminWYSIWYG.getEditorHTML('articleContent', article && article.content || '', 'Начните писать текст статьи...') +
+            '<label class="form-label">Краткое описание</label>' +
+            '<textarea class="form-textarea" id="articleExcerpt" placeholder="Краткое описание для превью статьи...">' +
+            window.escapeHtml((article && article.excerpt) || '') +
+            '</textarea>' +
             '</div>' +
-        '</form>';
+            '<div class="form-group">' +
+            '<label class="form-label">Полный текст статьи</label>' +
+            AdminWYSIWYG.getEditorHTML(
+                'articleContent',
+                (article && article.content) || '',
+                'Начните писать текст статьи...'
+            ) +
+            '</div>' +
+            '</form>';
 
         AdminModals.setTitle('modal', title);
         var modalBody = document.getElementById('modalBody');
@@ -6637,7 +7272,7 @@ var AdminArticleForm = (function() {
         AdminModals.open('modal');
 
         // Инициализация редактора после рендеринга DOM
-        requestAnimationFrame(function() {
+        requestAnimationFrame(function () {
             AdminWYSIWYG.initWithToolbar('articleContent');
         });
     }
@@ -6666,7 +7301,9 @@ var AdminArticleForm = (function() {
         var image = imageEl ? imageEl.value : null;
 
         var articleData = {
-            id: AdminState.editingItem ? AdminState.editingItem.id : SharedHelpers.generateId('article'),
+            id: AdminState.editingItem
+                ? AdminState.editingItem.id
+                : SharedHelpers.generateId('article'),
             title: title,
             tag: tag || 'Статья',
             date: date,
@@ -6679,7 +7316,7 @@ var AdminArticleForm = (function() {
         var articles = AdminState.articles || [];
 
         if (AdminState.editingItem) {
-            var index = articles.findIndex(function(a) {
+            var index = articles.findIndex(function (a) {
                 return a.id === AdminState.editingItem.id;
             });
             if (index !== -1) {
@@ -6708,7 +7345,7 @@ var AdminArticleForm = (function() {
             return;
         }
 
-        var articles = AdminState.articles.filter(function(a) {
+        var articles = AdminState.articles.filter(function (a) {
             return a.id !== id;
         });
 
@@ -6741,7 +7378,7 @@ window.AdminArticleForm = AdminArticleForm;
  * Форма добавления/редактирования FAQ
  */
 
-var AdminFaqForm = (function() {
+var AdminFaqForm = (function () {
     'use strict';
 
     /**
@@ -6752,16 +7389,21 @@ var AdminFaqForm = (function() {
 
         var title = faqItem ? 'Редактировать вопрос' : 'Добавить вопрос';
 
-        var html = '<form id="faqForm" class="admin-form">' +
+        var html =
+            '<form id="faqForm" class="admin-form">' +
             '<div class="form-group">' +
-                '<label class="form-label">Вопрос *</label>' +
-                '<input type="text" class="form-input" id="faqQuestion" value="' + window.escapeHtml(faqItem && faqItem.question || '') + '" placeholder="Введите вопрос" required>' +
+            '<label class="form-label">Вопрос *</label>' +
+            '<input type="text" class="form-input" id="faqQuestion" value="' +
+            window.escapeHtml((faqItem && faqItem.question) || '') +
+            '" placeholder="Введите вопрос" required>' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Ответ *</label>' +
-                '<textarea class="form-textarea" id="faqAnswer" placeholder="Введите ответ на вопрос..." rows="5">' + window.escapeHtml(faqItem && faqItem.answer || '') + '</textarea>' +
+            '<label class="form-label">Ответ *</label>' +
+            '<textarea class="form-textarea" id="faqAnswer" placeholder="Введите ответ на вопрос..." rows="5">' +
+            window.escapeHtml((faqItem && faqItem.answer) || '') +
+            '</textarea>' +
             '</div>' +
-        '</form>';
+            '</form>';
 
         AdminModals.setTitle('modal', title);
         var modalBody = document.getElementById('modalBody');
@@ -6792,7 +7434,9 @@ var AdminFaqForm = (function() {
         }
 
         var faqData = {
-            id: AdminState.editingItem ? AdminState.editingItem.id : SharedHelpers.generateId('faq'),
+            id: AdminState.editingItem
+                ? AdminState.editingItem.id
+                : SharedHelpers.generateId('faq'),
             question: question,
             answer: answer
         };
@@ -6800,7 +7444,7 @@ var AdminFaqForm = (function() {
         var faq = AdminState.faq || [];
 
         if (AdminState.editingItem) {
-            var index = faq.findIndex(function(f) {
+            var index = faq.findIndex(function (f) {
                 return f.id === AdminState.editingItem.id;
             });
             if (index !== -1) {
@@ -6829,7 +7473,7 @@ var AdminFaqForm = (function() {
             return;
         }
 
-        var faq = AdminState.faq.filter(function(f) {
+        var faq = AdminState.faq.filter(function (f) {
             return f.id !== id;
         });
 
@@ -6862,7 +7506,7 @@ window.AdminFaqForm = AdminFaqForm;
  * Форма добавления/редактирования категории товаров
  */
 
-var AdminCategoryForm = (function() {
+var AdminCategoryForm = (function () {
     'use strict';
 
     // Группы иконок для выбора
@@ -6892,58 +7536,83 @@ var AdminCategoryForm = (function() {
     function show(category) {
         AdminState.editingItem = category || null;
         var title = category ? 'Редактировать категорию' : 'Добавить категорию';
-        var currentIcon = category && category.icon || 'scissors';
+        var currentIcon = (category && category.icon) || 'scissors';
 
-        var html = '<form id="categoryForm" class="admin-form">' +
+        var html =
+            '<form id="categoryForm" class="admin-form">' +
             '<div class="form-row">' +
-                '<div class="form-group form-group-flex">' +
-                    '<label class="form-label">Название *</label>' +
-                    '<input type="text" class="form-input" id="categoryName" ' +
-                        'value="' + window.escapeHtml(category && category.name || '') + '" ' +
-                        'placeholder="Средства для волос" required>' +
-                '</div>' +
-                '<div class="form-group form-group-small">' +
-                    '<label class="form-label">URL (slug)</label>' +
-                    '<input type="text" class="form-input" id="categorySlug" ' +
-                        'value="' + window.escapeHtml(category && category.slug || '') + '" ' +
-                        'placeholder="hair-care">' +
-                '</div>' +
+            '<div class="form-group form-group-flex">' +
+            '<label class="form-label">Название *</label>' +
+            '<input type="text" class="form-input" id="categoryName" ' +
+            'value="' +
+            window.escapeHtml((category && category.name) || '') +
+            '" ' +
+            'placeholder="Средства для волос" required>' +
+            '</div>' +
+            '<div class="form-group form-group-small">' +
+            '<label class="form-label">URL (slug)</label>' +
+            '<input type="text" class="form-input" id="categorySlug" ' +
+            'value="' +
+            window.escapeHtml((category && category.slug) || '') +
+            '" ' +
+            'placeholder="hair-care">' +
+            '</div>' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Описание</label>' +
-                '<textarea class="form-textarea" id="categoryDescription" rows="2" ' +
-                    'placeholder="Краткое описание категории...">' +
-                    window.escapeHtml(category && category.description || '') +
-                '</textarea>' +
+            '<label class="form-label">Описание</label>' +
+            '<textarea class="form-textarea" id="categoryDescription" rows="2" ' +
+            'placeholder="Краткое описание категории...">' +
+            window.escapeHtml((category && category.description) || '') +
+            '</textarea>' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-checkbox">' +
-                    '<input type="checkbox" id="categoryActive" ' + (category && category.active === false ? '' : 'checked') + '>' +
-                    '<span class="checkbox-mark"></span>' +
-                    '<span class="checkbox-label">Активная категория</span>' +
-                '</label>' +
-                '<p class="form-hint">Неактивные категории не отображаются на сайте</p>' +
+            '<label class="form-checkbox">' +
+            '<input type="checkbox" id="categoryActive" ' +
+            (category && category.active === false ? '' : 'checked') +
+            '>' +
+            '<span class="checkbox-mark"></span>' +
+            '<span class="checkbox-label">Активная категория</span>' +
+            '</label>' +
+            '<p class="form-hint">Неактивные категории не отображаются на сайте</p>' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Иконка</label>' +
-                '<div class="icon-selector-grouped" id="iconSelector">' +
-                    iconGroups.map(function(group) {
-                        return '<div class="icon-group">' +
-                            '<span class="icon-group-label">' + group.name + '</span>' +
-                            '<div class="icon-group-icons">' +
-                                group.icons.map(function(icon) {
-                                    var activeClass = currentIcon === icon ? ' active' : '';
-                                    return '<button type="button" class="icon-option' + activeClass + '" data-icon="' + icon + '" title="' + icon + '">' +
-                                        SharedIcons.get(icon) +
-                                    '</button>';
-                                }).join('') +
-                            '</div>' +
-                        '</div>';
-                    }).join('') +
-                '</div>' +
-                '<input type="hidden" id="categoryIcon" value="' + window.escapeHtml(currentIcon) + '">' +
+            '<label class="form-label">Иконка</label>' +
+            '<div class="icon-selector-grouped" id="iconSelector">' +
+            iconGroups
+                .map(function (group) {
+                    return (
+                        '<div class="icon-group">' +
+                        '<span class="icon-group-label">' +
+                        group.name +
+                        '</span>' +
+                        '<div class="icon-group-icons">' +
+                        group.icons
+                            .map(function (icon) {
+                                var activeClass = currentIcon === icon ? ' active' : '';
+                                return (
+                                    '<button type="button" class="icon-option' +
+                                    activeClass +
+                                    '" data-icon="' +
+                                    icon +
+                                    '" title="' +
+                                    icon +
+                                    '">' +
+                                    SharedIcons.get(icon) +
+                                    '</button>'
+                                );
+                            })
+                            .join('') +
+                        '</div>' +
+                        '</div>'
+                    );
+                })
+                .join('') +
             '</div>' +
-        '</form>';
+            '<input type="hidden" id="categoryIcon" value="' +
+            window.escapeHtml(currentIcon) +
+            '">' +
+            '</div>' +
+            '</form>';
 
         AdminModals.setTitle('modal', title);
         document.getElementById('modalBody').innerHTML = html;
@@ -6958,7 +7627,7 @@ var AdminCategoryForm = (function() {
         var slugInput = document.getElementById('categorySlug');
 
         if (nameInput && slugInput) {
-            nameInput.addEventListener('input', function() {
+            nameInput.addEventListener('input', function () {
                 if (!category) {
                     slugInput.value = generateSlug(nameInput.value);
                 }
@@ -6970,10 +7639,10 @@ var AdminCategoryForm = (function() {
         var iconInput = document.getElementById('categoryIcon');
 
         if (iconSelector) {
-            iconSelector.addEventListener('click', function(e) {
+            iconSelector.addEventListener('click', function (e) {
                 var option = e.target.closest('.icon-option');
                 if (option) {
-                    iconSelector.querySelectorAll('.icon-option').forEach(function(o) {
+                    iconSelector.querySelectorAll('.icon-option').forEach(function (o) {
                         o.classList.remove('active');
                     });
                     option.classList.add('active');
@@ -6996,19 +7665,23 @@ var AdminCategoryForm = (function() {
         var active = document.getElementById('categoryActive').checked;
 
         var categoryData = {
-            id: AdminState.editingItem ? AdminState.editingItem.id : SharedHelpers.generateId('category'),
+            id: AdminState.editingItem
+                ? AdminState.editingItem.id
+                : SharedHelpers.generateId('category'),
             name: name,
             slug: slug,
             description: description,
             icon: icon,
-            order: AdminState.editingItem ? AdminState.editingItem.order : AdminState.shopCategories.length + 1,
+            order: AdminState.editingItem
+                ? AdminState.editingItem.order
+                : AdminState.shopCategories.length + 1,
             active: active
         };
 
         var categories = AdminState.shopCategories.slice();
 
         if (AdminState.editingItem) {
-            var index = categories.findIndex(function(c) {
+            var index = categories.findIndex(function (c) {
                 return c.id === AdminState.editingItem.id;
             });
             if (index !== -1) categories[index] = categoryData;
@@ -7029,12 +7702,15 @@ var AdminCategoryForm = (function() {
 
     async function remove(id) {
         // Check if category has products
-        var productsInCategory = AdminState.products.filter(function(p) {
+        var productsInCategory = AdminState.products.filter(function (p) {
             return p.categoryId === id;
         });
 
         if (productsInCategory.length > 0) {
-            showToast('Нельзя удалить категорию с товарами (' + productsInCategory.length + ' шт.)', 'error');
+            showToast(
+                'Нельзя удалить категорию с товарами (' + productsInCategory.length + ' шт.)',
+                'error'
+            );
             return;
         }
 
@@ -7045,7 +7721,7 @@ var AdminCategoryForm = (function() {
             return;
         }
 
-        var categories = AdminState.shopCategories.filter(function(c) {
+        var categories = AdminState.shopCategories.filter(function (c) {
             return c.id !== id;
         });
 
@@ -7078,7 +7754,7 @@ window.AdminCategoryForm = AdminCategoryForm;
  * Форма добавления/редактирования товара
  */
 
-var AdminProductForm = (function() {
+var AdminProductForm = (function () {
     'use strict';
 
     var uploadedImages = [];
@@ -7089,62 +7765,82 @@ var AdminProductForm = (function() {
 
         var title = product ? 'Редактировать товар' : 'Добавить товар';
 
-        var categoriesOptions = AdminState.shopCategories.map(function(cat) {
-            var selected = product && product.categoryId === cat.id ? ' selected' : '';
-            return '<option value="' + window.escapeHtml(cat.id) + '"' + selected + '>' +
-                window.escapeHtml(cat.name) + '</option>';
-        }).join('');
+        var categoriesOptions = AdminState.shopCategories
+            .map(function (cat) {
+                var selected = product && product.categoryId === cat.id ? ' selected' : '';
+                return (
+                    '<option value="' +
+                    window.escapeHtml(cat.id) +
+                    '"' +
+                    selected +
+                    '>' +
+                    window.escapeHtml(cat.name) +
+                    '</option>'
+                );
+            })
+            .join('');
 
-        var html = '<form id="productForm" class="admin-form">' +
+        var html =
+            '<form id="productForm" class="admin-form">' +
             '<div class="form-group">' +
-                '<label class="form-label">Изображения</label>' +
-                '<div class="images-upload-area" id="imagesUploadArea">' +
-                    '<div class="images-grid" id="imagesGrid"></div>' +
-                    '<label class="image-upload-btn">' +
-                        '<input type="file" accept="image/*" multiple id="productImagesInput">' +
-                        SharedIcons.get('plus') +
-                        '<span>Добавить</span>' +
-                    '</label>' +
-                '</div>' +
-                '<p class="form-hint">Первое изображение будет главным. Перетащите для изменения порядка.</p>' +
+            '<label class="form-label">Изображения</label>' +
+            '<div class="images-upload-area" id="imagesUploadArea">' +
+            '<div class="images-grid" id="imagesGrid"></div>' +
+            '<label class="image-upload-btn">' +
+            '<input type="file" accept="image/*" multiple id="productImagesInput">' +
+            SharedIcons.get('plus') +
+            '<span>Добавить</span>' +
+            '</label>' +
+            '</div>' +
+            '<p class="form-hint">Первое изображение будет главным. Перетащите для изменения порядка.</p>' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Название *</label>' +
-                '<input type="text" class="form-input" id="productName" ' +
-                    'value="' + window.escapeHtml(product && product.name || '') + '" ' +
-                    'placeholder="Помада для укладки" required>' +
+            '<label class="form-label">Название *</label>' +
+            '<input type="text" class="form-input" id="productName" ' +
+            'value="' +
+            window.escapeHtml((product && product.name) || '') +
+            '" ' +
+            'placeholder="Помада для укладки" required>' +
             '</div>' +
             '<div class="form-row form-row-2">' +
-                '<div class="form-group">' +
-                    '<label class="form-label">Категория *</label>' +
-                    '<select class="form-select" id="productCategory" required>' +
-                        '<option value="">Выберите категорию</option>' +
-                        categoriesOptions +
-                    '</select>' +
-                '</div>' +
-                '<div class="form-group">' +
-                    '<label class="form-label">Цена (₽) *</label>' +
-                    '<input type="number" class="form-input" id="productPrice" ' +
-                        'value="' + (product && product.price || '') + '" ' +
-                        'placeholder="1500" min="0" required>' +
-                '</div>' +
+            '<div class="form-group">' +
+            '<label class="form-label">Категория *</label>' +
+            '<select class="form-select" id="productCategory" required>' +
+            '<option value="">Выберите категорию</option>' +
+            categoriesOptions +
+            '</select>' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Описание</label>' +
-                '<textarea class="form-textarea" id="productDescription" rows="5" ' +
-                    'placeholder="Подробное описание товара...">' +
-                    window.escapeHtml(product && product.description || '') +
-                '</textarea>' +
+            '<label class="form-label">Цена (₽) *</label>' +
+            '<input type="number" class="form-input" id="productPrice" ' +
+            'value="' +
+            ((product && product.price) || '') +
+            '" ' +
+            'placeholder="1500" min="0" required>' +
+            '</div>' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Статус</label>' +
-                '<select class="form-select" id="productStatus">' +
-                    '<option value="active"' + (product && product.status === 'active' ? ' selected' : '') + '>Активен</option>' +
-                    '<option value="draft"' + (product && product.status === 'draft' ? ' selected' : '') + '>Черновик</option>' +
-                    '<option value="archived"' + (product && product.status === 'archived' ? ' selected' : '') + '>В архиве</option>' +
-                '</select>' +
+            '<label class="form-label">Описание</label>' +
+            '<textarea class="form-textarea" id="productDescription" rows="5" ' +
+            'placeholder="Подробное описание товара...">' +
+            window.escapeHtml((product && product.description) || '') +
+            '</textarea>' +
             '</div>' +
-        '</form>';
+            '<div class="form-group">' +
+            '<label class="form-label">Статус</label>' +
+            '<select class="form-select" id="productStatus">' +
+            '<option value="active"' +
+            (product && product.status === 'active' ? ' selected' : '') +
+            '>Активен</option>' +
+            '<option value="draft"' +
+            (product && product.status === 'draft' ? ' selected' : '') +
+            '>Черновик</option>' +
+            '<option value="archived"' +
+            (product && product.status === 'archived' ? ' selected' : '') +
+            '>В архиве</option>' +
+            '</select>' +
+            '</div>' +
+            '</form>';
 
         AdminModals.setTitle('modal', title);
         document.getElementById('modalBody').innerHTML = html;
@@ -7163,15 +7859,25 @@ var AdminProductForm = (function() {
             return;
         }
 
-        var html = uploadedImages.map(function(img, i) {
-            return '<div class="image-preview" data-index="' + i + '" draggable="true">' +
-                '<img src="' + window.escapeHtml(img.url) + '" alt="">' +
-                (i === 0 ? '<span class="main-badge">Главное</span>' : '') +
-                '<button type="button" class="remove-image-btn" data-index="' + i + '">' +
+        var html = uploadedImages
+            .map(function (img, i) {
+                return (
+                    '<div class="image-preview" data-index="' +
+                    i +
+                    '" draggable="true">' +
+                    '<img src="' +
+                    window.escapeHtml(img.url) +
+                    '" alt="">' +
+                    (i === 0 ? '<span class="main-badge">Главное</span>' : '') +
+                    '<button type="button" class="remove-image-btn" data-index="' +
+                    i +
+                    '">' +
                     SharedIcons.get('close') +
-                '</button>' +
-            '</div>';
-        }).join('');
+                    '</button>' +
+                    '</div>'
+                );
+            })
+            .join('');
 
         grid.innerHTML = html;
         initDragAndDrop();
@@ -7182,7 +7888,7 @@ var AdminProductForm = (function() {
         var grid = document.getElementById('imagesGrid');
         if (!input || !grid) return;
 
-        input.addEventListener('change', async function(e) {
+        input.addEventListener('change', async function (e) {
             var files = Array.from(e.target.files);
 
             for (var i = 0; i < files.length; i++) {
@@ -7207,14 +7913,14 @@ var AdminProductForm = (function() {
         });
 
         // Remove image handler
-        grid.addEventListener('click', function(e) {
+        grid.addEventListener('click', function (e) {
             var removeBtn = e.target.closest('.remove-image-btn');
             if (removeBtn) {
                 var index = parseInt(removeBtn.dataset.index, 10);
                 uploadedImages.splice(index, 1);
                 // Update isMain
                 if (uploadedImages.length > 0) {
-                    uploadedImages.forEach(function(img, i) {
+                    uploadedImages.forEach(function (img, i) {
                         img.isMain = i === 0;
                         img.order = i + 1;
                     });
@@ -7231,26 +7937,26 @@ var AdminProductForm = (function() {
         var draggedItem = null;
         var draggedIndex = null;
 
-        grid.querySelectorAll('.image-preview').forEach(function(preview) {
-            preview.addEventListener('dragstart', function(e) {
+        grid.querySelectorAll('.image-preview').forEach(function (preview) {
+            preview.addEventListener('dragstart', function (e) {
                 draggedItem = this;
                 draggedIndex = parseInt(this.dataset.index, 10);
                 this.classList.add('dragging');
                 e.dataTransfer.effectAllowed = 'move';
             });
 
-            preview.addEventListener('dragend', function() {
+            preview.addEventListener('dragend', function () {
                 this.classList.remove('dragging');
                 draggedItem = null;
                 draggedIndex = null;
             });
 
-            preview.addEventListener('dragover', function(e) {
+            preview.addEventListener('dragover', function (e) {
                 e.preventDefault();
                 e.dataTransfer.dropEffect = 'move';
             });
 
-            preview.addEventListener('drop', function(e) {
+            preview.addEventListener('drop', function (e) {
                 e.preventDefault();
                 if (!draggedItem || draggedItem === this) return;
 
@@ -7261,7 +7967,7 @@ var AdminProductForm = (function() {
                 uploadedImages.splice(targetIndex, 0, item);
 
                 // Update isMain and order
-                uploadedImages.forEach(function(img, i) {
+                uploadedImages.forEach(function (img, i) {
                     img.isMain = i === 0;
                     img.order = i + 1;
                 });
@@ -7294,7 +8000,9 @@ var AdminProductForm = (function() {
         var now = new Date().toISOString();
 
         var productData = {
-            id: AdminState.editingItem ? AdminState.editingItem.id : SharedHelpers.generateId('product'),
+            id: AdminState.editingItem
+                ? AdminState.editingItem.id
+                : SharedHelpers.generateId('product'),
             name: name,
             slug: generateSlug(name),
             description: description,
@@ -7302,7 +8010,9 @@ var AdminProductForm = (function() {
             categoryId: categoryId,
             images: uploadedImages,
             status: status,
-            order: AdminState.editingItem ? AdminState.editingItem.order : AdminState.products.length + 1,
+            order: AdminState.editingItem
+                ? AdminState.editingItem.order
+                : AdminState.products.length + 1,
             createdAt: AdminState.editingItem ? AdminState.editingItem.createdAt : now,
             updatedAt: now
         };
@@ -7310,7 +8020,7 @@ var AdminProductForm = (function() {
         var products = AdminState.products.slice();
 
         if (AdminState.editingItem) {
-            var index = products.findIndex(function(p) {
+            var index = products.findIndex(function (p) {
                 return p.id === AdminState.editingItem.id;
             });
             if (index !== -1) products[index] = productData;
@@ -7337,7 +8047,7 @@ var AdminProductForm = (function() {
             return;
         }
 
-        var products = AdminState.products.filter(function(p) {
+        var products = AdminState.products.filter(function (p) {
             return p.id !== id;
         });
 
@@ -7370,7 +8080,7 @@ window.AdminProductForm = AdminProductForm;
  * Форма редактирования юридических документов
  */
 
-var AdminLegalForm = (function() {
+var AdminLegalForm = (function () {
     'use strict';
 
     var currentDocumentId = null;
@@ -7383,27 +8093,38 @@ var AdminLegalForm = (function() {
 
         var title = legalDoc ? 'Редактирование документа' : 'Новый документ';
 
-        var formHtml = '<form id="legalForm" class="modal-form">' +
+        var formHtml =
+            '<form id="legalForm" class="modal-form">' +
             '<div class="form-group">' +
-                '<label class="form-label">Название документа *</label>' +
-                '<input type="text" class="form-input" id="legalTitle" value="' + window.escapeHtml(legalDoc ? legalDoc.title : '') + '" required placeholder="Политика конфиденциальности">' +
+            '<label class="form-label">Название документа *</label>' +
+            '<input type="text" class="form-input" id="legalTitle" value="' +
+            window.escapeHtml(legalDoc ? legalDoc.title : '') +
+            '" required placeholder="Политика конфиденциальности">' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">URL-идентификатор (slug) *</label>' +
-                '<input type="text" class="form-input" id="legalSlug" value="' + window.escapeHtml(legalDoc ? legalDoc.slug : '') + '" required placeholder="privacy" pattern="[a-z0-9-]+">' +
-                '<small class="form-hint">Только латинские буквы, цифры и дефис. Будет доступен по адресу /legal/slug</small>' +
+            '<label class="form-label">URL-идентификатор (slug) *</label>' +
+            '<input type="text" class="form-input" id="legalSlug" value="' +
+            window.escapeHtml(legalDoc ? legalDoc.slug : '') +
+            '" required placeholder="privacy" pattern="[a-z0-9-]+">' +
+            '<small class="form-hint">Только латинские буквы, цифры и дефис. Будет доступен по адресу /legal/slug</small>' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Содержимое документа *</label>' +
-                AdminWYSIWYG.getEditorHTML('legalContent', legalDoc ? legalDoc.content : '', 'Введите текст документа...') +
+            '<label class="form-label">Содержимое документа *</label>' +
+            AdminWYSIWYG.getEditorHTML(
+                'legalContent',
+                legalDoc ? legalDoc.content : '',
+                'Введите текст документа...'
+            ) +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-checkbox">' +
-                    '<input type="checkbox" id="legalActive" ' + (legalDoc && legalDoc.active !== false ? 'checked' : '') + '>' +
-                    '<span>Документ активен (отображается на сайте)</span>' +
-                '</label>' +
+            '<label class="form-checkbox">' +
+            '<input type="checkbox" id="legalActive" ' +
+            (legalDoc && legalDoc.active !== false ? 'checked' : '') +
+            '>' +
+            '<span>Документ активен (отображается на сайте)</span>' +
+            '</label>' +
             '</div>' +
-        '</form>';
+            '</form>';
 
         AdminModals.setTitle('modal', title);
         var modalBody = document.getElementById('modalBody');
@@ -7414,7 +8135,7 @@ var AdminLegalForm = (function() {
 
         // Инициализация WYSIWYG редактора с тулбаром
         // Используем requestAnimationFrame для гарантии что DOM обновился
-        requestAnimationFrame(function() {
+        requestAnimationFrame(function () {
             AdminWYSIWYG.initWithToolbar('legalContent');
         });
     }
@@ -7452,7 +8173,7 @@ var AdminLegalForm = (function() {
         var documents = AdminState.legalDocuments || [];
 
         // Проверка уникальности slug
-        var existingDoc = documents.find(function(d) {
+        var existingDoc = documents.find(function (d) {
             return d.slug === slug && d.id !== currentDocumentId;
         });
 
@@ -7463,7 +8184,9 @@ var AdminLegalForm = (function() {
 
         if (currentDocumentId) {
             // Редактирование существующего
-            var index = documents.findIndex(function(d) { return d.id === currentDocumentId; });
+            var index = documents.findIndex(function (d) {
+                return d.id === currentDocumentId;
+            });
             if (index !== -1) {
                 documents[index].title = title;
                 documents[index].slug = slug;
@@ -7503,24 +8226,21 @@ var AdminLegalForm = (function() {
         var legalDoc = AdminState.findLegalDocument(id);
         if (!legalDoc) return;
 
-        AdminModals.confirmDelete(
-            legalDoc.title,
-            async function() {
-                var documents = AdminState.legalDocuments.filter(function(d) {
-                    return d.id !== id;
-                });
+        AdminModals.confirmDelete(legalDoc.title, async function () {
+            var documents = AdminState.legalDocuments.filter(function (d) {
+                return d.id !== id;
+            });
 
-                try {
-                    await AdminAPI.save('legal', { documents: documents });
-                    AdminState.setLegalDocuments(documents);
-                    AdminLegalRenderer.render();
-                    showToast('Документ удалён', 'success');
-                } catch (error) {
-                    console.error('Error deleting legal document:', error);
-                    showToast('Ошибка удаления', 'error');
-                }
+            try {
+                await AdminAPI.save('legal', { documents: documents });
+                AdminState.setLegalDocuments(documents);
+                AdminLegalRenderer.render();
+                showToast('Документ удалён', 'success');
+            } catch (error) {
+                console.error('Error deleting legal document:', error);
+                showToast('Ошибка удаления', 'error');
             }
-        );
+        });
     }
 
     // generateId теперь используется из SharedHelpers (helpers.js)
@@ -7544,7 +8264,7 @@ window.AdminLegalForm = AdminLegalForm;
  * Инициализация и координация всех модулей
  */
 
-var AdminPanel = (function() {
+var AdminPanel = (function () {
     'use strict';
 
     // DOM элементы
@@ -7602,7 +8322,9 @@ var AdminPanel = (function() {
             AdminState.setArticles((data.articles && data.articles.articles) || []);
             AdminState.setFaq((data.faq && data.faq.faq) || []);
             AdminState.setSocial(data.social || {});
-            AdminState.setShopCategories((data.shopCategories && data.shopCategories.categories) || []);
+            AdminState.setShopCategories(
+                (data.shopCategories && data.shopCategories.categories) || []
+            );
             AdminState.setProducts((data.products && data.products.products) || []);
             AdminState.setLegalDocuments((data.legal && data.legal.documents) || []);
 
@@ -7718,12 +8440,12 @@ var AdminPanel = (function() {
     async function init() {
         await AdminAuth.init(
             // onAuthenticated
-            function() {
+            function () {
                 initAdminPanel();
             },
             // onNotAuthenticated
-            function() {
-                AdminAuth.initLoginForm(function() {
+            function () {
+                AdminAuth.initLoginForm(function () {
                     initAdminPanel();
                 });
             }
@@ -7764,85 +8486,103 @@ var AdminPanel = (function() {
     // Публичный API (для совместимости с onclick в HTML)
     return {
         // Navigation
-        switchSection: function(section) { AdminRouter.switchSection(section); },
-        switchServiceCategory: function(category) { AdminRouter.switchServiceCategory(category); },
+        switchSection: function (section) {
+            AdminRouter.switchSection(section);
+        },
+        switchServiceCategory: function (category) {
+            AdminRouter.switchServiceCategory(category);
+        },
 
         // Masters
         editMaster: editMaster,
-        deleteMaster: function(id) { AdminMasterForm.remove(id); },
-        showMasterForm: function(id) {
+        deleteMaster: function (id) {
+            AdminMasterForm.remove(id);
+        },
+        showMasterForm: function (id) {
             var master = id ? AdminState.findMaster(id) : null;
             AdminMasterForm.show(master);
         },
 
         // Services
-        editService: function(categoryId, index) {
+        editService: function (categoryId, index) {
             AdminServiceForm.show(categoryId, index);
         },
-        deleteService: function(categoryId, index) {
+        deleteService: function (categoryId, index) {
             AdminServiceForm.remove(categoryId, index);
         },
-        editPodologyService: function(index) {
+        editPodologyService: function (index) {
             AdminServiceForm.showPodology(index);
         },
-        deletePodologyService: function(index) {
+        deletePodologyService: function (index) {
             AdminServiceForm.removePodology(index);
         },
 
         // Articles
         editArticle: editArticle,
-        deleteArticle: function(id) { AdminArticleForm.remove(id); },
-        showArticleForm: function(id) {
+        deleteArticle: function (id) {
+            AdminArticleForm.remove(id);
+        },
+        showArticleForm: function (id) {
             var article = id ? AdminState.findArticle(id) : null;
             AdminArticleForm.show(article);
         },
 
         // FAQ
         editFaq: editFaq,
-        deleteFaq: function(id) { AdminFaqForm.remove(id); },
-        showFaqForm: function(id) {
+        deleteFaq: function (id) {
+            AdminFaqForm.remove(id);
+        },
+        showFaqForm: function (id) {
             var faqItem = id ? AdminState.findFaq(id) : null;
             AdminFaqForm.show(faqItem);
         },
 
         // Social
-        toggleSocialActive: function(id) {
+        toggleSocialActive: function (id) {
             AdminSocialRenderer.toggleActive(id);
         },
-        saveSocial: function() {
+        saveSocial: function () {
             AdminSocialRenderer.save();
         },
 
         // Image handling
-        handleImageUpload: function(event, inputId) {
+        handleImageUpload: function (event, inputId) {
             AdminImageHandler.handleUpload(event, inputId);
         },
-        removeImage: function(inputId) {
+        removeImage: function (inputId) {
             AdminImageHandler.removeImage(inputId);
         },
 
         // Master principles
-        addPrinciple: function() { AdminMasterForm.addPrinciple(); },
-        removePrinciple: function(btn) { AdminMasterForm.removePrinciple(btn); },
+        addPrinciple: function () {
+            AdminMasterForm.addPrinciple();
+        },
+        removePrinciple: function (btn) {
+            AdminMasterForm.removePrinciple(btn);
+        },
 
         // Shop categories
         editShopCategory: editShopCategory,
-        deleteShopCategory: function(id) { AdminCategoryForm.remove(id); },
-        showCategoryForm: function(id) {
+        deleteShopCategory: function (id) {
+            AdminCategoryForm.remove(id);
+        },
+        showCategoryForm: function (id) {
             var category = id ? AdminState.findShopCategory(id) : null;
             AdminCategoryForm.show(category);
         },
 
         // Shop products
         editProduct: editProduct,
-        deleteProduct: function(id) { AdminProductForm.remove(id); },
-        showProductForm: function(id) {
+        deleteProduct: function (id) {
+            AdminProductForm.remove(id);
+        },
+        showProductForm: function (id) {
             var product = id ? AdminState.findProduct(id) : null;
             AdminProductForm.show(product);
         },
 
         // WYSIWYG
-        formatText: function(command) {
+        formatText: function (command) {
             AdminWYSIWYG.formatText(command);
         },
 

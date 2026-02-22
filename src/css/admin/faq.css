@@ -16,7 +16,9 @@
     display: flex;
     gap: 24px;
     align-items: flex-start;
-    transition: border-color var(--transition-base), box-shadow var(--transition-base);
+    transition:
+        border-color var(--transition-base),
+        box-shadow var(--transition-base);
 }
 
 .faq-admin-item:hover {
@@ -39,7 +41,7 @@
 }
 
 .faq-admin-question::before {
-    content: 'Q';
+    content: "Q";
     display: inline-flex;
     align-items: center;
     justify-content: center;

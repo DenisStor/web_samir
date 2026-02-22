@@ -20,14 +20,14 @@
     }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
     .products-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 16px;
     }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 480px) {
     .products-grid {
         grid-template-columns: 1fr;
     }
@@ -42,7 +42,10 @@
     border-radius: var(--radius-xl);
     overflow: hidden;
     border: 1px solid var(--border-subtle);
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition:
+        transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+        border-color 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     cursor: pointer;
     animation: fadeInUp 0.5s ease forwards;
     opacity: 0;
@@ -93,7 +96,7 @@
 }
 
 .product-name {
-    font-family: 'Manrope', sans-serif;
+    font-family: "Manrope", sans-serif;
     font-size: 1.1rem;
     font-weight: 600;
     color: var(--text-white);
@@ -106,7 +109,7 @@
 }
 
 .product-price {
-    font-family: 'Unbounded', sans-serif;
+    font-family: "Unbounded", sans-serif;
     font-size: 1.25rem;
     font-weight: 700;
     color: var(--accent-green);
@@ -131,11 +134,14 @@
     border: 2px solid var(--border-subtle);
     border-radius: var(--radius-md);
     color: var(--text-white);
-    font-family: 'Manrope', sans-serif;
+    font-family: "Manrope", sans-serif;
     font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background var(--transition-base), border-color var(--transition-base), color var(--transition-base);
+    transition:
+        background var(--transition-base),
+        border-color var(--transition-base),
+        color var(--transition-base);
 }
 
 .product-btn:hover {

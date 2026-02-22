@@ -20,7 +20,9 @@
     background: var(--nav-bg);
     border-bottom: 1px solid var(--border-subtle);
     /* Оптимизировано: конкретные свойства вместо all */
-    transition: padding var(--transition-base), background var(--transition-base);
+    transition:
+        padding var(--transition-base),
+        background var(--transition-base);
 }
 
 /* backdrop-filter только на мощных desktop устройствах */
@@ -49,7 +51,7 @@
    ================================================================= */
 
 .logo {
-    font-family: 'Unbounded', sans-serif;
+    font-family: "Unbounded", sans-serif;
     font-size: 1.5rem;
     font-weight: 800;
     color: var(--text-white);
@@ -84,7 +86,7 @@
 }
 
 .nav-links a::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: -4px;
     left: 0;
@@ -114,7 +116,9 @@
     border-radius: var(--radius-full);
     font-weight: 600;
     text-decoration: none;
-    transition: transform var(--transition-base), box-shadow var(--transition-base);
+    transition:
+        transform var(--transition-base),
+        box-shadow var(--transition-base);
     box-shadow: var(--shadow-glow-md);
 }
 
@@ -154,7 +158,10 @@
     width: 28px;
     height: 2px;
     background: var(--text-white);
-    transition: transform var(--transition-base), opacity var(--transition-base), top var(--transition-base);
+    transition:
+        transform var(--transition-base),
+        opacity var(--transition-base),
+        top var(--transition-base);
     transform-origin: center center;
     will-change: transform;
     backface-visibility: hidden;
@@ -221,12 +228,14 @@
 .mobile-menu a {
     color: var(--text-white);
     text-decoration: none;
-    font-family: 'Unbounded', sans-serif;
+    font-family: "Unbounded", sans-serif;
     font-size: 1.5rem;
     font-weight: 600;
     padding: 16px 0;
     border-bottom: 1px solid var(--border-light);
-    transition: color var(--transition-base), padding-left var(--transition-base);
+    transition:
+        color var(--transition-base),
+        padding-left var(--transition-base);
 }
 
 .mobile-menu a:hover {
@@ -239,7 +248,12 @@
    ================================================================= */
 
 .marquee-section {
-    background: linear-gradient(90deg, var(--bg-darker) 0%, var(--content-bg) 50%, var(--bg-darker) 100%);
+    background: linear-gradient(
+        90deg,
+        var(--bg-darker) 0%,
+        var(--content-bg) 50%,
+        var(--bg-darker) 100%
+    );
     border-top: 1px solid var(--accent-green-subtle);
     border-bottom: 1px solid var(--accent-green-subtle);
     overflow: hidden;
@@ -250,7 +264,7 @@
 
 .marquee-section::before,
 .marquee-section::after {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     bottom: 0;
@@ -286,7 +300,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    font-family: 'Unbounded', sans-serif;
+    font-family: "Unbounded", sans-serif;
     font-size: 0.95rem;
     font-weight: 600;
     color: var(--text-white);

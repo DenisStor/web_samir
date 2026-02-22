@@ -5,7 +5,7 @@
    ===================================================================== */
 
 /* Shared variables - единый источник CSS переменных */
-@import '../shared/variables.css';
+@import "../shared/variables.css";
 
-@import '../site/footer.css';
-@import 'legal.css';
+@import "../site/footer.css";
+@import "legal.css";

@@ -3,7 +3,7 @@
  * Мобильное меню и фильтры
  * @module ShopMobile
  */
-var ShopMobile = (function() {
+var ShopMobile = (function () {
     'use strict';
 
     /**
@@ -79,7 +79,7 @@ var ShopMobile = (function() {
         var scrollRAF = ShopState.getScrollRAF();
         if (scrollRAF) return;
 
-        var newRAF = requestAnimationFrame(function() {
+        var newRAF = requestAnimationFrame(function () {
             var elements = ShopState.getElements();
             if (elements.nav) {
                 if (window.scrollY > 50) {

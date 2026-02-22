@@ -6,7 +6,7 @@
  * Зависит от: utils.js
  */
 
-(function() {
+(function () {
     'use strict';
 
     var $$ = SaysApp.$$;
@@ -26,16 +26,18 @@
      */
     function initAnimations() {
         // Проверяем prefers-reduced-motion
-        var prefersReducedMotion = window.matchMedia &&
-            window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var prefersReducedMotion =
+            window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
         if (prefersReducedMotion) {
-            $$('.fade-in').forEach(function(el) { el.classList.add('visible'); });
+            $$('.fade-in').forEach(function (el) {
+                el.classList.add('visible');
+            });
             return;
         }
 
-        fadeObserver = new IntersectionObserver(function(entries) {
-            entries.forEach(function(entry) {
+        fadeObserver = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('visible');
                     // Прекращаем наблюдение после появления (оптимизация)
@@ -55,7 +57,7 @@
     function observeFadeElements() {
         if (!fadeObserver) return;
 
-        $$('.fade-in:not(.visible)').forEach(function(el) {
+        $$('.fade-in:not(.visible)').forEach(function (el) {
             fadeObserver.observe(el);
         });
     }
@@ -78,5 +80,4 @@
 
     // Запуск при готовности DOM
     ready(initAnimations);
-
 })();

@@ -3,7 +3,7 @@
  * Счётчик посещений и просмотров секций
  */
 
-(function() {
+(function () {
     'use strict';
 
     // Не отслеживаем админку
@@ -16,16 +16,16 @@
 
     // Названия секций
     var SECTION_NAMES = {
-        'hero': 'Главный экран',
-        'services': 'Услуги',
-        'podology': 'Подология',
-        'masters': 'Мастера',
-        'quality': 'О нас',
-        'location': 'Локация',
-        'social': 'Соцсети',
-        'blog': 'Блог',
-        'faq': 'FAQ',
-        'booking': 'Запись'
+        hero: 'Главный экран',
+        services: 'Услуги',
+        podology: 'Подология',
+        masters: 'Мастера',
+        quality: 'О нас',
+        location: 'Локация',
+        social: 'Соцсети',
+        blog: 'Блог',
+        faq: 'FAQ',
+        booking: 'Запись'
     };
 
     // Отслеженные секции для текущей сессии (используем объект вместо Set)
@@ -119,46 +119,49 @@
         // Храним видимость каждой секции (используем объект вместо Map)
         var visibleSections = {};
 
-        sectionObserver = new IntersectionObserver(function(entries) {
-            entries.forEach(function(entry) {
-                var sectionId = entry.target.id;
-                if (!SECTION_NAMES[sectionId]) return;
+        sectionObserver = new IntersectionObserver(
+            function (entries) {
+                entries.forEach(function (entry) {
+                    var sectionId = entry.target.id;
+                    if (!SECTION_NAMES[sectionId]) return;
 
-                if (entry.isIntersecting) {
-                    visibleSections[sectionId] = entry.intersectionRatio;
+                    if (entry.isIntersecting) {
+                        visibleSections[sectionId] = entry.intersectionRatio;
 
-                    // Отслеживаем для аналитики
-                    if (entry.intersectionRatio >= 0.3) {
-                        trackSectionView(sectionId);
+                        // Отслеживаем для аналитики
+                        if (entry.intersectionRatio >= 0.3) {
+                            trackSectionView(sectionId);
+                        }
+                    } else {
+                        delete visibleSections[sectionId];
                     }
-                } else {
-                    delete visibleSections[sectionId];
-                }
-            });
+                });
 
-            // Определяем самую видимую секцию и обновляем URL
-            var maxRatio = 0;
-            var topSection = null;
+                // Определяем самую видимую секцию и обновляем URL
+                var maxRatio = 0;
+                var topSection = null;
 
-            for (var id in visibleSections) {
-                if (visibleSections.hasOwnProperty(id)) {
-                    var ratio = visibleSections[id];
-                    if (ratio > maxRatio) {
-                        maxRatio = ratio;
-                        topSection = id;
+                for (var id in visibleSections) {
+                    if (visibleSections.hasOwnProperty(id)) {
+                        var ratio = visibleSections[id];
+                        if (ratio > maxRatio) {
+                            maxRatio = ratio;
+                            topSection = id;
+                        }
                     }
                 }
-            }
 
-            if (topSection && maxRatio >= 0.3) {
-                updateUrlHash(topSection);
+                if (topSection && maxRatio >= 0.3) {
+                    updateUrlHash(topSection);
+                }
+            },
+            {
+                // Уменьшено с 11 до 5 threshold для снижения нагрузки
+                threshold: [0, 0.3, 0.5, 0.7, 1.0]
             }
-        }, {
-            // Уменьшено с 11 до 5 threshold для снижения нагрузки
-            threshold: [0, 0.3, 0.5, 0.7, 1.0]
-        });
+        );
 
-        sections.forEach(function(section) {
+        sections.forEach(function (section) {
             if (SECTION_NAMES[section.id]) {
                 sectionObserver.observe(section);
             }
@@ -207,5 +210,4 @@
     window.SaysAnalytics = {
         cleanup: cleanup
     };
-
 })();

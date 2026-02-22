@@ -71,6 +71,11 @@ class SessionManager:
             if datetime.now() > session['expires']:
                 del self._sessions[token]
                 return False
+            # Очистка истёкших токенов
+            now = datetime.now()
+            expired = [t for t, s in self._sessions.items() if now > s['expires']]
+            for t in expired:
+                del self._sessions[t]
             return True
 
     def get(self, token):

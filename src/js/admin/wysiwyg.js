@@ -6,7 +6,7 @@
  *        undo/redo, переключатель HTML режима
  */
 
-var AdminWYSIWYG = (function() {
+var AdminWYSIWYG = (function () {
     'use strict';
 
     // =================================================================
@@ -19,7 +19,29 @@ var AdminWYSIWYG = (function() {
 
     // Конфигурация DOMPurify для всех операций
     var PURIFY_CONFIG = {
-        ALLOWED_TAGS: ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'span', 'div', 'font'],
+        ALLOWED_TAGS: [
+            'p',
+            'br',
+            'strong',
+            'b',
+            'em',
+            'i',
+            'u',
+            'a',
+            'ul',
+            'ol',
+            'li',
+            'h1',
+            'h2',
+            'h3',
+            'h4',
+            'h5',
+            'h6',
+            'blockquote',
+            'span',
+            'div',
+            'font'
+        ],
         ALLOWED_ATTR: ['href', 'target', 'class', 'style', 'color']
     };
 
@@ -284,12 +306,12 @@ var AdminWYSIWYG = (function() {
         modal.innerHTML =
             '<div class="wysiwyg-link-modal-backdrop"></div>' +
             '<div class="wysiwyg-link-modal-content">' +
-                '<div class="wysiwyg-link-modal-header">Вставить ссылку</div>' +
-                '<input type="url" class="wysiwyg-link-input" placeholder="https://example.com" autocomplete="off">' +
-                '<div class="wysiwyg-link-modal-actions">' +
-                    '<button type="button" class="wysiwyg-link-cancel">Отмена</button>' +
-                    '<button type="button" class="wysiwyg-link-confirm">Вставить</button>' +
-                '</div>' +
+            '<div class="wysiwyg-link-modal-header">Вставить ссылку</div>' +
+            '<input type="url" class="wysiwyg-link-input" placeholder="https://example.com" autocomplete="off">' +
+            '<div class="wysiwyg-link-modal-actions">' +
+            '<button type="button" class="wysiwyg-link-cancel">Отмена</button>' +
+            '<button type="button" class="wysiwyg-link-confirm">Вставить</button>' +
+            '</div>' +
             '</div>';
 
         document.body.appendChild(modal);
@@ -303,11 +325,11 @@ var AdminWYSIWYG = (function() {
         backdrop.addEventListener('click', hideLinkModal);
         cancelBtn.addEventListener('click', hideLinkModal);
 
-        confirmBtn.addEventListener('click', function() {
+        confirmBtn.addEventListener('click', function () {
             insertLinkFromModal();
         });
 
-        input.addEventListener('keydown', function(e) {
+        input.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 insertLinkFromModal();
@@ -336,7 +358,7 @@ var AdminWYSIWYG = (function() {
         modal.classList.add('visible');
 
         // Фокус на input с небольшой задержкой
-        setTimeout(function() {
+        setTimeout(function () {
             input.focus();
             input.setSelectionRange(input.value.length, input.value.length);
         }, 50);
@@ -381,7 +403,12 @@ var AdminWYSIWYG = (function() {
         if (selectedText) {
             execFormat('createLink', url);
         } else {
-            var linkHtml = '<a href="' + SharedHelpers.escapeHtml(url) + '">' + SharedHelpers.escapeHtml(url) + '</a>';
+            var linkHtml =
+                '<a href="' +
+                SharedHelpers.escapeHtml(url) +
+                '">' +
+                SharedHelpers.escapeHtml(url) +
+                '</a>';
             execFormat('insertHTML', linkHtml);
         }
 
@@ -451,7 +478,7 @@ var AdminWYSIWYG = (function() {
 
         // Отключаем другие кнопки в режиме исходного кода
         var buttons = state.toolbar.querySelectorAll('[data-command]');
-        buttons.forEach(function(b) {
+        buttons.forEach(function (b) {
             var cmd = b.getAttribute('data-command');
             if (cmd !== 'toggleSource') {
                 if (isActive) {
@@ -482,21 +509,29 @@ var AdminWYSIWYG = (function() {
             picker.className = 'color-picker-dropdown visible';
 
             var html = '<div class="color-picker-colors">';
-            COLORS.forEach(function(c) {
-                html += '<button type="button" class="color-swatch" data-color="' + c.value + '" title="' + c.name + '" style="background-color: ' + c.value + '"></button>';
+            COLORS.forEach(function (c) {
+                html +=
+                    '<button type="button" class="color-swatch" data-color="' +
+                    c.value +
+                    '" title="' +
+                    c.name +
+                    '" style="background-color: ' +
+                    c.value +
+                    '"></button>';
             });
             html += '</div>';
-            html += '<button type="button" class="color-remove-btn" data-color-remove>Убрать цвет</button>';
+            html +=
+                '<button type="button" class="color-remove-btn" data-color-remove>Убрать цвет</button>';
 
             picker.innerHTML = html;
             btn.appendChild(picker);
 
-            picker.querySelectorAll('.color-swatch').forEach(function(swatch) {
-                swatch.addEventListener('mousedown', function(e) {
+            picker.querySelectorAll('.color-swatch').forEach(function (swatch) {
+                swatch.addEventListener('mousedown', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                 });
-                swatch.addEventListener('click', function(e) {
+                swatch.addEventListener('click', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     var color = this.getAttribute('data-color');
@@ -504,14 +539,14 @@ var AdminWYSIWYG = (function() {
                 });
             });
 
-            picker.querySelector('[data-color-remove]').addEventListener('click', function(e) {
+            picker.querySelector('[data-color-remove]').addEventListener('click', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
                 removeColor(editorId);
             });
         }
 
-        document.querySelectorAll('.color-picker-dropdown.visible').forEach(function(p) {
+        document.querySelectorAll('.color-picker-dropdown.visible').forEach(function (p) {
             if (p !== picker) p.classList.remove('visible');
         });
     }
@@ -520,7 +555,7 @@ var AdminWYSIWYG = (function() {
      * Скрыть все палитры цветов
      */
     function hideColorPicker() {
-        document.querySelectorAll('.color-picker-dropdown').forEach(function(p) {
+        document.querySelectorAll('.color-picker-dropdown').forEach(function (p) {
             p.classList.remove('visible');
         });
     }
@@ -540,7 +575,7 @@ var AdminWYSIWYG = (function() {
         if (state.isSourceMode) return;
 
         var buttons = state.toolbar.querySelectorAll('.toolbar-btn:not(.disabled)');
-        buttons.forEach(function(btn) {
+        buttons.forEach(function (btn) {
             var cmd = btn.getAttribute('data-command');
             // Не трогаем toggleSource
             if (cmd !== 'toggleSource') {
@@ -616,12 +651,12 @@ var AdminWYSIWYG = (function() {
         toolbar.dataset.initialized = 'true';
 
         var buttons = toolbar.querySelectorAll('[data-command]');
-        buttons.forEach(function(btn) {
-            btn.addEventListener('mousedown', function(e) {
+        buttons.forEach(function (btn) {
+            btn.addEventListener('mousedown', function (e) {
                 e.preventDefault();
             });
 
-            btn.addEventListener('click', function(e) {
+            btn.addEventListener('click', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
 
@@ -646,7 +681,7 @@ var AdminWYSIWYG = (function() {
             });
         });
 
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (!e.target.closest('.toolbar-btn-color')) {
                 hideColorPicker();
             }
@@ -722,26 +757,26 @@ var AdminWYSIWYG = (function() {
         }
 
         // События
-        editorEl.addEventListener('blur', function() {
+        editorEl.addEventListener('blur', function () {
             saveSelection(id);
         });
 
-        editorEl.addEventListener('focus', function() {
+        editorEl.addEventListener('focus', function () {
             setActiveEditor(id);
         });
 
-        editorEl.addEventListener('keyup', function() {
+        editorEl.addEventListener('keyup', function () {
             saveSelection(id);
             updateToolbarState(id);
         });
 
-        editorEl.addEventListener('mouseup', function() {
+        editorEl.addEventListener('mouseup', function () {
             saveSelection(id);
             updateToolbarState(id);
         });
 
         // Горячие клавиши
-        editorEl.addEventListener('keydown', function(e) {
+        editorEl.addEventListener('keydown', function (e) {
             var state = getEditorState(id);
             if (state && state.isSourceMode) return;
 
@@ -774,7 +809,7 @@ var AdminWYSIWYG = (function() {
             }
         });
 
-        editorEl.addEventListener('paste', function(e) {
+        editorEl.addEventListener('paste', function (e) {
             handlePaste(e, id);
         });
 
@@ -866,13 +901,14 @@ var AdminWYSIWYG = (function() {
      * Генерировать HTML тулбара
      */
     function getToolbarHTML() {
-        return '<div class="editor-toolbar">' +
+        return (
+            '<div class="editor-toolbar">' +
             // Undo/Redo
             '<button type="button" class="toolbar-btn" data-command="undo" title="Отменить (Ctrl+Z)">' +
-                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h10a5 5 0 0 1 0 10H7"/><path d="M3 10l4-4"/><path d="M3 10l4 4"/></svg>' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h10a5 5 0 0 1 0 10H7"/><path d="M3 10l4-4"/><path d="M3 10l4 4"/></svg>' +
             '</button>' +
             '<button type="button" class="toolbar-btn" data-command="redo" title="Повторить (Ctrl+Y)">' +
-                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10H11a5 5 0 0 0 0 10h6"/><path d="M21 10l-4-4"/><path d="M21 10l-4 4"/></svg>' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10H11a5 5 0 0 0 0 10h6"/><path d="M21 10l-4-4"/><path d="M21 10l-4 4"/></svg>' +
             '</button>' +
             '<span class="toolbar-divider"></span>' +
             // Bold/Italic/Underline
@@ -887,51 +923,59 @@ var AdminWYSIWYG = (function() {
             '<span class="toolbar-divider"></span>' +
             // Lists
             '<button type="button" class="toolbar-btn" data-command="ul" title="Маркированный список">' +
-                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.5" fill="currentColor"/><circle cx="4" cy="12" r="1.5" fill="currentColor"/><circle cx="4" cy="18" r="1.5" fill="currentColor"/></svg>' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.5" fill="currentColor"/><circle cx="4" cy="12" r="1.5" fill="currentColor"/><circle cx="4" cy="18" r="1.5" fill="currentColor"/></svg>' +
             '</button>' +
             '<button type="button" class="toolbar-btn" data-command="ol" title="Нумерованный список">' +
-                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="10" y1="6" x2="20" y2="6"/><line x1="10" y1="12" x2="20" y2="12"/><line x1="10" y1="18" x2="20" y2="18"/><text x="4" y="8" font-size="8" fill="currentColor">1</text><text x="4" y="14" font-size="8" fill="currentColor">2</text><text x="4" y="20" font-size="8" fill="currentColor">3</text></svg>' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="10" y1="6" x2="20" y2="6"/><line x1="10" y1="12" x2="20" y2="12"/><line x1="10" y1="18" x2="20" y2="18"/><text x="4" y="8" font-size="8" fill="currentColor">1</text><text x="4" y="14" font-size="8" fill="currentColor">2</text><text x="4" y="20" font-size="8" fill="currentColor">3</text></svg>' +
             '</button>' +
             '<span class="toolbar-divider"></span>' +
             // Link/Quote
             '<button type="button" class="toolbar-btn" data-command="link" title="Вставить ссылку">' +
-                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>' +
             '</button>' +
             '<button type="button" class="toolbar-btn" data-command="quote" title="Цитата">' +
-                '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>' +
             '</button>' +
             '<span class="toolbar-divider"></span>' +
             // Color/Clear
             '<button type="button" class="toolbar-btn toolbar-btn-color" data-command="showColorPicker" title="Цвет текста">' +
-                '<span class="color-indicator">A</span>' +
+            '<span class="color-indicator">A</span>' +
             '</button>' +
             '<button type="button" class="toolbar-btn" data-command="removeFormat" title="Очистить форматирование">' +
-                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
             '</button>' +
             '<span class="toolbar-divider"></span>' +
             // Source mode
             '<button type="button" class="toolbar-btn" data-command="toggleSource" title="Исходный код HTML">' +
-                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>' +
             '</button>' +
-        '</div>';
+            '</div>'
+        );
     }
 
     /**
      * Генерировать HTML редактора с тулбаром
      */
     function getEditorHTML(id, content, placeholder) {
-        return '<div class="wysiwyg-wrapper">' +
+        return (
+            '<div class="wysiwyg-wrapper">' +
             getToolbarHTML() +
-            '<div class="wysiwyg-editor" id="' + id + '" contenteditable="true" data-placeholder="' + (placeholder || 'Начните писать...') + '">' +
-                (content || '') +
+            '<div class="wysiwyg-editor" id="' +
+            id +
+            '" contenteditable="true" data-placeholder="' +
+            (placeholder || 'Начните писать...') +
+            '">' +
+            (content || '') +
             '</div>' +
-        '</div>';
+            '</div>'
+        );
     }
 
     // Legacy init function for backwards compatibility
     function init(editorId, toolbarId) {
         var editorEl = typeof editorId === 'string' ? document.getElementById(editorId) : editorId;
-        var toolbarEl = typeof toolbarId === 'string' ? document.getElementById(toolbarId) : toolbarId;
+        var toolbarEl =
+            typeof toolbarId === 'string' ? document.getElementById(toolbarId) : toolbarId;
 
         if (!editorEl) return;
 
@@ -953,18 +997,18 @@ var AdminWYSIWYG = (function() {
             initToolbar(id);
         }
 
-        editorEl.addEventListener('paste', function(e) {
+        editorEl.addEventListener('paste', function (e) {
             handlePaste(e, id);
         });
-        editorEl.addEventListener('keyup', function() {
+        editorEl.addEventListener('keyup', function () {
             saveSelection(id);
             updateToolbarState(id);
         });
-        editorEl.addEventListener('mouseup', function() {
+        editorEl.addEventListener('mouseup', function () {
             saveSelection(id);
             updateToolbarState(id);
         });
-        editorEl.addEventListener('focus', function() {
+        editorEl.addEventListener('focus', function () {
             setActiveEditor(id);
         });
 

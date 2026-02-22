@@ -3,7 +3,7 @@
  * Форма добавления/редактирования категорий подологии
  */
 
-var AdminPodologyCategoryForm = (function() {
+var AdminPodologyCategoryForm = (function () {
     'use strict';
 
     var availableIcons = [
@@ -20,31 +20,50 @@ var AdminPodologyCategoryForm = (function() {
         var podology = services.podology || {};
         var categories = podology.categories || [];
 
-        var listHtml = categories.length > 0
-            ? categories.map(function(cat, index) {
-                return '<div class="category-item" data-id="' + cat.id + '">' +
-                    '<div class="category-info">' +
-                        '<strong>' + escapeHtml(cat.name) + '</strong>' +
-                        '<span>' + (cat.services ? cat.services.length : 0) + ' услуг</span>' +
-                    '</div>' +
-                    '<div class="category-actions">' +
-                        '<button class="btn btn-icon" data-action="edit-podology-category" data-id="' + cat.id + '" title="Редактировать">' +
-                            SharedIcons.get('edit') +
-                        '</button>' +
-                        '<button class="btn btn-icon danger" data-action="delete-podology-category" data-id="' + cat.id + '" title="Удалить">' +
-                            SharedIcons.get('delete') +
-                        '</button>' +
-                    '</div>' +
-                '</div>';
-            }).join('')
-            : '<p class="empty-message">Нет категорий</p>';
+        var listHtml =
+            categories.length > 0
+                ? categories
+                      .map(function (cat, index) {
+                          return (
+                              '<div class="category-item" data-id="' +
+                              cat.id +
+                              '">' +
+                              '<div class="category-info">' +
+                              '<strong>' +
+                              escapeHtml(cat.name) +
+                              '</strong>' +
+                              '<span>' +
+                              (cat.services ? cat.services.length : 0) +
+                              ' услуг</span>' +
+                              '</div>' +
+                              '<div class="category-actions">' +
+                              '<button class="btn btn-icon" data-action="edit-podology-category" data-id="' +
+                              cat.id +
+                              '" title="Редактировать">' +
+                              SharedIcons.get('edit') +
+                              '</button>' +
+                              '<button class="btn btn-icon danger" data-action="delete-podology-category" data-id="' +
+                              cat.id +
+                              '" title="Удалить">' +
+                              SharedIcons.get('delete') +
+                              '</button>' +
+                              '</div>' +
+                              '</div>'
+                          );
+                      })
+                      .join('')
+                : '<p class="empty-message">Нет категорий</p>';
 
-        var html = '<div class="categories-manager">' +
-            '<div class="categories-list">' + listHtml + '</div>' +
+        var html =
+            '<div class="categories-manager">' +
+            '<div class="categories-list">' +
+            listHtml +
+            '</div>' +
             '<button class="btn btn-primary" data-action="add-podology-category" style="margin-top: 16px;">' +
-                SharedIcons.get('plus') + ' Добавить категорию' +
+            SharedIcons.get('plus') +
+            ' Добавить категорию' +
             '</button>' +
-        '</div>';
+            '</div>';
 
         AdminModals.setTitle('modal', 'Управление категориями');
         var modalBody = document.getElementById('modalBody');
@@ -71,7 +90,9 @@ var AdminPodologyCategoryForm = (function() {
         var category = null;
 
         if (categoryId) {
-            category = categories.find(function(c) { return c.id === categoryId; });
+            category = categories.find(function (c) {
+                return c.id === categoryId;
+            });
         }
 
         AdminState.editingItem = {
@@ -82,31 +103,42 @@ var AdminPodologyCategoryForm = (function() {
 
         var title = category ? 'Редактировать категорию' : 'Добавить категорию';
 
-        var iconsHtml = availableIcons.map(function(icon) {
-            var selected = category && category.icon === icon.id ? ' selected' : '';
-            return '<option value="' + icon.id + '"' + selected + '>' + icon.name + '</option>';
-        }).join('');
+        var iconsHtml = availableIcons
+            .map(function (icon) {
+                var selected = category && category.icon === icon.id ? ' selected' : '';
+                return '<option value="' + icon.id + '"' + selected + '>' + icon.name + '</option>';
+            })
+            .join('');
 
-        var html = '<form id="podologyCategoryForm" class="admin-form">' +
+        var html =
+            '<form id="podologyCategoryForm" class="admin-form">' +
             '<div class="form-group">' +
-                '<label class="form-label">Название категории *</label>' +
-                '<input type="text" class="form-input" id="podCategoryName" value="' + escapeHtml(category && category.name || '') + '" placeholder="Комплексные программы" required>' +
+            '<label class="form-label">Название категории *</label>' +
+            '<input type="text" class="form-input" id="podCategoryName" value="' +
+            escapeHtml((category && category.name) || '') +
+            '" placeholder="Комплексные программы" required>' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Описание</label>' +
-                '<input type="text" class="form-input" id="podCategoryDescription" value="' + escapeHtml(category && category.description || '') + '" placeholder="Выгодные пакеты услуг">' +
+            '<label class="form-label">Описание</label>' +
+            '<input type="text" class="form-input" id="podCategoryDescription" value="' +
+            escapeHtml((category && category.description) || '') +
+            '" placeholder="Выгодные пакеты услуг">' +
             '</div>' +
             '<div class="form-row">' +
-                '<div class="form-group">' +
-                    '<label class="form-label">Иконка</label>' +
-                    '<select class="form-select" id="podCategoryIcon">' + iconsHtml + '</select>' +
-                '</div>' +
-                '<div class="form-group">' +
-                    '<label class="form-label">Бейдж</label>' +
-                    '<input type="text" class="form-input" id="podCategoryBadge" value="' + escapeHtml(category && category.badge || '') + '" placeholder="Выгодно">' +
-                '</div>' +
+            '<div class="form-group">' +
+            '<label class="form-label">Иконка</label>' +
+            '<select class="form-select" id="podCategoryIcon">' +
+            iconsHtml +
+            '</select>' +
             '</div>' +
-        '</form>';
+            '<div class="form-group">' +
+            '<label class="form-label">Бейдж</label>' +
+            '<input type="text" class="form-input" id="podCategoryBadge" value="' +
+            escapeHtml((category && category.badge) || '') +
+            '" placeholder="Выгодно">' +
+            '</div>' +
+            '</div>' +
+            '</form>';
 
         AdminModals.setTitle('modal', title);
         var modalBody = document.getElementById('modalBody');
@@ -143,7 +175,12 @@ var AdminPodologyCategoryForm = (function() {
         var badgeEl = document.getElementById('podCategoryBadge');
 
         var categoryData = {
-            id: editing.category ? editing.category.id : name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+            id: editing.category
+                ? editing.category.id
+                : name
+                      .toLowerCase()
+                      .replace(/\s+/g, '-')
+                      .replace(/[^a-z0-9-]/g, ''),
             name: name,
             description: descEl ? descEl.value.trim() : '',
             icon: iconEl ? iconEl.value : 'heart',
@@ -160,7 +197,7 @@ var AdminPodologyCategoryForm = (function() {
         }
 
         if (editing.categoryId) {
-            var index = services.podology.categories.findIndex(function(c) {
+            var index = services.podology.categories.findIndex(function (c) {
                 return c.id === editing.categoryId;
             });
             if (index !== -1) {
@@ -192,15 +229,14 @@ var AdminPodologyCategoryForm = (function() {
         var services = AdminState.services || {};
         if (!services.podology || !services.podology.categories) return;
 
-        services.podology.categories = services.podology.categories.filter(function(c) {
+        services.podology.categories = services.podology.categories.filter(function (c) {
             return c.id !== categoryId;
         });
 
         // Если удалили текущую категорию, переключаемся на первую
         if (AdminState.currentPodologyCategory === categoryId) {
-            AdminState.currentPodologyCategory = services.podology.categories.length > 0
-                ? services.podology.categories[0].id
-                : '';
+            AdminState.currentPodologyCategory =
+                services.podology.categories.length > 0 ? services.podology.categories[0].id : '';
         }
 
         try {

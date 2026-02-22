@@ -3,8 +3,10 @@
  * Фильтрация и категории магазина
  * @module ShopFilters
  */
-var ShopFilters = (function() {
+var ShopFilters = (function () {
     'use strict';
+
+    var escapeHtml = window.escapeHtml;
 
     /**
      * Рендер категорий
@@ -34,7 +36,7 @@ var ShopFilters = (function() {
                 activeCategories.push(categories[j]);
             }
         }
-        activeCategories.sort(function(a, b) {
+        activeCategories.sort(function (a, b) {
             return (a.order || 0) - (b.order || 0);
         });
 
@@ -45,11 +47,20 @@ var ShopFilters = (function() {
             var count = getProductCount(cat.id);
             var icon = ShopRenderer.getCategoryIcon(cat.slug).replace('category-icon', 'chip-icon');
             var isActive = currentCategory === cat.slug ? ' active' : '';
-            html += '<button class="category-chip' + isActive + '" data-category="' + escapeHtml(cat.slug) + '">' +
+            html +=
+                '<button class="category-chip' +
+                isActive +
+                '" data-category="' +
+                escapeHtml(cat.slug) +
+                '">' +
                 icon +
-                '<span>' + escapeHtml(cat.name) + '</span>' +
-                '<span class="chip-count">' + count + '</span>' +
-            '</button>';
+                '<span>' +
+                escapeHtml(cat.name) +
+                '</span>' +
+                '<span class="chip-count">' +
+                count +
+                '</span>' +
+                '</button>';
         }
 
         if (elements.categoriesChips) {
@@ -62,7 +73,6 @@ var ShopFilters = (function() {
      */
     function renderProducts() {
         var elements = ShopState.getElements();
-        var categories = ShopState.getCategories();
         var products = ShopState.getProducts();
         var currentCategory = ShopState.getCurrentCategory();
         var searchQuery = ShopState.getSearchQuery();
@@ -78,13 +88,7 @@ var ShopFilters = (function() {
 
         // Filter by category
         if (currentCategory !== 'all') {
-            var category = null;
-            for (var j = 0; j < categories.length; j++) {
-                if (categories[j].slug === currentCategory) {
-                    category = categories[j];
-                    break;
-                }
-            }
+            var category = ShopState.getCategoryBySlug(currentCategory);
             if (category) {
                 var categoryFiltered = [];
                 for (var k = 0; k < filtered.length; k++) {
@@ -102,7 +106,8 @@ var ShopFilters = (function() {
             for (var m = 0; m < filtered.length; m++) {
                 var p = filtered[m];
                 var nameMatch = p.name.toLowerCase().indexOf(searchQuery) !== -1;
-                var descMatch = p.description && p.description.toLowerCase().indexOf(searchQuery) !== -1;
+                var descMatch =
+                    p.description && p.description.toLowerCase().indexOf(searchQuery) !== -1;
                 if (nameMatch || descMatch) {
                     searchFiltered.push(p);
                 }
@@ -117,7 +122,10 @@ var ShopFilters = (function() {
             var emptyText = searchQuery
                 ? 'По запросу «' + escapeHtml(searchQuery) + '» ничего не найдено'
                 : 'В этой категории пока нет товаров';
-            elements.productsGrid.innerHTML = ShopRenderer.renderEmptyState(emptyText, 'Попробуйте изменить параметры поиска');
+            elements.productsGrid.innerHTML = ShopRenderer.renderEmptyState(
+                emptyText,
+                'Попробуйте изменить параметры поиска'
+            );
             return;
         }
 
@@ -139,13 +147,21 @@ var ShopFilters = (function() {
         var sorted = items.slice();
         switch (sortBy) {
             case 'price-asc':
-                return sorted.sort(function(a, b) { return a.price - b.price; });
+                return sorted.sort(function (a, b) {
+                    return a.price - b.price;
+                });
             case 'price-desc':
-                return sorted.sort(function(a, b) { return b.price - a.price; });
+                return sorted.sort(function (a, b) {
+                    return b.price - a.price;
+                });
             case 'name':
-                return sorted.sort(function(a, b) { return a.name.localeCompare(b.name, 'ru'); });
+                return sorted.sort(function (a, b) {
+                    return a.name.localeCompare(b.name, 'ru');
+                });
             default:
-                return sorted.sort(function(a, b) { return (a.order || 0) - (b.order || 0); });
+                return sorted.sort(function (a, b) {
+                    return (a.order || 0) - (b.order || 0);
+                });
         }
     }
 

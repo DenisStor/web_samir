@@ -26,7 +26,10 @@
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
-    transition: background var(--transition-base), border-color var(--transition-base), color var(--transition-base);
+    transition:
+        background var(--transition-base),
+        border-color var(--transition-base),
+        color var(--transition-base);
 }
 
 .toolbar-btn:hover {
@@ -204,7 +207,9 @@
     z-index: var(--z-dropdown);
     opacity: 0;
     visibility: hidden;
-    transition: opacity var(--transition-fast), visibility var(--transition-fast);
+    transition:
+        opacity var(--transition-fast),
+        visibility var(--transition-fast);
 }
 
 .color-picker-dropdown.visible {
@@ -213,7 +218,7 @@
 }
 
 .color-picker-dropdown::before {
-    content: '';
+    content: "";
     position: absolute;
     top: -6px;
     left: 50%;
@@ -238,7 +243,9 @@
     border: 2px solid transparent;
     border-radius: var(--radius-sm);
     cursor: pointer;
-    transition: transform var(--transition-fast), border-color var(--transition-fast);
+    transition:
+        transform var(--transition-fast),
+        border-color var(--transition-fast);
 }
 
 .color-swatch:hover {
@@ -255,7 +262,10 @@
     color: var(--text-gray);
     font-size: 12px;
     cursor: pointer;
-    transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+    transition:
+        background var(--transition-fast),
+        color var(--transition-fast),
+        border-color var(--transition-fast);
 }
 
 .color-remove-btn:hover {
@@ -290,7 +300,7 @@
     border-top: none;
     border-radius: 0 0 var(--radius-md) var(--radius-md);
     color: var(--accent-green);
-    font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+    font-family: "Menlo", "Monaco", "Courier New", monospace;
     font-size: 13px;
     line-height: 1.6;
     resize: vertical;
@@ -325,7 +335,9 @@
     justify-content: center;
     opacity: 0;
     visibility: hidden;
-    transition: opacity var(--transition-base), visibility var(--transition-base);
+    transition:
+        opacity var(--transition-base),
+        visibility var(--transition-base);
 }
 
 .wysiwyg-link-modal.visible {
@@ -402,7 +414,10 @@
     font-size: 0.9375rem;
     font-weight: 500;
     cursor: pointer;
-    transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+    transition:
+        background var(--transition-fast),
+        border-color var(--transition-fast),
+        color var(--transition-fast);
 }
 
 .wysiwyg-link-cancel {

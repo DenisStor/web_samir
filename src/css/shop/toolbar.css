@@ -43,12 +43,15 @@
     border: 1.5px solid var(--border-subtle);
     border-radius: 100px;
     color: var(--text-gray);
-    font-family: 'Manrope', sans-serif;
+    font-family: "Manrope", sans-serif;
     font-size: 0.85rem;
     font-weight: 500;
     white-space: nowrap;
     cursor: pointer;
-    transition: background var(--transition-base), border-color var(--transition-base), color var(--transition-base);
+    transition:
+        background var(--transition-base),
+        border-color var(--transition-base),
+        color var(--transition-base);
 }
 
 .category-chip:hover {
@@ -102,7 +105,7 @@
     border-radius: 100px;
     color: var(--text-white);
     font-size: 0.85rem;
-    font-family: 'Manrope', sans-serif;
+    font-family: "Manrope", sans-serif;
     cursor: pointer;
     transition: border-color var(--transition-base);
     appearance: none;

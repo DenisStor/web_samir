@@ -3,7 +3,7 @@
  * Форма добавления/редактирования услуги
  */
 
-var AdminServiceForm = (function() {
+var AdminServiceForm = (function () {
     'use strict';
 
     /**
@@ -17,7 +17,7 @@ var AdminServiceForm = (function() {
         var service = null;
 
         if (services.categories) {
-            category = services.categories.find(function(c) {
+            category = services.categories.find(function (c) {
                 return c.id === categoryId;
             });
         }
@@ -34,29 +34,38 @@ var AdminServiceForm = (function() {
 
         var title = service ? 'Редактировать услугу' : 'Добавить услугу';
 
-        var html = '<form id="serviceForm" class="admin-form">' +
+        var html =
+            '<form id="serviceForm" class="admin-form">' +
             '<div class="form-group">' +
-                '<label class="form-label">Название услуги *</label>' +
-                '<input type="text" class="form-input" id="serviceName" value="' + window.escapeHtml(service && service.name || '') + '" placeholder="Введите название услуги" required>' +
+            '<label class="form-label">Название услуги *</label>' +
+            '<input type="text" class="form-input" id="serviceName" value="' +
+            window.escapeHtml((service && service.name) || '') +
+            '" placeholder="Введите название услуги" required>' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Цены по уровням мастеров</label>' +
-                '<div class="form-row">' +
-                    '<div class="form-group">' +
-                        '<label class="form-label price-label-green">Green</label>' +
-                        '<input type="number" class="form-input" id="priceGreen" value="' + (service && service.priceGreen || '') + '" placeholder="1000">' +
-                    '</div>' +
-                    '<div class="form-group">' +
-                        '<label class="form-label price-label-pink">Pink</label>' +
-                        '<input type="number" class="form-input" id="pricePink" value="' + (service && service.pricePink || '') + '" placeholder="1300">' +
-                    '</div>' +
-                    '<div class="form-group">' +
-                        '<label class="form-label price-label-blue">Dark Blue</label>' +
-                        '<input type="number" class="form-input" id="priceBlue" value="' + (service && service.priceBlue || '') + '" placeholder="1500">' +
-                    '</div>' +
-                '</div>' +
+            '<label class="form-label">Цены по уровням мастеров</label>' +
+            '<div class="form-row">' +
+            '<div class="form-group">' +
+            '<label class="form-label price-label-green">Green</label>' +
+            '<input type="number" class="form-input" id="priceGreen" value="' +
+            ((service && service.priceGreen) || '') +
+            '" placeholder="1000">' +
             '</div>' +
-        '</form>';
+            '<div class="form-group">' +
+            '<label class="form-label price-label-pink">Pink</label>' +
+            '<input type="number" class="form-input" id="pricePink" value="' +
+            ((service && service.pricePink) || '') +
+            '" placeholder="1300">' +
+            '</div>' +
+            '<div class="form-group">' +
+            '<label class="form-label price-label-blue">Dark Blue</label>' +
+            '<input type="number" class="form-input" id="priceBlue" value="' +
+            ((service && service.priceBlue) || '') +
+            '" placeholder="1500">' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '</form>';
 
         AdminModals.setTitle('modal', title);
         var modalBody = document.getElementById('modalBody');
@@ -75,7 +84,9 @@ var AdminServiceForm = (function() {
         var services = AdminState.services || {};
         var podology = services.podology || {};
         var categories = podology.categories || [];
-        var category = categories.find(function(c) { return c.id === categoryId; });
+        var category = categories.find(function (c) {
+            return c.id === categoryId;
+        });
         var service = null;
 
         if (category && index !== null && index !== undefined) {
@@ -91,26 +102,35 @@ var AdminServiceForm = (function() {
 
         var title = service ? 'Редактировать услугу' : 'Добавить услугу подологии';
 
-        var html = '<form id="podologyForm" class="admin-form">' +
+        var html =
+            '<form id="podologyForm" class="admin-form">' +
             '<div class="form-group">' +
-                '<label class="form-label">Название услуги *</label>' +
-                '<input type="text" class="form-input" id="podologyName" value="' + window.escapeHtml(service && service.name || '') + '" placeholder="Введите название услуги" required>' +
+            '<label class="form-label">Название услуги *</label>' +
+            '<input type="text" class="form-input" id="podologyName" value="' +
+            window.escapeHtml((service && service.name) || '') +
+            '" placeholder="Введите название услуги" required>' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Длительность</label>' +
-                '<input type="text" class="form-input" id="podologyDuration" value="' + window.escapeHtml(service && service.duration || '') + '" placeholder="1 час 30 минут">' +
+            '<label class="form-label">Длительность</label>' +
+            '<input type="text" class="form-input" id="podologyDuration" value="' +
+            window.escapeHtml((service && service.duration) || '') +
+            '" placeholder="1 час 30 минут">' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Цена</label>' +
-                '<input type="text" class="form-input" id="podologyPrice" value="' + window.escapeHtml(service && service.price || '') + '" placeholder="2500 ₽">' +
+            '<label class="form-label">Цена</label>' +
+            '<input type="text" class="form-input" id="podologyPrice" value="' +
+            window.escapeHtml((service && service.price) || '') +
+            '" placeholder="2500 ₽">' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-checkbox">' +
-                    '<input type="checkbox" id="podologyFeatured"' + (service && service.featured ? ' checked' : '') + '>' +
-                    '<span>Выделить услугу</span>' +
-                '</label>' +
+            '<label class="form-checkbox">' +
+            '<input type="checkbox" id="podologyFeatured"' +
+            (service && service.featured ? ' checked' : '') +
+            '>' +
+            '<span>Выделить услугу</span>' +
+            '</label>' +
             '</div>' +
-        '</form>';
+            '</form>';
 
         AdminModals.setTitle('modal', title);
         var modalBody = document.getElementById('modalBody');
@@ -171,7 +191,7 @@ var AdminServiceForm = (function() {
             services.categories = [];
         }
 
-        var category = services.categories.find(function(c) {
+        var category = services.categories.find(function (c) {
             return c.id === categoryId;
         });
 
@@ -242,7 +262,7 @@ var AdminServiceForm = (function() {
             services.podology.categories = [];
         }
 
-        var category = services.podology.categories.find(function(c) {
+        var category = services.podology.categories.find(function (c) {
             return c.id === categoryId;
         });
 
@@ -281,9 +301,11 @@ var AdminServiceForm = (function() {
         }
 
         var services = AdminState.services || {};
-        var category = services.categories && services.categories.find(function(c) {
-            return c.id === categoryId;
-        });
+        var category =
+            services.categories &&
+            services.categories.find(function (c) {
+                return c.id === categoryId;
+            });
 
         if (category && category.services) {
             category.services.splice(index, 1);
@@ -310,7 +332,7 @@ var AdminServiceForm = (function() {
         var services = AdminState.services || {};
 
         if (services.podology && services.podology.categories) {
-            var category = services.podology.categories.find(function(c) {
+            var category = services.podology.categories.find(function (c) {
                 return c.id === categoryId;
             });
             if (category && category.services) {

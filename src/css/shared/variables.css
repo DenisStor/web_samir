@@ -20,16 +20,12 @@
     --accent-green: #00ff88;
     --accent-green-dim: #00cc6a;
     --accent-green-glow: rgba(0, 255, 136, 0.3);
-    --accent-green-glow-strong: rgba(0, 255, 136, 0.4);
-    --accent-green-glow-intense: rgba(0, 255, 136, 0.5);
+    --accent-green-glow-strong: rgba(0, 255, 136, 0.45);
     --accent-green-subtle: rgba(0, 255, 136, 0.1);
     --accent-green-hover: rgba(0, 255, 136, 0.15);
     --accent-green-muted: rgba(0, 255, 136, 0.08);
     --accent-green-faint: rgba(0, 255, 136, 0.05);
-    --accent-green-06: rgba(0, 255, 136, 0.06);
-    --accent-green-ghost: rgba(0, 255, 136, 0.02);
-    --accent-green-03: rgba(0, 255, 136, 0.03);
-    --accent-green-12: rgba(0, 255, 136, 0.12);
+    --accent-green-ghost: rgba(0, 255, 136, 0.03);
 
     /* Текст */
     --text-white: #ffffff;
@@ -174,7 +170,6 @@
     --shadow-black-25: rgba(0, 0, 0, 0.25);
     --shadow-black-30: rgba(0, 0, 0, 0.3);
     --shadow-black-40: rgba(0, 0, 0, 0.4);
-    --shadow-black-50: rgba(0, 0, 0, 0.5);
     --shadow-black-60: rgba(0, 0, 0, 0.6);
 
     /* =================================================================

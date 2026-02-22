@@ -2,7 +2,7 @@
  * Admin Search Module
  * Поиск и фильтрация элементов в списках
  */
-var AdminSearch = (function() {
+var AdminSearch = (function () {
     'use strict';
 
     var searchConfigs = {};
@@ -35,7 +35,7 @@ var AdminSearch = (function() {
         searchConfigs[inputId] = config;
 
         // Обработчик ввода
-        input.addEventListener('input', function() {
+        input.addEventListener('input', function () {
             handleInput(inputId, input.value);
         });
 
@@ -44,7 +44,7 @@ var AdminSearch = (function() {
         if (searchBox) {
             var clearBtn = searchBox.querySelector('.search-clear');
             if (clearBtn) {
-                clearBtn.addEventListener('click', function() {
+                clearBtn.addEventListener('click', function () {
                     input.value = '';
                     handleInput(inputId, '');
                     input.focus();
@@ -75,7 +75,7 @@ var AdminSearch = (function() {
             clearTimeout(debounceTimers[inputId]);
         }
 
-        debounceTimers[inputId] = setTimeout(function() {
+        debounceTimers[inputId] = setTimeout(function () {
             filterItems(config, value);
         }, config.debounce);
     }
@@ -103,9 +103,12 @@ var AdminSearch = (function() {
         var visibleCount = 0;
         var totalCount = items.length;
 
-        items.forEach(function(item) {
+        items.forEach(function (item) {
             // Пропускаем сообщения о пустом списке
-            if (item.classList.contains('empty-message') || item.classList.contains('empty-state')) {
+            if (
+                item.classList.contains('empty-message') ||
+                item.classList.contains('empty-state')
+            ) {
                 return;
             }
 

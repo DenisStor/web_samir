@@ -3,22 +3,26 @@
  * Управление модальными окнами
  */
 
-var AdminModals = (function() {
+var AdminModals = (function () {
     'use strict';
 
     var currentModal = null;
     var escapeHandlerBound = false;
     var overlayClickHandlerBound = false;
     var boundCloseHandlers = []; // Хранение ссылок на обработчики для cleanup
-    var boundOpenHandlers = [];  // Хранение ссылок на обработчики для cleanup
+    var boundOpenHandlers = []; // Хранение ссылок на обработчики для cleanup
 
     /**
      * Открыть модальное окно
      */
     function open(modalId) {
         // Для modal и deleteModal - активируем overlay
-        var overlayId = modalId === 'modal' ? 'modalOverlay' :
-                        modalId === 'deleteModal' ? 'deleteModalOverlay' : modalId;
+        var overlayId =
+            modalId === 'modal'
+                ? 'modalOverlay'
+                : modalId === 'deleteModal'
+                  ? 'deleteModalOverlay'
+                  : modalId;
         var overlay = document.getElementById(overlayId);
         if (!overlay) {
             console.error('Modal overlay not found:', overlayId);
@@ -48,8 +52,12 @@ var AdminModals = (function() {
     function close(modalId) {
         var overlay;
         if (modalId) {
-            var overlayId = modalId === 'modal' ? 'modalOverlay' :
-                            modalId === 'deleteModal' ? 'deleteModalOverlay' : modalId;
+            var overlayId =
+                modalId === 'modal'
+                    ? 'modalOverlay'
+                    : modalId === 'deleteModal'
+                      ? 'deleteModalOverlay'
+                      : modalId;
             overlay = document.getElementById(overlayId);
         } else {
             overlay = currentModal;
@@ -214,8 +222,8 @@ var AdminModals = (function() {
 
         // Инициализация кнопок закрытия
         var closeButtons = document.querySelectorAll('.modal-close, [data-modal-close]');
-        closeButtons.forEach(function(btn) {
-            var handler = function(e) {
+        closeButtons.forEach(function (btn) {
+            var handler = function (e) {
                 e.preventDefault();
                 closeCurrent();
             };
@@ -225,8 +233,8 @@ var AdminModals = (function() {
 
         // Инициализация кнопок открытия
         var openButtons = document.querySelectorAll('[data-modal-open]');
-        openButtons.forEach(function(btn) {
-            var handler = function(e) {
+        openButtons.forEach(function (btn) {
+            var handler = function (e) {
                 e.preventDefault();
                 var modalId = btn.getAttribute('data-modal-open');
                 if (modalId) {
@@ -248,13 +256,13 @@ var AdminModals = (function() {
         }
 
         // Удаляем обработчики кнопок закрытия
-        boundCloseHandlers.forEach(function(item) {
+        boundCloseHandlers.forEach(function (item) {
             item.element.removeEventListener('click', item.handler);
         });
         boundCloseHandlers = [];
 
         // Удаляем обработчики кнопок открытия
-        boundOpenHandlers.forEach(function(item) {
+        boundOpenHandlers.forEach(function (item) {
             item.element.removeEventListener('click', item.handler);
         });
         boundOpenHandlers = [];

@@ -3,8 +3,12 @@
  * Логика модального окна блога для динамически загруженных статей
  */
 
-var BlogModal = (function() {
+var BlogModal = (function () {
     'use strict';
+
+    var escapeHtml = window.escapeHtml;
+    var escapeAttr = window.SharedHelpers ? SharedHelpers.escapeAttr : window.escapeAttr;
+    var formatDate = window.SharedHelpers ? SharedHelpers.formatDate : window.formatDate;
 
     // Store escape handler reference for cleanup
     var currentEscapeHandler = null;
@@ -21,7 +25,28 @@ var BlogModal = (function() {
     function sanitizeHTML(html) {
         if (typeof DOMPurify !== 'undefined') {
             return DOMPurify.sanitize(html, {
-                ALLOWED_TAGS: ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'span', 'div'],
+                ALLOWED_TAGS: [
+                    'p',
+                    'br',
+                    'strong',
+                    'b',
+                    'em',
+                    'i',
+                    'u',
+                    'a',
+                    'ul',
+                    'ol',
+                    'li',
+                    'h1',
+                    'h2',
+                    'h3',
+                    'h4',
+                    'h5',
+                    'h6',
+                    'blockquote',
+                    'span',
+                    'div'
+                ],
                 ALLOWED_ATTR: ['href', 'target', 'class', 'style'],
                 ALLOW_DATA_ATTR: false
             });
@@ -57,13 +82,23 @@ var BlogModal = (function() {
         // Заполняем шапку (категория + дата)
         if (topMeta) {
             topMeta.innerHTML =
-                '<span class="blog-modal-tag">' + escapeHtml(article.tag || 'Статья') + '</span>' +
-                '<span class="blog-modal-date">' + (icons.calendar || '') + ' ' + dateText + '</span>';
+                '<span class="blog-modal-tag">' +
+                escapeHtml(article.tag || 'Статья') +
+                '</span>' +
+                '<span class="blog-modal-date">' +
+                (icons.calendar || '') +
+                ' ' +
+                dateText +
+                '</span>';
         }
 
         // Генерируем HTML для изображения
         var imageHtml = article.image
-            ? '<div class="blog-modal-image"><img src="' + safeImage + '" alt="' + safeTitle + '" style="width:100%; height:100%; object-fit:cover;"></div>'
+            ? '<div class="blog-modal-image"><img src="' +
+              safeImage +
+              '" alt="' +
+              safeTitle +
+              '" style="width:100%; height:100%; object-fit:cover;"></div>'
             : '';
 
         // Обработка контента
@@ -72,9 +107,14 @@ var BlogModal = (function() {
         if (/<[a-z][\s\S]*>/i.test(content)) {
             contentHtml = sanitizeHTML(content);
         } else {
-            contentHtml = content.split('\n\n')
-                .filter(function(p) { return p.trim(); })
-                .map(function(p) { return '<p>' + escapeHtml(p).replace(/\n/g, '<br>') + '</p>'; })
+            contentHtml = content
+                .split('\n\n')
+                .filter(function (p) {
+                    return p.trim();
+                })
+                .map(function (p) {
+                    return '<p>' + escapeHtml(p).replace(/\n/g, '<br>') + '</p>';
+                })
                 .join('');
             if (!contentHtml) {
                 contentHtml = '<p>' + escapeHtml(article.excerpt || '') + '</p>';
@@ -84,8 +124,12 @@ var BlogModal = (function() {
         // Генерируем полный HTML и вставляем в контейнер
         container.innerHTML =
             imageHtml +
-            '<h2 class="blog-modal-title">' + escapeHtml(article.title || '') + '</h2>' +
-            '<div class="blog-modal-body">' + contentHtml + '</div>';
+            '<h2 class="blog-modal-title">' +
+            escapeHtml(article.title || '') +
+            '</h2>' +
+            '<div class="blog-modal-body">' +
+            contentHtml +
+            '</div>';
 
         // Show modal
         modal.classList.add('active');
@@ -97,7 +141,7 @@ var BlogModal = (function() {
         }
 
         // Handle escape key
-        currentEscapeHandler = function(e) {
+        currentEscapeHandler = function (e) {
             if (e.key === 'Escape') {
                 close();
             }
@@ -112,7 +156,9 @@ var BlogModal = (function() {
     function open(articleId) {
         // Try dynamic data first
         if (window.dynamicArticlesData) {
-            var article = window.dynamicArticlesData.find(function(a) { return a.id === articleId; });
+            var article = window.dynamicArticlesData.find(function (a) {
+                return a.id === articleId;
+            });
             if (article) {
                 showDynamicArticleModal(article);
                 return;

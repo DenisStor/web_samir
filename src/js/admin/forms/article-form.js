@@ -3,7 +3,7 @@
  * Форма добавления/редактирования статьи
  */
 
-var AdminArticleForm = (function() {
+var AdminArticleForm = (function () {
     'use strict';
 
     /**
@@ -15,41 +15,64 @@ var AdminArticleForm = (function() {
         var title = article ? 'Редактировать статью' : 'Добавить статью';
         var today = new Date().toISOString().split('T')[0];
 
-        var html = '<form id="articleForm" class="admin-form">' +
+        var html =
+            '<form id="articleForm" class="admin-form">' +
             '<div class="form-group">' +
-                '<label class="form-label">Изображение</label>' +
-                '<div class="image-upload ' + (article && article.image ? 'has-image' : '') + '" id="articleImageUpload">' +
-                    (article && article.image ? '<img src="' + article.image + '" alt="Изображение">' : '') +
-                    '<input type="file" accept="image/*" data-upload-target="articleImage">' +
-                    SharedIcons.get('upload') +
-                    '<span>Нажмите для загрузки изображения</span>' +
-                    (article && article.image ? '<button type="button" class="remove-image" data-action="remove-image" data-target="articleImage">' + SharedIcons.get('close') + '</button>' : '') +
-                '</div>' +
-                '<input type="hidden" id="articleImage" value="' + (article && article.image ? article.image : '') + '">' +
+            '<label class="form-label">Изображение</label>' +
+            '<div class="image-upload ' +
+            (article && article.image ? 'has-image' : '') +
+            '" id="articleImageUpload">' +
+            (article && article.image
+                ? '<img src="' + article.image + '" alt="Изображение">'
+                : '') +
+            '<input type="file" accept="image/*" data-upload-target="articleImage">' +
+            SharedIcons.get('upload') +
+            '<span>Нажмите для загрузки изображения</span>' +
+            (article && article.image
+                ? '<button type="button" class="remove-image" data-action="remove-image" data-target="articleImage">' +
+                  SharedIcons.get('close') +
+                  '</button>'
+                : '') +
+            '</div>' +
+            '<input type="hidden" id="articleImage" value="' +
+            (article && article.image ? article.image : '') +
+            '">' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Заголовок *</label>' +
-                '<input type="text" class="form-input" id="articleTitle" value="' + window.escapeHtml(article && article.title || '') + '" placeholder="Введите заголовок статьи" required>' +
+            '<label class="form-label">Заголовок *</label>' +
+            '<input type="text" class="form-input" id="articleTitle" value="' +
+            window.escapeHtml((article && article.title) || '') +
+            '" placeholder="Введите заголовок статьи" required>' +
             '</div>' +
             '<div class="form-row form-row-2">' +
-                '<div class="form-group">' +
-                    '<label class="form-label">Тег/Категория</label>' +
-                    '<input type="text" class="form-input" id="articleTag" value="' + window.escapeHtml(article && article.tag || '') + '" placeholder="Уход за волосами">' +
-                '</div>' +
-                '<div class="form-group">' +
-                    '<label class="form-label">Дата публикации</label>' +
-                    '<input type="date" class="form-input" id="articleDate" value="' + (article && article.date || today) + '">' +
-                '</div>' +
+            '<div class="form-group">' +
+            '<label class="form-label">Тег/Категория</label>' +
+            '<input type="text" class="form-input" id="articleTag" value="' +
+            window.escapeHtml((article && article.tag) || '') +
+            '" placeholder="Уход за волосами">' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Краткое описание</label>' +
-                '<textarea class="form-textarea" id="articleExcerpt" placeholder="Краткое описание для превью статьи...">' + window.escapeHtml(article && article.excerpt || '') + '</textarea>' +
+            '<label class="form-label">Дата публикации</label>' +
+            '<input type="date" class="form-input" id="articleDate" value="' +
+            ((article && article.date) || today) +
+            '">' +
+            '</div>' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Полный текст статьи</label>' +
-                AdminWYSIWYG.getEditorHTML('articleContent', article && article.content || '', 'Начните писать текст статьи...') +
+            '<label class="form-label">Краткое описание</label>' +
+            '<textarea class="form-textarea" id="articleExcerpt" placeholder="Краткое описание для превью статьи...">' +
+            window.escapeHtml((article && article.excerpt) || '') +
+            '</textarea>' +
             '</div>' +
-        '</form>';
+            '<div class="form-group">' +
+            '<label class="form-label">Полный текст статьи</label>' +
+            AdminWYSIWYG.getEditorHTML(
+                'articleContent',
+                (article && article.content) || '',
+                'Начните писать текст статьи...'
+            ) +
+            '</div>' +
+            '</form>';
 
         AdminModals.setTitle('modal', title);
         var modalBody = document.getElementById('modalBody');
@@ -59,7 +82,7 @@ var AdminArticleForm = (function() {
         AdminModals.open('modal');
 
         // Инициализация редактора после рендеринга DOM
-        requestAnimationFrame(function() {
+        requestAnimationFrame(function () {
             AdminWYSIWYG.initWithToolbar('articleContent');
         });
     }
@@ -88,7 +111,9 @@ var AdminArticleForm = (function() {
         var image = imageEl ? imageEl.value : null;
 
         var articleData = {
-            id: AdminState.editingItem ? AdminState.editingItem.id : SharedHelpers.generateId('article'),
+            id: AdminState.editingItem
+                ? AdminState.editingItem.id
+                : SharedHelpers.generateId('article'),
             title: title,
             tag: tag || 'Статья',
             date: date,
@@ -101,7 +126,7 @@ var AdminArticleForm = (function() {
         var articles = AdminState.articles || [];
 
         if (AdminState.editingItem) {
-            var index = articles.findIndex(function(a) {
+            var index = articles.findIndex(function (a) {
                 return a.id === AdminState.editingItem.id;
             });
             if (index !== -1) {
@@ -130,7 +155,7 @@ var AdminArticleForm = (function() {
             return;
         }
 
-        var articles = AdminState.articles.filter(function(a) {
+        var articles = AdminState.articles.filter(function (a) {
             return a.id !== id;
         });
 

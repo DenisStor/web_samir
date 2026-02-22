@@ -22,7 +22,9 @@
     font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
-    transition: background var(--transition-base), color var(--transition-base);
+    transition:
+        background var(--transition-base),
+        color var(--transition-base);
 }
 
 .tab:hover {

@@ -21,7 +21,6 @@ try:
     from server import (
         validate_image_bytes,
         is_valid_filename,
-        get_file_lock,
         DATA_DIR,
         UPLOADS_DIR,
     )
@@ -234,56 +233,6 @@ class TestIsValidFilename:
 
 
 # =============================================================================
-# FILE LOCK TESTS
-# =============================================================================
-
-class TestFileLocking:
-    """Tests for get_file_lock function"""
-
-    def test_get_lock_same_filename(self):
-        """Same filename should return same lock"""
-        if not SERVER_IMPORTS_OK:
-            pytest.skip("Server imports failed")
-
-        lock1 = get_file_lock('test.json')
-        lock2 = get_file_lock('test.json')
-        assert lock1 is lock2
-
-    def test_get_lock_different_filenames(self):
-        """Different filenames should return different locks"""
-        if not SERVER_IMPORTS_OK:
-            pytest.skip("Server imports failed")
-
-        lock1 = get_file_lock('file1.json')
-        lock2 = get_file_lock('file2.json')
-        assert lock1 is not lock2
-
-    def test_lock_thread_safety(self):
-        """Locks should be thread-safe"""
-        if not SERVER_IMPORTS_OK:
-            pytest.skip("Server imports failed")
-
-        results = []
-
-        def get_lock_in_thread(name, idx):
-            lock = get_file_lock(name)
-            results.append((idx, id(lock)))
-
-        threads = []
-        for i in range(10):
-            t = threading.Thread(target=get_lock_in_thread, args=('same_file.json', i))
-            threads.append(t)
-            t.start()
-
-        for t in threads:
-            t.join()
-
-        # All should have same lock id
-        lock_ids = [r[1] for r in results]
-        assert len(set(lock_ids)) == 1
-
-
-# =============================================================================
 # ATOMIC WRITE TESTS
 # =============================================================================
 
@@ -404,6 +353,43 @@ class TestFileSizeLimits:
         # 11 MB file (over 10MB limit)
         large_size = 11 * 1024 * 1024
         assert large_size > 10 * 1024 * 1024
+
+
+class TestValidationIntegration:
+    """Tests for data validation schemas"""
+
+    def test_master_schema_valid(self):
+        """Valid master data should pass validation"""
+        try:
+            from server.validators import SchemaValidator, MASTER_SCHEMA
+        except ImportError:
+            pytest.skip("Validators import failed")
+
+        data = {'id': 'master_123456_abc', 'name': 'Test Master', 'badge': 'green'}
+        is_valid, error = SchemaValidator.validate(data, MASTER_SCHEMA)
+        assert is_valid is True
+
+    def test_master_schema_missing_name(self):
+        """Master without name should fail validation"""
+        try:
+            from server.validators import SchemaValidator, MASTER_SCHEMA
+        except ImportError:
+            pytest.skip("Validators import failed")
+
+        data = {'id': 'master_123456_abc', 'name': '', 'badge': 'green'}
+        is_valid, error = SchemaValidator.validate(data, MASTER_SCHEMA)
+        assert is_valid is False
+
+    def test_product_schema_invalid_price(self):
+        """Product with negative price should fail validation"""
+        try:
+            from server.validators import SchemaValidator, PRODUCT_SCHEMA
+        except ImportError:
+            pytest.skip("Validators import failed")
+
+        data = {'id': 'product_123_abc', 'name': 'Test', 'price': -100}
+        is_valid, error = SchemaValidator.validate(data, PRODUCT_SCHEMA)
+        assert is_valid is False
 
 
 # Run tests with pytest

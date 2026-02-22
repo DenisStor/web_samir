@@ -15,7 +15,9 @@
     justify-content: center;
     gap: 12px;
     cursor: pointer;
-    transition: border-color var(--transition-base), background var(--transition-base);
+    transition:
+        border-color var(--transition-base),
+        background var(--transition-base);
     overflow: hidden;
 }
 
@@ -70,7 +72,9 @@
     justify-content: center;
     z-index: 10;
     opacity: 0;
-    transition: opacity var(--transition-base), transform var(--transition-base);
+    transition:
+        opacity var(--transition-base),
+        transform var(--transition-base);
 }
 
 .image-upload:hover .remove-image {
@@ -121,7 +125,9 @@
     border-radius: var(--radius-md);
     overflow: hidden;
     cursor: grab;
-    transition: opacity var(--transition-base), transform var(--transition-base);
+    transition:
+        opacity var(--transition-base),
+        transform var(--transition-base);
 }
 
 .image-preview:active {
@@ -167,7 +173,9 @@
     align-items: center;
     justify-content: center;
     opacity: 0;
-    transition: opacity var(--transition-base), transform var(--transition-base);
+    transition:
+        opacity var(--transition-base),
+        transform var(--transition-base);
 }
 
 .image-preview:hover .remove-image-btn {
@@ -190,7 +198,9 @@
     border: 1px dashed var(--border-light);
     border-radius: var(--radius-md);
     cursor: pointer;
-    transition: border-color var(--transition-base), background var(--transition-base);
+    transition:
+        border-color var(--transition-base),
+        background var(--transition-base);
 }
 
 .image-upload-btn:hover {

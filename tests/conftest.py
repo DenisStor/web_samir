@@ -281,11 +281,16 @@ def temp_uploads_dir(tmp_path):
 
 @pytest.fixture
 def mock_data_dir(temp_data_dir, monkeypatch):
-    """Mock the DATA_DIR to use temp directory"""
+    """Mock storage with temp Database instance.
+
+    Returns the Database instance. Use db.write('file.json', data) to seed test data.
+    """
+    from server.database import Database
     import server.handler as handler_module
+    db = Database(db_path=str(temp_data_dir / 'test.db'))
     monkeypatch.setattr(handler_module, 'DATA_DIR', temp_data_dir)
-    monkeypatch.setattr(handler_module.storage, 'data_dir', temp_data_dir)
-    return temp_data_dir
+    monkeypatch.setattr(handler_module, 'storage', db)
+    return db
 
 
 @pytest.fixture
@@ -323,10 +328,10 @@ def clean_sessions():
 # =============================================================================
 
 @pytest.fixture
-def isolated_storage(tmp_path):
-    """Isolated JSONStorage for unit tests"""
-    from server.storage import JSONStorage
-    return JSONStorage(data_dir=str(tmp_path))
+def isolated_database(tmp_path):
+    """Isolated Database for unit tests"""
+    from server.database import Database
+    return Database(db_path=str(tmp_path / 'test.db'))
 
 
 @pytest.fixture

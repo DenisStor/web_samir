@@ -2,7 +2,7 @@
  * Config Module - Централизованный доступ к конфигурации
  * @module AppConfig
  */
-(function() {
+(function () {
     'use strict';
 
     // Дефолтные значения (fallback если config.json не загружен)
@@ -27,7 +27,8 @@
             debounceDelay: 300,
             animationDuration: 300,
             maxImageSize: 5242880,
-            maxUploadImages: 10
+            maxUploadImages: 10,
+            articlesPerPage: 3
         },
         colors: {
             danger: '#ff4757',
@@ -102,18 +103,18 @@
         if (loadPromise) return loadPromise;
 
         loadPromise = fetch('/config.json')
-            .then(function(response) {
+            .then(function (response) {
                 if (!response.ok) {
                     throw new Error('Config not found');
                 }
                 return response.json();
             })
-            .then(function(data) {
+            .then(function (data) {
                 config = data;
                 loaded = true;
                 return config;
             })
-            .catch(function(error) {
+            .catch(function (error) {
                 console.warn('AppConfig: Using defaults, config.json not loaded:', error.message);
                 config = defaults;
                 loaded = true;
@@ -146,5 +147,4 @@
         isLoaded: isLoaded,
         getDefaults: getDefaults
     };
-
 })();

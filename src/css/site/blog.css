@@ -37,9 +37,10 @@
     overflow: hidden;
     border: 1px solid var(--border-subtle);
     /* Оптимизировано: конкретные свойства вместо all */
-    transition: transform var(--transition-bounce),
-                border-color var(--transition-bounce),
-                box-shadow var(--transition-bounce);
+    transition:
+        transform var(--transition-bounce),
+        border-color var(--transition-bounce),
+        box-shadow var(--transition-bounce);
     cursor: pointer;
 }
 
@@ -60,7 +61,7 @@
 }
 
 .blog-image::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     background: linear-gradient(180deg, transparent 50%, var(--content-bg) 100%);
@@ -221,9 +222,10 @@
     justify-content: center;
     cursor: pointer;
     flex-shrink: 0;
-    transition: background var(--transition-base),
-                border-color var(--transition-base),
-                transform var(--transition-base);
+    transition:
+        background var(--transition-base),
+        border-color var(--transition-base),
+        transform var(--transition-base);
 }
 
 .blog-modal-close:hover {
@@ -412,7 +414,7 @@
 }
 
 .blog-modal-body .tip::before {
-    content: '';
+    content: "";
     font-size: 1.2em;
 }
 

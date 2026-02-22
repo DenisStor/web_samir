@@ -5,13 +5,13 @@
 ## Структура на сервере
 
 ```
-/var/www/saysbarbers-data/     ← Персистентное хранилище (вне git)
+/var/www/web_samir-data/     ← Персистентное хранилище (вне git)
 ├── uploads/                   ← Загруженные изображения
-└── data/                      ← JSON данные CMS
+└── data/                      ← SQLite БД (saysbarbers.db)
 
-/var/www/saysbarbers/          ← Git репозиторий
-├── uploads → symlink          ← Симлинк на ../saysbarbers-data/uploads
-├── data → symlink             ← Симлинк на ../saysbarbers-data/data
+/var/www/web_samir/          ← Git репозиторий
+├── uploads → symlink          ← Симлинк на ../web_samir-data/uploads
+├── data → symlink             ← Симлинк на ../web_samir-data/data
 └── ... остальные файлы
 ```
 
@@ -20,21 +20,21 @@
 ```bash
 # 1. Клонировать репозиторий
 cd /var/www
-git clone <repository-url> saysbarbers
+git clone <repository-url> web_samir
 
 # 2. Создать персистентное хранилище
-mkdir -p /var/www/saysbarbers-data/uploads
-mkdir -p /var/www/saysbarbers-data/data
+mkdir -p /var/www/web_samir-data/uploads
+mkdir -p /var/www/web_samir-data/data
 
 # 3. Создать симлинки
-cd /var/www/saysbarbers
+cd /var/www/web_samir
 rm -rf uploads data
-ln -sfn /var/www/saysbarbers-data/uploads uploads
-ln -sfn /var/www/saysbarbers-data/data data
+ln -sfn /var/www/web_samir-data/uploads uploads
+ln -sfn /var/www/web_samir-data/data data
 
 # 4. Установить права
-chown -R www-data:www-data /var/www/saysbarbers-data
-chmod -R 755 /var/www/saysbarbers-data
+chown -R www-data:www-data /var/www/web_samir-data
+chmod -R 755 /var/www/web_samir-data
 
 # 5. Установить зависимости
 pip install -r requirements.txt
@@ -46,7 +46,7 @@ npm install
 Используйте скрипт `deploy.sh`:
 
 ```bash
-cd /var/www/saysbarbers
+cd /var/www/web_samir
 ./deploy.sh
 ```
 
@@ -61,26 +61,26 @@ cd /var/www/saysbarbers
 Если нужен контроль:
 
 ```bash
-cd /var/www/saysbarbers
+cd /var/www/web_samir
 
 # Сохранить текущее состояние (на всякий случай)
-# cp -r /var/www/saysbarbers-data /var/www/saysbarbers-data-backup
+# cp -r /var/www/web_samir-data /var/www/web_samir-data-backup
 
 # Обновить код
 git pull origin main
 
 # Пересоздать симлинки (git может удалить их)
 rm -rf uploads data
-ln -sfn /var/www/saysbarbers-data/uploads uploads
-ln -sfn /var/www/saysbarbers-data/data data
+ln -sfn /var/www/web_samir-data/uploads uploads
+ln -sfn /var/www/web_samir-data/data data
 
 # Перезапустить сервер
-sudo systemctl restart saysbarbers
+sudo systemctl restart web_samir
 ```
 
 ## Systemd сервис
 
-Пример `/etc/systemd/system/saysbarbers.service`:
+Пример `/etc/systemd/system/web_samir.service`:
 
 ```ini
 [Unit]
@@ -90,7 +90,7 @@ After=network.target
 [Service]
 Type=simple
 User=www-data
-WorkingDirectory=/var/www/saysbarbers
+WorkingDirectory=/var/www/web_samir
 ExecStart=/usr/bin/python3 server.py
 Restart=always
 RestartSec=5
@@ -101,16 +101,16 @@ WantedBy=multi-user.target
 
 Команды:
 ```bash
-sudo systemctl enable saysbarbers   # Автозапуск
-sudo systemctl start saysbarbers    # Запуск
-sudo systemctl restart saysbarbers  # Перезапуск
-sudo systemctl status saysbarbers   # Статус
-sudo journalctl -u saysbarbers -f   # Логи
+sudo systemctl enable web_samir   # Автозапуск
+sudo systemctl start web_samir    # Запуск
+sudo systemctl restart web_samir  # Перезапуск
+sudo systemctl status web_samir   # Статус
+sudo journalctl -u web_samir -f   # Логи
 ```
 
 ## Nginx конфигурация
 
-Пример `/etc/nginx/sites-available/saysbarbers`:
+Пример `/etc/nginx/sites-available/web_samir`:
 
 ```nginx
 server {
@@ -140,7 +140,7 @@ server {
     }
 
     location /uploads/ {
-        alias /var/www/saysbarbers-data/uploads/;
+        alias /var/www/web_samir-data/uploads/;
         expires 30d;
         add_header Cache-Control "public, immutable";
     }
@@ -149,29 +149,11 @@ server {
 }
 ```
 
-## Редактирование данных на сервере
+## Хранилище данных
 
-Данные CMS (`data/*.json`) не отслеживаются в git и хранятся в `/var/www/saysbarbers-data/data/`.
+Данные CMS хранятся в SQLite: `/var/www/web_samir-data/data/saysbarbers.db`.
 
-**Для изменения структуры данных** (названия категорий, порядок и т.д.):
-
-```bash
-# Подключиться к серверу
-ssh root@80.90.187.187
-
-# Редактировать нужный файл
-nano /var/www/saysbarbers-data/data/services.json
-```
-
-Файлы данных:
-- `services.json` — услуги барбершопа и подологии
-- `masters.json` — мастера
-- `articles.json` — статьи блога
-- `products.json` — товары магазина
-- `faq.json` — FAQ
-- `legal.json` — юридические документы
-
-**Важно:** `deploy.sh` НЕ перезаписывает эти файлы — они персистентны.
+Управление данными — через админку (`/admin.html`).
 
 ## Бэкапы
 
@@ -179,17 +161,17 @@ nano /var/www/saysbarbers-data/data/services.json
 
 ```bash
 # Ежедневный бэкап в crontab
-0 3 * * * tar -czf /var/backups/saysbarbers-data-$(date +\%Y\%m\%d).tar.gz /var/www/saysbarbers-data
+0 3 * * * tar -czf /var/backups/web_samir-data-$(date +\%Y\%m\%d).tar.gz /var/www/web_samir-data
 
 # Удаление старых бэкапов (старше 30 дней)
-0 4 * * * find /var/backups -name "saysbarbers-data-*.tar.gz" -mtime +30 -delete
+0 4 * * * find /var/backups -name "web_samir-data-*.tar.gz" -mtime +30 -delete
 ```
 
 ## Проверка после деплоя
 
 1. Симлинки на месте:
    ```bash
-   ls -la /var/www/saysbarbers/uploads /var/www/saysbarbers/data
+   ls -la /var/www/web_samir/uploads /var/www/web_samir/data
    ```
 
 2. Сайт работает:
@@ -199,5 +181,5 @@ nano /var/www/saysbarbers-data/data/services.json
 
 3. Данные доступны:
    ```bash
-   ls /var/www/saysbarbers-data/uploads/
+   ls /var/www/web_samir-data/uploads/
    ```

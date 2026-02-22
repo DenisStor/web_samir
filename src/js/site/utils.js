@@ -17,7 +17,7 @@ var SaysApp = window.SaysApp || {};
  * @param {Element} parent - родительский элемент (по умолчанию document)
  * @returns {Element|null}
  */
-SaysApp.$ = function(selector, parent) {
+SaysApp.$ = function (selector, parent) {
     parent = parent || document;
     return parent.querySelector(selector);
 };
@@ -28,7 +28,7 @@ SaysApp.$ = function(selector, parent) {
  * @param {Element} parent - родительский элемент (по умолчанию document)
  * @returns {NodeList}
  */
-SaysApp.$$ = function(selector, parent) {
+SaysApp.$$ = function (selector, parent) {
     parent = parent || document;
     return parent.querySelectorAll(selector);
 };
@@ -38,7 +38,7 @@ SaysApp.$$ = function(selector, parent) {
  * @param {string} id - ID элемента
  * @returns {Element|null}
  */
-SaysApp.byId = function(id) {
+SaysApp.byId = function (id) {
     return document.getElementById(id);
 };
 
@@ -50,7 +50,7 @@ SaysApp.byId = function(id) {
  * Заблокировать/разблокировать скролл страницы
  * @param {boolean} lock - true для блокировки, false для разблокировки
  */
-SaysApp.lockScroll = function(lock) {
+SaysApp.lockScroll = function (lock) {
     document.body.style.overflow = lock ? 'hidden' : '';
 };
 
@@ -63,7 +63,7 @@ SaysApp.lockScroll = function(lock) {
  * @param {Element} element - DOM элемент
  * @param {Object} attrs - объект с aria-атрибутами
  */
-SaysApp.setAria = function(element, attrs) {
+SaysApp.setAria = function (element, attrs) {
     if (!element) return;
     for (var key in attrs) {
         if (attrs.hasOwnProperty(key)) {
@@ -84,17 +84,19 @@ SaysApp.setAria = function(element, attrs) {
  * @param {Object} options - опции addEventListener
  * @returns {Function} - функция для удаления обработчика
  */
-SaysApp.on = function(target, event, handler, options) {
+SaysApp.on = function (target, event, handler, options) {
     options = options || {};
     target.addEventListener(event, handler, options);
-    return function() { target.removeEventListener(event, handler, options); };
+    return function () {
+        target.removeEventListener(event, handler, options);
+    };
 };
 
 /**
  * Выполнить функцию когда DOM готов
  * @param {Function} fn - функция для выполнения
  */
-SaysApp.ready = function(fn) {
+SaysApp.ready = function (fn) {
     if (document.readyState !== 'loading') {
         fn();
     } else {
@@ -113,7 +115,7 @@ SaysApp.ready = function(fn) {
  * @param {boolean} force - принудительно добавить/удалить
  * @returns {boolean} - добавлен ли класс
  */
-SaysApp.toggleClass = function(element, className, force) {
+SaysApp.toggleClass = function (element, className, force) {
     if (!element) return false;
     return element.classList.toggle(className, force);
 };
@@ -124,7 +126,7 @@ SaysApp.toggleClass = function(element, className, force) {
  * @param {string} className - название класса
  * @returns {boolean}
  */
-SaysApp.hasClass = function(element, className) {
+SaysApp.hasClass = function (element, className) {
     if (!element) return false;
     return element.classList.contains(className);
 };
@@ -138,8 +140,8 @@ SaysApp.hasClass = function(element, className) {
  * @param {Function} callback - функция для вызова при нажатии Escape
  * @returns {Function} - функция для удаления обработчика
  */
-SaysApp.onEscape = function(callback) {
-    var handler = function(e) {
+SaysApp.onEscape = function (callback) {
+    var handler = function (e) {
         if (e.key === 'Escape') {
             callback(e);
         }
@@ -152,36 +154,31 @@ SaysApp.onEscape = function(callback) {
 // =================================================================
 
 /**
- * Форматировать дату в русском формате
- * @param {string|Date} dateStr - строка даты или объект Date
- * @param {Object} options - опции форматирования
- * @returns {string} - отформатированная дата
+ * Форматировать дату — делегирует в SharedHelpers
  */
-SaysApp.formatDate = function(dateStr, options) {
-    options = options || {};
-    if (!dateStr) return '';
-
-    var defaultOptions = {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-    };
-
-    try {
-        var date = dateStr instanceof Date ? dateStr : new Date(dateStr);
-        if (isNaN(date.getTime())) return String(dateStr);
-        return date.toLocaleDateString('ru-RU', Object.assign({}, defaultOptions, options));
-    } catch (e) {
-        return String(dateStr);
-    }
-};
+SaysApp.formatDate = window.SharedHelpers
+    ? SharedHelpers.formatDate
+    : function (dateStr) {
+          if (!dateStr) return '';
+          try {
+              var date = dateStr instanceof Date ? dateStr : new Date(dateStr);
+              if (isNaN(date.getTime())) return String(dateStr);
+              return date.toLocaleDateString('ru-RU', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric'
+              });
+          } catch (e) {
+              return String(dateStr);
+          }
+      };
 
 /**
  * Форматировать дату кратко (ДД.ММ.ГГГГ)
  * @param {string|Date} dateStr - строка даты или объект Date
  * @returns {string} - отформатированная дата
  */
-SaysApp.formatDateShort = function(dateStr) {
+SaysApp.formatDateShort = function (dateStr) {
     if (!dateStr) return '';
 
     try {
@@ -199,22 +196,21 @@ SaysApp.formatDateShort = function(dateStr) {
 };
 
 /**
- * Debounce функция
- * @param {Function} fn - функция для debounce
- * @param {number} delay - задержка в миллисекундах
- * @returns {Function} - debounced функция
+ * Debounce — делегирует в SharedHelpers
  */
-SaysApp.debounce = function(fn, delay) {
-    var timeoutId = null;
-    return function() {
-        var context = this;
-        var args = arguments;
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(function() {
-            fn.apply(context, args);
-        }, delay);
-    };
-};
+SaysApp.debounce = window.SharedHelpers
+    ? SharedHelpers.debounce
+    : function (fn, delay) {
+          var timeoutId = null;
+          return function () {
+              var context = this;
+              var args = arguments;
+              clearTimeout(timeoutId);
+              timeoutId = setTimeout(function () {
+                  fn.apply(context, args);
+              }, delay);
+          };
+      };
 
 /**
  * Throttle функция
@@ -222,15 +218,15 @@ SaysApp.debounce = function(fn, delay) {
  * @param {number} limit - минимальный интервал в миллисекундах
  * @returns {Function} - throttled функция
  */
-SaysApp.throttle = function(fn, limit) {
+SaysApp.throttle = function (fn, limit) {
     var inThrottle = false;
-    return function() {
+    return function () {
         var context = this;
         var args = arguments;
         if (!inThrottle) {
             fn.apply(context, args);
             inThrottle = true;
-            setTimeout(function() {
+            setTimeout(function () {
                 inThrottle = false;
             }, limit);
         }

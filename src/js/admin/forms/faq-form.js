@@ -3,7 +3,7 @@
  * Форма добавления/редактирования FAQ
  */
 
-var AdminFaqForm = (function() {
+var AdminFaqForm = (function () {
     'use strict';
 
     /**
@@ -14,16 +14,21 @@ var AdminFaqForm = (function() {
 
         var title = faqItem ? 'Редактировать вопрос' : 'Добавить вопрос';
 
-        var html = '<form id="faqForm" class="admin-form">' +
+        var html =
+            '<form id="faqForm" class="admin-form">' +
             '<div class="form-group">' +
-                '<label class="form-label">Вопрос *</label>' +
-                '<input type="text" class="form-input" id="faqQuestion" value="' + window.escapeHtml(faqItem && faqItem.question || '') + '" placeholder="Введите вопрос" required>' +
+            '<label class="form-label">Вопрос *</label>' +
+            '<input type="text" class="form-input" id="faqQuestion" value="' +
+            window.escapeHtml((faqItem && faqItem.question) || '') +
+            '" placeholder="Введите вопрос" required>' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Ответ *</label>' +
-                '<textarea class="form-textarea" id="faqAnswer" placeholder="Введите ответ на вопрос..." rows="5">' + window.escapeHtml(faqItem && faqItem.answer || '') + '</textarea>' +
+            '<label class="form-label">Ответ *</label>' +
+            '<textarea class="form-textarea" id="faqAnswer" placeholder="Введите ответ на вопрос..." rows="5">' +
+            window.escapeHtml((faqItem && faqItem.answer) || '') +
+            '</textarea>' +
             '</div>' +
-        '</form>';
+            '</form>';
 
         AdminModals.setTitle('modal', title);
         var modalBody = document.getElementById('modalBody');
@@ -54,7 +59,9 @@ var AdminFaqForm = (function() {
         }
 
         var faqData = {
-            id: AdminState.editingItem ? AdminState.editingItem.id : SharedHelpers.generateId('faq'),
+            id: AdminState.editingItem
+                ? AdminState.editingItem.id
+                : SharedHelpers.generateId('faq'),
             question: question,
             answer: answer
         };
@@ -62,7 +69,7 @@ var AdminFaqForm = (function() {
         var faq = AdminState.faq || [];
 
         if (AdminState.editingItem) {
-            var index = faq.findIndex(function(f) {
+            var index = faq.findIndex(function (f) {
                 return f.id === AdminState.editingItem.id;
             });
             if (index !== -1) {
@@ -91,7 +98,7 @@ var AdminFaqForm = (function() {
             return;
         }
 
-        var faq = AdminState.faq.filter(function(f) {
+        var faq = AdminState.faq.filter(function (f) {
             return f.id !== id;
         });
 

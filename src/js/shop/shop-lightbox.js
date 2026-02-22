@@ -3,7 +3,7 @@
  * Галерея изображений
  * @module ShopLightbox
  */
-var ShopLightbox = (function() {
+var ShopLightbox = (function () {
     'use strict';
 
     /**

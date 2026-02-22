@@ -12,7 +12,9 @@
     z-index: 1000;
     opacity: 0;
     visibility: hidden;
-    transition: opacity var(--transition-base), visibility var(--transition-base);
+    transition:
+        opacity var(--transition-base),
+        visibility var(--transition-base);
 }
 
 @supports (backdrop-filter: blur(4px)) {
@@ -57,7 +59,7 @@
 }
 
 .modal-header h2 {
-    font-family: 'Unbounded', sans-serif;
+    font-family: "Unbounded", sans-serif;
     font-size: 1.2rem;
     font-weight: 600;
 }
@@ -73,7 +75,10 @@
     border-radius: var(--radius-sm);
     color: var(--text-gray);
     cursor: pointer;
-    transition: background var(--transition-base), color var(--transition-base), border-color var(--transition-base);
+    transition:
+        background var(--transition-base),
+        color var(--transition-base),
+        border-color var(--transition-base);
 }
 
 .modal-close:hover {

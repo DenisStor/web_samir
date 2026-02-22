@@ -3,7 +3,9 @@
    ===================================================================== */
 
 /* Reset & Base */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -16,7 +18,11 @@ html {
 }
 
 body {
-    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family:
+        "Manrope",
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif;
     background: var(--bg-dark);
     color: var(--text-white);
     min-height: 100vh;
@@ -47,7 +53,7 @@ body {
 }
 
 .logo {
-    font-family: 'Unbounded', sans-serif;
+    font-family: "Unbounded", sans-serif;
     font-size: 1.25rem;
     font-weight: 700;
     color: var(--text-white);
@@ -82,7 +88,9 @@ body {
     font-size: 0.95rem;
     font-weight: 500;
     cursor: pointer;
-    transition: background var(--transition-base), color var(--transition-base);
+    transition:
+        background var(--transition-base),
+        color var(--transition-base);
     text-align: left;
     width: 100%;
 }
@@ -122,7 +130,9 @@ body {
     text-decoration: none;
     font-size: 0.95rem;
     font-weight: 500;
-    transition: background var(--transition-base), color var(--transition-base);
+    transition:
+        background var(--transition-base),
+        color var(--transition-base);
 }
 
 .back-link svg {
@@ -148,7 +158,9 @@ body {
     font-size: 0.95rem;
     font-weight: 500;
     cursor: pointer;
-    transition: background var(--transition-base), color var(--transition-base);
+    transition:
+        background var(--transition-base),
+        color var(--transition-base);
     width: 100%;
     text-align: left;
 }
@@ -188,7 +200,7 @@ body {
 }
 
 .header-title h1 {
-    font-family: 'Unbounded', sans-serif;
+    font-family: "Unbounded", sans-serif;
     font-size: 1.5rem;
     font-weight: 600;
     margin-bottom: 4px;
@@ -223,8 +235,14 @@ body {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Cards Grid */

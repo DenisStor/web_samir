@@ -29,12 +29,7 @@ from .auth import (
     UploadRateLimiter,
 )
 
-from .storage import (
-    JSONStorage,
-    Repository,
-    get_storage,
-    atomic_write_json,
-)
+from .database import Database
 
 from .validators import (
     is_valid_slug,
@@ -80,11 +75,6 @@ def record_login_attempt(ip, success):
     return login_limiter.record(ip, success)
 
 
-def get_file_lock(filename):
-    """Получение блокировки для файла (алиас для обратной совместимости)."""
-    return storage._get_lock(filename)
-
-
 __all__ = [
     # Handler
     'AdminAPIHandler',
@@ -110,11 +100,8 @@ __all__ = [
     'RateLimiter',
     'UploadRateLimiter',
 
-    # Storage
-    'JSONStorage',
-    'Repository',
-    'get_storage',
-    'atomic_write_json',
+    # Database
+    'Database',
 
     # Validators
     'is_valid_slug',
@@ -144,5 +131,4 @@ __all__ = [
     'validate_token',
     'check_rate_limit',
     'record_login_attempt',
-    'get_file_lock',
 ]

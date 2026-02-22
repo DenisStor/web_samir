@@ -1,0 +1,119 @@
+/* =====================================================================
+   EXAMPLE-SECTION.CSS - Стили секции Example
+   Файл: src/css/site/example-section.css
+   Не забудьте добавить @import в src/css/site/index.css
+   ===================================================================== */
+
+/* Основной контейнер секции */
+.example-section {
+    padding: var(--section-padding);
+    background: var(--surface-primary);
+}
+
+/* Заголовок секции */
+.example-section .section-header {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto var(--spacing-2xl);
+}
+
+.example-section .section-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+}
+
+.example-section .section-description {
+    font-size: var(--text-lg);
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* Сетка карточек */
+.example-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-2xl);
+}
+
+/* Карточка */
+.example-card {
+    background: var(--surface-card);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.example-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Иконка карточки */
+.example-card-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto var(--spacing-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-green-subtle);
+    border-radius: var(--radius-full);
+    color: var(--accent-green);
+}
+
+.example-card-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* Заголовок карточки */
+.example-card-title {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+/* Текст карточки */
+.example-card-text {
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+/* Кнопки */
+.example-actions {
+    text-align: center;
+}
+
+/* =====================================================================
+   RESPONSIVE
+   ===================================================================== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+    .example-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .example-section {
+        padding: var(--section-padding-mobile);
+    }
+
+    .example-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+
+    .example-card {
+        padding: var(--spacing-lg);
+    }
+}

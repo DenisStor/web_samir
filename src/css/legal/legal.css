@@ -23,7 +23,11 @@
 }
 
 body {
-    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family:
+        "Manrope",
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif;
     background: var(--bg-dark);
     color: var(--text-light);
     min-height: 100vh;
@@ -65,7 +69,7 @@ body {
 }
 
 .logo {
-    font-family: 'Unbounded', sans-serif;
+    font-family: "Unbounded", sans-serif;
     font-size: 1.25rem;
     font-weight: 700;
     color: var(--text-white);
@@ -85,7 +89,9 @@ body {
     height: 20px;
     flex-shrink: 0;
     color: var(--text-gray);
-    transition: color 0.2s, transform 0.2s;
+    transition:
+        color 0.2s,
+        transform 0.2s;
 }
 
 .logo:hover .logo-icon {
@@ -107,7 +113,7 @@ body {
 }
 
 .legal-page-title {
-    font-family: 'Unbounded', sans-serif;
+    font-family: "Unbounded", sans-serif;
     font-size: clamp(1.5rem, 4vw, 2rem);
     font-weight: 700;
     color: var(--text-white);
@@ -140,11 +146,13 @@ body {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .legal-title {
-    font-family: 'Unbounded', sans-serif;
+    font-family: "Unbounded", sans-serif;
     font-size: clamp(1.75rem, 5vw, 2.5rem);
     font-weight: 700;
     color: var(--text-white);
@@ -181,7 +189,7 @@ body {
 }
 
 .legal-content h2 {
-    font-family: 'Unbounded', sans-serif;
+    font-family: "Unbounded", sans-serif;
     font-size: 1.3rem;
     font-weight: 600;
     color: var(--text-white);
@@ -197,7 +205,7 @@ body {
 }
 
 .legal-content h3 {
-    font-family: 'Unbounded', sans-serif;
+    font-family: "Unbounded", sans-serif;
     font-size: 1.1rem;
     font-weight: 600;
     color: var(--text-white);
@@ -266,7 +274,7 @@ body {
 }
 
 .legal-error-title {
-    font-family: 'Unbounded', sans-serif;
+    font-family: "Unbounded", sans-serif;
     font-size: 1.5rem;
     color: var(--text-white);
     margin-bottom: 12px;
@@ -291,7 +299,9 @@ body {
     font-size: 0.95rem;
     font-weight: 600;
     border-radius: var(--radius-md);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
     border: none;
     cursor: pointer;
 }
@@ -320,7 +330,10 @@ body {
     border-radius: var(--radius-lg);
     color: var(--text-white);
     text-decoration: none;
-    transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+    transition:
+        background 0.3s ease,
+        border-color 0.3s ease,
+        transform 0.3s ease;
 }
 
 .legal-doc-card:hover {
@@ -351,7 +364,9 @@ body {
     height: 20px;
     flex-shrink: 0;
     color: var(--text-gray);
-    transition: transform 0.3s, color 0.3s;
+    transition:
+        transform 0.3s,
+        color 0.3s;
 }
 
 .legal-doc-card:hover .doc-arrow {
@@ -363,7 +378,7 @@ body {
    RESPONSIVE
    ================================================================= */
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     .header-content {
         padding: 14px 16px;
     }

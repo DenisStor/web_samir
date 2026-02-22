@@ -3,8 +3,24 @@
  * Централизованное состояние магазина
  * @module ShopState
  */
-var ShopState = (function() {
+var ShopState = (function () {
     'use strict';
+
+    function safeGetItem(key) {
+        try {
+            return localStorage.getItem(key);
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function safeSetItem(key, value) {
+        try {
+            localStorage.setItem(key, value);
+        } catch (e) {
+            /* Private mode */
+        }
+    }
 
     var API_BASE = '/api/shop';
 
@@ -13,7 +29,7 @@ var ShopState = (function() {
     var products = [];
     var currentCategory = 'all';
     var searchQuery = '';
-    var currentSort = localStorage.getItem('shopSort') || 'order';
+    var currentSort = safeGetItem('shopSort') || 'order';
     var lightboxImages = [];
     var lightboxIndex = 0;
 
@@ -73,40 +89,90 @@ var ShopState = (function() {
         API_BASE: API_BASE,
 
         // Getters/Setters для состояния
-        getCategories: function() { return categories; },
-        setCategories: function(val) { categories = val; },
-
-        getProducts: function() { return products; },
-        setProducts: function(val) { products = val; },
-
-        getCurrentCategory: function() { return currentCategory; },
-        setCurrentCategory: function(val) { currentCategory = val; },
-
-        getSearchQuery: function() { return searchQuery; },
-        setSearchQuery: function(val) { searchQuery = val; },
-
-        getCurrentSort: function() { return currentSort; },
-        setCurrentSort: function(val) {
-            currentSort = val;
-            localStorage.setItem('shopSort', val);
+        getCategories: function () {
+            return categories;
+        },
+        setCategories: function (val) {
+            categories = val;
         },
 
-        getLightboxImages: function() { return lightboxImages; },
-        setLightboxImages: function(val) { lightboxImages = val; },
+        getProducts: function () {
+            return products;
+        },
+        setProducts: function (val) {
+            products = val;
+        },
 
-        getLightboxIndex: function() { return lightboxIndex; },
-        setLightboxIndex: function(val) { lightboxIndex = val; },
+        getCurrentCategory: function () {
+            return currentCategory;
+        },
+        setCurrentCategory: function (val) {
+            currentCategory = val;
+        },
+
+        getSearchQuery: function () {
+            return searchQuery;
+        },
+        setSearchQuery: function (val) {
+            searchQuery = val;
+        },
+
+        getCurrentSort: function () {
+            return currentSort;
+        },
+        setCurrentSort: function (val) {
+            currentSort = val;
+            safeSetItem('shopSort', val);
+        },
+
+        getLightboxImages: function () {
+            return lightboxImages;
+        },
+        setLightboxImages: function (val) {
+            lightboxImages = val;
+        },
+
+        getLightboxIndex: function () {
+            return lightboxIndex;
+        },
+        setLightboxIndex: function (val) {
+            lightboxIndex = val;
+        },
 
         // DOM Elements
-        getElements: function() { return elements; },
-        getProgressBar: function() { return progressBar; },
+        getElements: function () {
+            return elements;
+        },
+        getProgressBar: function () {
+            return progressBar;
+        },
 
         // Scroll RAF
-        getScrollRAF: function() { return scrollRAF; },
-        setScrollRAF: function(val) { scrollRAF = val; },
+        getScrollRAF: function () {
+            return scrollRAF;
+        },
+        setScrollRAF: function (val) {
+            scrollRAF = val;
+        },
 
         // Handlers
-        getBoundHandlers: function() { return boundHandlers; },
+        getBoundHandlers: function () {
+            return boundHandlers;
+        },
+
+        // Поиск категории
+        getCategoryBySlug: function (slug) {
+            for (var i = 0; i < categories.length; i++) {
+                if (categories[i].slug === slug) return categories[i];
+            }
+            return null;
+        },
+        getCategoryById: function (id) {
+            for (var i = 0; i < categories.length; i++) {
+                if (categories[i].id === id) return categories[i];
+            }
+            return null;
+        },
 
         // Init & Reset
         initElements: initElements,

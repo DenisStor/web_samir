@@ -3,7 +3,7 @@
  * Обработчики событий админ-панели
  */
 
-var AdminEventHandlers = (function() {
+var AdminEventHandlers = (function () {
     'use strict';
 
     // Кэшированные элементы
@@ -255,30 +255,96 @@ var AdminEventHandlers = (function() {
      * Карта обработчиков действий
      */
     var ACTION_ROUTES = {
-        'edit-master': function(t) { handleMasterAction('edit-master', t.getAttribute('data-id')); },
-        'delete-master': function(t) { handleMasterAction('delete-master', t.getAttribute('data-id')); },
-        'edit-service': function(t) { handleServiceAction('edit-service', t.getAttribute('data-category'), t.getAttribute('data-index')); },
-        'delete-service': function(t) { handleServiceAction('delete-service', t.getAttribute('data-category'), t.getAttribute('data-index')); },
-        'edit-podology': function(t) { handleServiceAction('edit-podology', t.getAttribute('data-category'), t.getAttribute('data-index')); },
-        'delete-podology': function(t) { handleServiceAction('delete-podology', t.getAttribute('data-category'), t.getAttribute('data-index')); },
-        'add-podology-category': function() { handlePodologyCategoryAction('add-podology-category'); },
-        'edit-podology-category': function(t) { handlePodologyCategoryAction('edit-podology-category', t.getAttribute('data-id')); },
-        'delete-podology-category': function(t) { handlePodologyCategoryAction('delete-podology-category', t.getAttribute('data-id')); },
-        'edit-article': function(t) { handleArticleAction('edit-article', t.getAttribute('data-id')); },
-        'delete-article': function(t) { handleArticleAction('delete-article', t.getAttribute('data-id')); },
-        'edit-faq': function(t) { handleFaqAction('edit-faq', t.getAttribute('data-id')); },
-        'delete-faq': function(t) { handleFaqAction('delete-faq', t.getAttribute('data-id')); },
-        'toggle-social': function(t) { if (window.AdminSocialRenderer) AdminSocialRenderer.toggleActive(t.getAttribute('data-social-id')); },
-        'remove-image': function(t) { if (window.AdminImageHandler) AdminImageHandler.removeImage(t.getAttribute('data-target')); },
-        'add-principle': function() { AdminMasterForm.addPrinciple(); },
-        'remove-principle': function(t) { AdminMasterForm.removePrinciple(t); },
-        'edit-shop-category': function(t) { handleShopCategoryAction('edit-shop-category', t.getAttribute('data-id')); },
-        'delete-shop-category': function(t) { handleShopCategoryAction('delete-shop-category', t.getAttribute('data-id')); },
-        'edit-product': function(t) { handleProductAction('edit-product', t.getAttribute('data-id')); },
-        'delete-product': function(t) { handleProductAction('delete-product', t.getAttribute('data-id')); },
-        'edit-legal': function(t) { handleLegalAction('edit-legal', t.getAttribute('data-id')); },
-        'delete-legal': function(t) { handleLegalAction('delete-legal', t.getAttribute('data-id')); },
-        'toggle-legal': function(t) { handleLegalAction('toggle-legal', t.getAttribute('data-id')); }
+        'edit-master': function (t) {
+            handleMasterAction('edit-master', t.getAttribute('data-id'));
+        },
+        'delete-master': function (t) {
+            handleMasterAction('delete-master', t.getAttribute('data-id'));
+        },
+        'edit-service': function (t) {
+            handleServiceAction(
+                'edit-service',
+                t.getAttribute('data-category'),
+                t.getAttribute('data-index')
+            );
+        },
+        'delete-service': function (t) {
+            handleServiceAction(
+                'delete-service',
+                t.getAttribute('data-category'),
+                t.getAttribute('data-index')
+            );
+        },
+        'edit-podology': function (t) {
+            handleServiceAction(
+                'edit-podology',
+                t.getAttribute('data-category'),
+                t.getAttribute('data-index')
+            );
+        },
+        'delete-podology': function (t) {
+            handleServiceAction(
+                'delete-podology',
+                t.getAttribute('data-category'),
+                t.getAttribute('data-index')
+            );
+        },
+        'add-podology-category': function () {
+            handlePodologyCategoryAction('add-podology-category');
+        },
+        'edit-podology-category': function (t) {
+            handlePodologyCategoryAction('edit-podology-category', t.getAttribute('data-id'));
+        },
+        'delete-podology-category': function (t) {
+            handlePodologyCategoryAction('delete-podology-category', t.getAttribute('data-id'));
+        },
+        'edit-article': function (t) {
+            handleArticleAction('edit-article', t.getAttribute('data-id'));
+        },
+        'delete-article': function (t) {
+            handleArticleAction('delete-article', t.getAttribute('data-id'));
+        },
+        'edit-faq': function (t) {
+            handleFaqAction('edit-faq', t.getAttribute('data-id'));
+        },
+        'delete-faq': function (t) {
+            handleFaqAction('delete-faq', t.getAttribute('data-id'));
+        },
+        'toggle-social': function (t) {
+            if (window.AdminSocialRenderer)
+                AdminSocialRenderer.toggleActive(t.getAttribute('data-social-id'));
+        },
+        'remove-image': function (t) {
+            if (window.AdminImageHandler)
+                AdminImageHandler.removeImage(t.getAttribute('data-target'));
+        },
+        'add-principle': function () {
+            AdminMasterForm.addPrinciple();
+        },
+        'remove-principle': function (t) {
+            AdminMasterForm.removePrinciple(t);
+        },
+        'edit-shop-category': function (t) {
+            handleShopCategoryAction('edit-shop-category', t.getAttribute('data-id'));
+        },
+        'delete-shop-category': function (t) {
+            handleShopCategoryAction('delete-shop-category', t.getAttribute('data-id'));
+        },
+        'edit-product': function (t) {
+            handleProductAction('edit-product', t.getAttribute('data-id'));
+        },
+        'delete-product': function (t) {
+            handleProductAction('delete-product', t.getAttribute('data-id'));
+        },
+        'edit-legal': function (t) {
+            handleLegalAction('edit-legal', t.getAttribute('data-id'));
+        },
+        'delete-legal': function (t) {
+            handleLegalAction('delete-legal', t.getAttribute('data-id'));
+        },
+        'toggle-legal': function (t) {
+            handleLegalAction('toggle-legal', t.getAttribute('data-id'));
+        }
     };
 
     /**
@@ -299,7 +365,7 @@ var AdminEventHandlers = (function() {
      * Инициализация делегирования событий
      */
     function initEventDelegation() {
-        boundHandlers.documentClick = function(e) {
+        boundHandlers.documentClick = function (e) {
             // Обработка табов подологии
             var podologyTab = e.target.closest('[data-podology-category]');
             if (podologyTab) {
@@ -314,7 +380,7 @@ var AdminEventHandlers = (function() {
         document.addEventListener('click', boundHandlers.documentClick);
 
         // Обработчик загрузки изображений
-        boundHandlers.documentChange = function(e) {
+        boundHandlers.documentChange = function (e) {
             var target = e.target;
             if (target.matches('[data-upload-target]')) {
                 var inputId = target.getAttribute('data-upload-target');
@@ -344,37 +410,49 @@ var AdminEventHandlers = (function() {
         if (!elements) return;
 
         // Navigation items
-        (elements.navItems || []).forEach(function(item) {
-            item.addEventListener('click', function() { AdminRouter.switchSection(item.dataset.section); });
+        (elements.navItems || []).forEach(function (item) {
+            item.addEventListener('click', function () {
+                AdminRouter.switchSection(item.dataset.section);
+            });
         });
 
         // Service tabs
-        (elements.serviceTabs || []).forEach(function(tab) {
-            tab.addEventListener('click', function() { AdminRouter.switchServiceCategory(tab.dataset.category); });
+        (elements.serviceTabs || []).forEach(function (tab) {
+            tab.addEventListener('click', function () {
+                AdminRouter.switchServiceCategory(tab.dataset.category);
+            });
         });
 
         // Buttons
         bindClick(elements.addNewBtn, handleAddNew);
-        bindClick(elements.modalClose, function() { AdminModals.close('modal'); });
-        bindClick(elements.modalCancel, function() { AdminModals.close('modal'); });
+        bindClick(elements.modalClose, function () {
+            AdminModals.close('modal');
+        });
+        bindClick(elements.modalCancel, function () {
+            AdminModals.close('modal');
+        });
         bindClick(elements.modalSave, handleModalSave);
-        bindClick(elements.saveSocialBtn, function() { if (window.AdminSocialRenderer) AdminSocialRenderer.save(); });
+        bindClick(elements.saveSocialBtn, function () {
+            if (window.AdminSocialRenderer) AdminSocialRenderer.save();
+        });
 
         // Podology categories button
         var managePodologyCategoriesBtn = document.getElementById('managePodologyCategoriesBtn');
-        bindClick(managePodologyCategoriesBtn, function() {
+        bindClick(managePodologyCategoriesBtn, function () {
             if (window.AdminPodologyCategoryForm) {
                 AdminPodologyCategoryForm.showList();
             }
         });
 
         // Modal overlay click
-        bindClick(elements.modalOverlay, function(e) {
+        bindClick(elements.modalOverlay, function (e) {
             if (e.target === elements.modalOverlay) AdminModals.close('modal');
         });
 
         // Escape key
-        boundHandlers.documentKeydown = function(e) { if (e.key === 'Escape') AdminModals.closeCurrent(); };
+        boundHandlers.documentKeydown = function (e) {
+            if (e.key === 'Escape') AdminModals.closeCurrent();
+        };
         document.addEventListener('keydown', boundHandlers.documentKeydown);
     }
 

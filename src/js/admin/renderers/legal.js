@@ -3,7 +3,7 @@
  * Рендеринг юридических документов (политики, соглашения)
  */
 
-var AdminLegalRenderer = (function() {
+var AdminLegalRenderer = (function () {
     'use strict';
 
     var elements = {};
@@ -29,43 +29,70 @@ var AdminLegalRenderer = (function() {
         var documents = AdminState.legalDocuments || [];
 
         if (documents.length === 0) {
-            elements.legalDocumentsList.innerHTML = '<p class="empty-message">Нет юридических документов</p>';
+            elements.legalDocumentsList.innerHTML =
+                '<p class="empty-message">Нет юридических документов</p>';
             return;
         }
 
-        var html = documents.map(function(doc) {
-            var statusClass = doc.active ? 'active' : 'inactive';
-            var statusText = doc.active ? 'Активен' : 'Скрыт';
-            var updatedAt = doc.updatedAt ? new Date(doc.updatedAt).toLocaleDateString('ru-RU') : '';
+        var html = documents
+            .map(function (doc) {
+                var statusClass = doc.active ? 'active' : 'inactive';
+                var statusText = doc.active ? 'Активен' : 'Скрыт';
+                var updatedAt = doc.updatedAt
+                    ? new Date(doc.updatedAt).toLocaleDateString('ru-RU')
+                    : '';
 
-            return '<div class="legal-document-card ' + statusClass + '" data-id="' + doc.id + '">' +
-                '<div class="legal-document-header">' +
+                return (
+                    '<div class="legal-document-card ' +
+                    statusClass +
+                    '" data-id="' +
+                    doc.id +
+                    '">' +
+                    '<div class="legal-document-header">' +
                     '<div class="legal-document-info">' +
-                        '<h3 class="legal-document-title">' + window.escapeHtml(doc.title) + '</h3>' +
-                        '<div class="legal-document-meta">' +
-                            '<span class="legal-document-slug">/legal/' + window.escapeHtml(doc.slug) + '</span>' +
-                            (updatedAt ? '<span class="legal-document-date">Обновлён: ' + updatedAt + '</span>' : '') +
-                        '</div>' +
+                    '<h3 class="legal-document-title">' +
+                    window.escapeHtml(doc.title) +
+                    '</h3>' +
+                    '<div class="legal-document-meta">' +
+                    '<span class="legal-document-slug">/legal/' +
+                    window.escapeHtml(doc.slug) +
+                    '</span>' +
+                    (updatedAt
+                        ? '<span class="legal-document-date">Обновлён: ' + updatedAt + '</span>'
+                        : '') +
+                    '</div>' +
                     '</div>' +
                     '<div class="legal-document-status">' +
-                        '<span class="status-badge ' + statusClass + '">' + statusText + '</span>' +
+                    '<span class="status-badge ' +
+                    statusClass +
+                    '">' +
+                    statusText +
+                    '</span>' +
                     '</div>' +
-                '</div>' +
-                '<div class="legal-document-preview">' +
+                    '</div>' +
+                    '<div class="legal-document-preview">' +
                     getPreviewText(doc.content) +
-                '</div>' +
-                '<div class="legal-document-actions">' +
-                    '<button class="btn btn-secondary btn-sm" data-action="edit-legal" data-id="' + doc.id + '">' +
-                        SharedIcons.get('edit') +
-                        '<span>Редактировать</span>' +
+                    '</div>' +
+                    '<div class="legal-document-actions">' +
+                    '<button class="btn btn-secondary btn-sm" data-action="edit-legal" data-id="' +
+                    doc.id +
+                    '">' +
+                    SharedIcons.get('edit') +
+                    '<span>Редактировать</span>' +
                     '</button>' +
-                    '<button class="btn btn-outline btn-sm" data-action="toggle-legal" data-id="' + doc.id + '">' +
-                        (doc.active ? SharedIcons.get('eyeOff') : SharedIcons.get('eye')) +
-                        '<span>' + (doc.active ? 'Скрыть' : 'Показать') + '</span>' +
+                    '<button class="btn btn-outline btn-sm" data-action="toggle-legal" data-id="' +
+                    doc.id +
+                    '">' +
+                    (doc.active ? SharedIcons.get('eyeOff') : SharedIcons.get('eye')) +
+                    '<span>' +
+                    (doc.active ? 'Скрыть' : 'Показать') +
+                    '</span>' +
                     '</button>' +
-                '</div>' +
-            '</div>';
-        }).join('');
+                    '</div>' +
+                    '</div>'
+                );
+            })
+            .join('');
 
         elements.legalDocumentsList.innerHTML = html;
     }
@@ -86,7 +113,9 @@ var AdminLegalRenderer = (function() {
      */
     async function toggleActive(id) {
         var documents = AdminState.legalDocuments || [];
-        var doc = documents.find(function(d) { return d.id === id; });
+        var doc = documents.find(function (d) {
+            return d.id === id;
+        });
 
         if (doc) {
             doc.active = !doc.active;

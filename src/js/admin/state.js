@@ -28,7 +28,7 @@ var AdminState = {
     /**
      * Сброс состояния к начальным значениям
      */
-    reset: function() {
+    reset: function () {
         this.masters = [];
         this.services = { categories: [], podology: { categories: [], consultation: null } };
         this.articles = [];
@@ -47,32 +47,32 @@ var AdminState = {
      * @returns {Array} Отсортированный массив
      * @private
      */
-    _sortByOrder: function(items) {
+    _sortByOrder: function (items) {
         if (!items || !Array.isArray(items)) return items;
-        return items.slice().sort(function(a, b) {
+        return items.slice().sort(function (a, b) {
             var orderA = typeof a.order === 'number' ? a.order : Infinity;
             var orderB = typeof b.order === 'number' ? b.order : Infinity;
             return orderA - orderB;
         });
     },
 
-    setMasters: function(data) {
+    setMasters: function (data) {
         this.masters = this._sortByOrder(data || []);
     },
 
-    setServices: function(data) {
+    setServices: function (data) {
         this.services = data || { categories: [], podology: { services: [] } };
     },
 
-    setArticles: function(data) {
+    setArticles: function (data) {
         this.articles = this._sortByOrder(data || []);
     },
 
-    setFaq: function(data) {
+    setFaq: function (data) {
         this.faq = this._sortByOrder(data || []);
     },
 
-    setSocial: function(data) {
+    setSocial: function (data) {
         this.social = data || { social: [], phone: '', email: '', address: '' };
     },
 
@@ -81,47 +81,61 @@ var AdminState = {
      * @param {string} id - ID мастера
      * @returns {Object|undefined} Найденный мастер или undefined
      */
-    findMaster: function(id) {
-        return this.masters.find(function(m) { return m.id === id; });
+    findMaster: function (id) {
+        return this.masters.find(function (m) {
+            return m.id === id;
+        });
     },
 
-    findArticle: function(id) {
-        return this.articles.find(function(a) { return a.id === id; });
+    findArticle: function (id) {
+        return this.articles.find(function (a) {
+            return a.id === id;
+        });
     },
 
-    findFaq: function(id) {
-        return this.faq.find(function(f) { return f.id === id; });
+    findFaq: function (id) {
+        return this.faq.find(function (f) {
+            return f.id === id;
+        });
     },
 
-    findSocialLink: function(id) {
+    findSocialLink: function (id) {
         var links = this.social.social || [];
-        return links.find(function(s) { return s.id === id; });
+        return links.find(function (s) {
+            return s.id === id;
+        });
     },
 
     // Shop методы
-    setShopCategories: function(data) {
+    setShopCategories: function (data) {
         this.shopCategories = this._sortByOrder(data || []);
     },
 
-    setProducts: function(data) {
+    setProducts: function (data) {
         this.products = this._sortByOrder(data || []);
     },
 
-    findShopCategory: function(id) {
-        return this.shopCategories.find(function(c) { return c.id === id; });
+    findShopCategory: function (id) {
+        return this.shopCategories.find(function (c) {
+            return c.id === id;
+        });
     },
 
-    findProduct: function(id) {
-        return this.products.find(function(p) { return p.id === id; });
+    findProduct: function (id) {
+        return this.products.find(function (p) {
+            return p.id === id;
+        });
     },
 
     // Legal методы
-    setLegalDocuments: function(data) {
+    setLegalDocuments: function (data) {
         this.legalDocuments = data || [];
     },
 
-    findLegalDocument: function(id) {
-        return this.legalDocuments.find(function(d) { return d.id === id; });
+    findLegalDocument: function (id) {
+        return this.legalDocuments.find(function (d) {
+            return d.id === id;
+        });
     }
 };
 

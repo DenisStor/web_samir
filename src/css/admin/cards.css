@@ -8,7 +8,10 @@
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-xl);
     padding: 24px;
-    transition: border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base);
+    transition:
+        border-color var(--transition-base),
+        box-shadow var(--transition-base),
+        transform var(--transition-base);
 }
 
 .master-card:hover {
@@ -31,7 +34,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Unbounded', sans-serif;
+    font-family: "Unbounded", sans-serif;
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--accent-green);
@@ -49,7 +52,7 @@
 }
 
 .master-name {
-    font-family: 'Unbounded', sans-serif;
+    font-family: "Unbounded", sans-serif;
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 4px;
@@ -125,7 +128,10 @@
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-xl);
     overflow: hidden;
-    transition: border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base);
+    transition:
+        border-color var(--transition-base),
+        box-shadow var(--transition-base),
+        transform var(--transition-base);
     display: flex;
     flex-direction: column;
 }
@@ -186,7 +192,7 @@
 }
 
 .article-title {
-    font-family: 'Unbounded', sans-serif;
+    font-family: "Unbounded", sans-serif;
     font-size: 1rem;
     font-weight: 600;
     margin-bottom: 8px;

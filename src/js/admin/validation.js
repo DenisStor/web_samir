@@ -2,27 +2,27 @@
  * Admin Form Validation Module
  * Валидация форм перед отправкой
  */
-var AdminValidation = (function() {
+var AdminValidation = (function () {
     'use strict';
 
     /**
      * Правила валидации
      */
     var rules = {
-        required: function(value) {
+        required: function (value) {
             return value !== null && value !== undefined && String(value).trim() !== '';
         },
-        minLength: function(value, min) {
+        minLength: function (value, min) {
             return String(value).trim().length >= min;
         },
-        maxLength: function(value, max) {
+        maxLength: function (value, max) {
             return String(value).trim().length <= max;
         },
-        email: function(value) {
+        email: function (value) {
             var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return !value || emailRegex.test(value);
         },
-        url: function(value) {
+        url: function (value) {
             if (!value) return true;
             try {
                 new URL(value);
@@ -31,11 +31,11 @@ var AdminValidation = (function() {
                 return false;
             }
         },
-        number: function(value) {
+        number: function (value) {
             return !value || !isNaN(parseFloat(value));
         },
-        positiveNumber: function(value) {
-            return !value || (parseFloat(value) >= 0);
+        positiveNumber: function (value) {
+            return !value || parseFloat(value) >= 0;
         }
     };
 
@@ -94,7 +94,7 @@ var AdminValidation = (function() {
         var errors = {};
         var isValid = true;
 
-        Object.keys(fieldsConfig).forEach(function(fieldId) {
+        Object.keys(fieldsConfig).forEach(function (fieldId) {
             var result = validateField(fieldId, fieldsConfig[fieldId]);
             if (!result.valid) {
                 errors[fieldId] = result.error;
@@ -125,7 +125,9 @@ var AdminValidation = (function() {
         if (message) {
             var errorEl = document.createElement('div');
             errorEl.className = 'form-error-message';
-            errorEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' + window.escapeHtml(message);
+            errorEl.innerHTML =
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
+                window.escapeHtml(message);
             field.parentElement.appendChild(errorEl);
         }
     }
@@ -149,7 +151,7 @@ var AdminValidation = (function() {
      * Показать все ошибки формы
      */
     function showFormErrors(errors) {
-        Object.keys(errors).forEach(function(fieldId) {
+        Object.keys(errors).forEach(function (fieldId) {
             showFieldError(fieldId, errors[fieldId]);
         });
 
@@ -168,7 +170,7 @@ var AdminValidation = (function() {
      * Очистить все ошибки формы
      */
     function clearFormErrors(fieldsConfig) {
-        Object.keys(fieldsConfig).forEach(function(fieldId) {
+        Object.keys(fieldsConfig).forEach(function (fieldId) {
             clearFieldError(fieldId);
         });
     }
@@ -205,7 +207,7 @@ var AdminValidation = (function() {
         var field = document.getElementById(fieldId);
         if (!field) return;
 
-        field.addEventListener('blur', function() {
+        field.addEventListener('blur', function () {
             var result = validateField(fieldId, fieldRules);
             if (!result.valid) {
                 showFieldError(fieldId, result.error);
@@ -214,7 +216,7 @@ var AdminValidation = (function() {
             }
         });
 
-        field.addEventListener('input', function() {
+        field.addEventListener('input', function () {
             // Убираем ошибку при вводе
             clearFieldError(fieldId);
         });

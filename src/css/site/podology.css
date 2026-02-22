@@ -3,10 +3,12 @@
    ===================================================================== */
 
 .podology {
-    background: linear-gradient(180deg,
+    background: linear-gradient(
+        180deg,
         var(--medical-bg-gradient-start) 0%,
         var(--medical-bg-gradient-mid) 50%,
-        var(--medical-bg-gradient-end) 100%);
+        var(--medical-bg-gradient-end) 100%
+    );
     color: var(--medical-text-dark);
     position: relative;
     overflow: hidden;
@@ -14,13 +16,18 @@
 }
 
 .podology::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     height: 6px;
-    background: linear-gradient(90deg, var(--accent-green-dim) 0%, var(--accent-green) 50%, var(--accent-green-dim) 100%);
+    background: linear-gradient(
+        90deg,
+        var(--accent-green-dim) 0%,
+        var(--accent-green) 50%,
+        var(--accent-green-dim) 100%
+    );
     background-size: 200% 100%;
     animation: shimmerMove 3s ease-in-out infinite;
 }
@@ -61,7 +68,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Unbounded', sans-serif;
+    font-family: "Unbounded", sans-serif;
     font-weight: 700;
     font-size: 2rem;
     color: white;
@@ -70,7 +77,7 @@
 }
 
 .podology-intro-name {
-    font-family: 'Unbounded', sans-serif;
+    font-family: "Unbounded", sans-serif;
     font-size: 1.4rem;
     font-weight: 700;
     color: var(--medical-text-dark);
@@ -101,7 +108,11 @@
 
 .intro-tag {
     padding: 8px 16px;
-    background: linear-gradient(135deg, var(--medical-green-subtle) 0%, var(--accent-green-06) 100%);
+    background: linear-gradient(
+        135deg,
+        var(--medical-green-subtle) 0%,
+        var(--accent-green-faint) 100%
+    );
     border: 1px solid var(--medical-green-20);
     border-radius: var(--radius-full);
     font-size: 0.85rem;
@@ -128,17 +139,18 @@
     background: linear-gradient(135deg, #ffffff 0%, #fafffe 100%);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-medical-sm);
-    border: 2px solid var(--accent-green-12);
+    border: 2px solid var(--accent-green-subtle);
     /* Оптимизировано: конкретные свойства вместо all */
-    transition: transform var(--transition-bounce),
-                box-shadow var(--transition-bounce),
-                border-color var(--transition-bounce);
+    transition:
+        transform var(--transition-bounce),
+        box-shadow var(--transition-bounce),
+        border-color var(--transition-bounce);
     position: relative;
     overflow: hidden;
 }
 
 .podology-item::before {
-    content: '';
+    content: "";
     position: absolute;
     left: 0;
     top: 0;
@@ -150,7 +162,7 @@
 }
 
 .podology-item::after {
-    content: '';
+    content: "";
     position: absolute;
     top: -50%;
     right: -50%;
@@ -196,12 +208,12 @@
 }
 
 .podology-item-info span::before {
-    content: '';
+    content: "";
     font-size: 0.85rem;
 }
 
 .podology-price {
-    font-family: 'Unbounded', sans-serif;
+    font-family: "Unbounded", sans-serif;
     font-size: 1.15rem;
     font-weight: 700;
     color: var(--accent-green-dim);
@@ -211,7 +223,9 @@
     border-radius: var(--radius-md);
     position: relative;
     z-index: var(--z-base);
-    transition: background var(--transition-base), transform var(--transition-base);
+    transition:
+        background var(--transition-base),
+        transform var(--transition-base);
 }
 
 .podology-item:hover .podology-price {
@@ -392,11 +406,12 @@
     font-size: 0.95rem;
     cursor: pointer;
     /* Оптимизировано: конкретные свойства вместо all */
-    transition: background var(--transition-base),
-                border-color var(--transition-base),
-                transform var(--transition-base),
-                box-shadow var(--transition-base),
-                color var(--transition-base);
+    transition:
+        background var(--transition-base),
+        border-color var(--transition-base),
+        transform var(--transition-base),
+        box-shadow var(--transition-base),
+        color var(--transition-base);
     box-shadow: 0 4px 12px var(--shadow-black-05);
 }
 
@@ -500,10 +515,11 @@
     border-radius: var(--radius-lg);
     border: 1px solid var(--medical-green-subtle);
     /* Оптимизировано: конкретные свойства вместо all */
-    transition: transform var(--transition-base),
-                background var(--transition-base),
-                border-color var(--transition-base),
-                box-shadow var(--transition-base);
+    transition:
+        transform var(--transition-base),
+        background var(--transition-base),
+        border-color var(--transition-base),
+        box-shadow var(--transition-base);
 }
 
 .podology-service-item:hover {
@@ -533,12 +549,12 @@
 }
 
 .podology-service-info span::before {
-    content: '';
+    content: "";
     font-size: 0.85rem;
 }
 
 .podology-service-price {
-    font-family: 'Unbounded', sans-serif;
+    font-family: "Unbounded", sans-serif;
     font-size: 1.15rem;
     font-weight: 700;
     color: var(--accent-green-dim);
@@ -546,7 +562,10 @@
     padding: 10px 18px;
     background: var(--medical-green-muted);
     border-radius: var(--radius-md);
-    transition: background var(--transition-base), transform var(--transition-base), box-shadow var(--transition-base);
+    transition:
+        background var(--transition-base),
+        transform var(--transition-base),
+        box-shadow var(--transition-base);
 }
 
 .podology-service-item:hover .podology-service-price {
@@ -583,7 +602,7 @@
 .podology-consultation .podology-service-price {
     background: linear-gradient(135deg, var(--accent-green-dim) 0%, var(--accent-green) 100%);
     color: white;
-    font-family: 'Unbounded', sans-serif;
+    font-family: "Unbounded", sans-serif;
     font-size: 1.15rem;
     font-weight: 700;
     padding: 10px 18px;

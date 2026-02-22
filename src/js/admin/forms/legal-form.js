@@ -3,7 +3,7 @@
  * Форма редактирования юридических документов
  */
 
-var AdminLegalForm = (function() {
+var AdminLegalForm = (function () {
     'use strict';
 
     var currentDocumentId = null;
@@ -16,27 +16,38 @@ var AdminLegalForm = (function() {
 
         var title = legalDoc ? 'Редактирование документа' : 'Новый документ';
 
-        var formHtml = '<form id="legalForm" class="modal-form">' +
+        var formHtml =
+            '<form id="legalForm" class="modal-form">' +
             '<div class="form-group">' +
-                '<label class="form-label">Название документа *</label>' +
-                '<input type="text" class="form-input" id="legalTitle" value="' + window.escapeHtml(legalDoc ? legalDoc.title : '') + '" required placeholder="Политика конфиденциальности">' +
+            '<label class="form-label">Название документа *</label>' +
+            '<input type="text" class="form-input" id="legalTitle" value="' +
+            window.escapeHtml(legalDoc ? legalDoc.title : '') +
+            '" required placeholder="Политика конфиденциальности">' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">URL-идентификатор (slug) *</label>' +
-                '<input type="text" class="form-input" id="legalSlug" value="' + window.escapeHtml(legalDoc ? legalDoc.slug : '') + '" required placeholder="privacy" pattern="[a-z0-9-]+">' +
-                '<small class="form-hint">Только латинские буквы, цифры и дефис. Будет доступен по адресу /legal/slug</small>' +
+            '<label class="form-label">URL-идентификатор (slug) *</label>' +
+            '<input type="text" class="form-input" id="legalSlug" value="' +
+            window.escapeHtml(legalDoc ? legalDoc.slug : '') +
+            '" required placeholder="privacy" pattern="[a-z0-9-]+">' +
+            '<small class="form-hint">Только латинские буквы, цифры и дефис. Будет доступен по адресу /legal/slug</small>' +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-label">Содержимое документа *</label>' +
-                AdminWYSIWYG.getEditorHTML('legalContent', legalDoc ? legalDoc.content : '', 'Введите текст документа...') +
+            '<label class="form-label">Содержимое документа *</label>' +
+            AdminWYSIWYG.getEditorHTML(
+                'legalContent',
+                legalDoc ? legalDoc.content : '',
+                'Введите текст документа...'
+            ) +
             '</div>' +
             '<div class="form-group">' +
-                '<label class="form-checkbox">' +
-                    '<input type="checkbox" id="legalActive" ' + (legalDoc && legalDoc.active !== false ? 'checked' : '') + '>' +
-                    '<span>Документ активен (отображается на сайте)</span>' +
-                '</label>' +
+            '<label class="form-checkbox">' +
+            '<input type="checkbox" id="legalActive" ' +
+            (legalDoc && legalDoc.active !== false ? 'checked' : '') +
+            '>' +
+            '<span>Документ активен (отображается на сайте)</span>' +
+            '</label>' +
             '</div>' +
-        '</form>';
+            '</form>';
 
         AdminModals.setTitle('modal', title);
         var modalBody = document.getElementById('modalBody');
@@ -47,7 +58,7 @@ var AdminLegalForm = (function() {
 
         // Инициализация WYSIWYG редактора с тулбаром
         // Используем requestAnimationFrame для гарантии что DOM обновился
-        requestAnimationFrame(function() {
+        requestAnimationFrame(function () {
             AdminWYSIWYG.initWithToolbar('legalContent');
         });
     }
@@ -85,7 +96,7 @@ var AdminLegalForm = (function() {
         var documents = AdminState.legalDocuments || [];
 
         // Проверка уникальности slug
-        var existingDoc = documents.find(function(d) {
+        var existingDoc = documents.find(function (d) {
             return d.slug === slug && d.id !== currentDocumentId;
         });
 
@@ -96,7 +107,9 @@ var AdminLegalForm = (function() {
 
         if (currentDocumentId) {
             // Редактирование существующего
-            var index = documents.findIndex(function(d) { return d.id === currentDocumentId; });
+            var index = documents.findIndex(function (d) {
+                return d.id === currentDocumentId;
+            });
             if (index !== -1) {
                 documents[index].title = title;
                 documents[index].slug = slug;
@@ -136,24 +149,21 @@ var AdminLegalForm = (function() {
         var legalDoc = AdminState.findLegalDocument(id);
         if (!legalDoc) return;
 
-        AdminModals.confirmDelete(
-            legalDoc.title,
-            async function() {
-                var documents = AdminState.legalDocuments.filter(function(d) {
-                    return d.id !== id;
-                });
+        AdminModals.confirmDelete(legalDoc.title, async function () {
+            var documents = AdminState.legalDocuments.filter(function (d) {
+                return d.id !== id;
+            });
 
-                try {
-                    await AdminAPI.save('legal', { documents: documents });
-                    AdminState.setLegalDocuments(documents);
-                    AdminLegalRenderer.render();
-                    showToast('Документ удалён', 'success');
-                } catch (error) {
-                    console.error('Error deleting legal document:', error);
-                    showToast('Ошибка удаления', 'error');
-                }
+            try {
+                await AdminAPI.save('legal', { documents: documents });
+                AdminState.setLegalDocuments(documents);
+                AdminLegalRenderer.render();
+                showToast('Документ удалён', 'success');
+            } catch (error) {
+                console.error('Error deleting legal document:', error);
+                showToast('Ошибка удаления', 'error');
             }
-        );
+        });
     }
 
     // generateId теперь используется из SharedHelpers (helpers.js)

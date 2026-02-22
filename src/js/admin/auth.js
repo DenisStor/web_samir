@@ -3,7 +3,7 @@
  * Управление входом и выходом из админ-панели
  */
 
-var AdminAuth = (function() {
+var AdminAuth = (function () {
     'use strict';
 
     /**
@@ -33,7 +33,7 @@ var AdminAuth = (function() {
 
         // Toggle password visibility
         if (togglePassword) {
-            togglePassword.addEventListener('click', function() {
+            togglePassword.addEventListener('click', function () {
                 var type = passwordInput.type === 'password' ? 'text' : 'password';
                 passwordInput.type = type;
 
@@ -51,7 +51,7 @@ var AdminAuth = (function() {
         }
 
         // Handle login form submit
-        loginForm.addEventListener('submit', async function(e) {
+        loginForm.addEventListener('submit', async function (e) {
             e.preventDefault();
 
             var password = passwordInput.value;
@@ -100,7 +100,7 @@ var AdminAuth = (function() {
         });
 
         // Enter key handler
-        passwordInput.addEventListener('keydown', function(e) {
+        passwordInput.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
                 loginForm.dispatchEvent(new Event('submit'));
             }
@@ -113,7 +113,7 @@ var AdminAuth = (function() {
     function initLogoutButton() {
         var logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
-            logoutBtn.addEventListener('click', async function() {
+            logoutBtn.addEventListener('click', async function () {
                 if (confirm('Вы уверены, что хотите выйти?')) {
                     await AdminAPI.logout();
                     hideAdminPanel();

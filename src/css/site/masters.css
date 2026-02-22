@@ -26,9 +26,10 @@
     overflow: hidden;
     border: 1px solid var(--border-subtle);
     /* Оптимизировано: конкретные свойства вместо all */
-    transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1),
-                border-color 0.4s ease,
-                box-shadow 0.4s ease;
+    transition:
+        transform 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+        border-color 0.4s ease,
+        box-shadow 0.4s ease;
     position: relative;
     /* will-change перемещён в :hover для экономии GPU памяти */
 }
@@ -67,7 +68,9 @@
     height: 100%;
     object-fit: cover;
     z-index: 0;
-    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), filter 0.4s ease;
+    transition:
+        transform 0.6s cubic-bezier(0.23, 1, 0.32, 1),
+        filter 0.4s ease;
 }
 
 .master-card:hover .master-image img.master-photo {
@@ -76,7 +79,7 @@
 }
 
 .master-image::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     background: linear-gradient(180deg, transparent 40%, var(--content-bg) 100%);
@@ -90,7 +93,7 @@
 
 /* Decorative line */
 .master-image::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: 0;
     left: 50%;
@@ -115,14 +118,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Unbounded', sans-serif;
+    font-family: "Unbounded", sans-serif;
     font-size: 2.2rem;
     font-weight: 800;
     color: white;
     position: relative;
     z-index: var(--z-base);
     box-shadow: 0 8px 32px var(--accent-green-glow);
-    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    transition:
+        transform 0.4s ease,
+        box-shadow 0.4s ease;
 }
 
 .master-card:hover .master-avatar {
@@ -141,9 +146,13 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     z-index: 3;
-    box-shadow: 0 4px 16px var(--shadow-black-40), inset 0 1px 0 var(--white-subtle);
+    box-shadow:
+        0 4px 16px var(--shadow-black-40),
+        inset 0 1px 0 var(--white-subtle);
     border: 1px solid var(--white-light);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
 }
 
 @supports (backdrop-filter: blur(8px)) {
@@ -154,7 +163,9 @@
 
 .master-card:hover .master-badge {
     transform: scale(1.05);
-    box-shadow: 0 6px 24px var(--shadow-black-60), inset 0 1px 0 var(--white-light);
+    box-shadow:
+        0 6px 24px var(--shadow-black-60),
+        inset 0 1px 0 var(--white-light);
 }
 
 /* Badge colors for readability on photos */
@@ -229,16 +240,17 @@
     border-radius: 8px;
     border-left: 2px solid transparent;
     /* Оптимизировано: конкретные свойства вместо all */
-    transition: color 0.3s ease,
-                background 0.3s ease,
-                border-color 0.3s ease,
-                transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    transition:
+        color 0.3s ease,
+        background 0.3s ease,
+        border-color 0.3s ease,
+        transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
     position: relative;
     overflow: hidden;
 }
 
 .master-principle::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     background: linear-gradient(90deg, var(--accent-green-muted), transparent);
@@ -267,8 +279,12 @@
 }
 
 /* Cascade animation for principles */
-.master-card:hover .master-principles > .master-principle:nth-child(1) { transition-delay: 0s; }
-.master-card:hover .master-principles > .master-principle:nth-child(2) { transition-delay: 0.05s; }
+.master-card:hover .master-principles > .master-principle:nth-child(1) {
+    transition-delay: 0s;
+}
+.master-card:hover .master-principles > .master-principle:nth-child(2) {
+    transition-delay: 0.05s;
+}
 
 .master-principle svg {
     width: 18px;
@@ -278,7 +294,9 @@
     flex-shrink: 0;
     margin-top: 1px;
     /* Оптимизировано: упрощён easing и конкретные свойства */
-    transition: transform 0.3s ease-out, filter 0.3s ease;
+    transition:
+        transform 0.3s ease-out,
+        filter 0.3s ease;
     position: relative;
     z-index: 1;
     filter: drop-shadow(0 0 0 transparent);
@@ -286,7 +304,7 @@
 
 .master-card:hover .master-principle svg {
     transform: scale(1.2) rotate(5deg);
-    filter: drop-shadow(0 0 6px var(--accent-green-glow-intense));
+    filter: drop-shadow(0 0 6px var(--accent-green-glow-strong));
 }
 
 /* Master Extra (reveal on hover via grid animation) */
@@ -294,7 +312,9 @@
     display: grid;
     grid-template-rows: 0fr;
     opacity: 0;
-    transition: grid-template-rows 0.4s ease, opacity 0.3s ease;
+    transition:
+        grid-template-rows 0.4s ease,
+        opacity 0.3s ease;
 }
 
 .master-extra-inner {

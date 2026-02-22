@@ -3,7 +3,7 @@
  * Клиент для работы с серверным API
  */
 
-var AdminAPI = (function() {
+var AdminAPI = (function () {
     'use strict';
 
     var AUTH_TOKEN_KEY = 'says_admin_token';
@@ -43,7 +43,7 @@ var AdminAPI = (function() {
             AdminAuth.showLoginForm();
         } else {
             // Fallback: показываем модальное окно или перезагружаем страницу с задержкой
-            setTimeout(function() {
+            setTimeout(function () {
                 sessionExpiredHandled = false;
                 location.reload();
             }, 2000);
@@ -78,7 +78,9 @@ var AdminAPI = (function() {
      */
     async function handleHttpError(response) {
         if (!response.ok) {
-            var errorData = await response.json().catch(function() { return {}; });
+            var errorData = await response.json().catch(function () {
+                return {};
+            });
             throw new Error(errorData.error || 'HTTP ' + response.status);
         }
     }

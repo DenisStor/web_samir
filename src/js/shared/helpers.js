@@ -3,7 +3,7 @@
  * Общие утилиты для всех частей приложения
  * @module SharedHelpers
  */
-(function() {
+(function () {
     'use strict';
 
     // =================================================================
@@ -74,17 +74,45 @@
         if (!text) return '';
 
         var translitMap = {
-            'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo',
-            'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
-            'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
-            'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch',
-            'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya'
+            а: 'a',
+            б: 'b',
+            в: 'v',
+            г: 'g',
+            д: 'd',
+            е: 'e',
+            ё: 'yo',
+            ж: 'zh',
+            з: 'z',
+            и: 'i',
+            й: 'y',
+            к: 'k',
+            л: 'l',
+            м: 'm',
+            н: 'n',
+            о: 'o',
+            п: 'p',
+            р: 'r',
+            с: 's',
+            т: 't',
+            у: 'u',
+            ф: 'f',
+            х: 'h',
+            ц: 'ts',
+            ч: 'ch',
+            ш: 'sh',
+            щ: 'sch',
+            ъ: '',
+            ы: 'y',
+            ь: '',
+            э: 'e',
+            ю: 'yu',
+            я: 'ya'
         };
 
         return text
             .toLowerCase()
             .split('')
-            .map(function(char) {
+            .map(function (char) {
                 return translitMap[char] !== undefined ? translitMap[char] : char;
             })
             .join('')
@@ -108,11 +136,11 @@
      */
     function debounce(func, wait) {
         var timeout;
-        return function() {
+        return function () {
             var context = this;
             var args = arguments;
             clearTimeout(timeout);
-            timeout = setTimeout(function() {
+            timeout = setTimeout(function () {
                 func.apply(context, args);
             }, wait);
         };
@@ -128,11 +156,11 @@
      */
     function throttleRAF(func) {
         var rafId = null;
-        return function() {
+        return function () {
             var context = this;
             var args = arguments;
             if (rafId) return;
-            rafId = requestAnimationFrame(function() {
+            rafId = requestAnimationFrame(function () {
                 func.apply(context, args);
                 rafId = null;
             });
@@ -164,16 +192,20 @@
      */
     function formatDate(date, options) {
         if (!date) return '';
-        var d = typeof date === 'string' ? new Date(date) : date;
-        if (isNaN(d.getTime())) return '';
+        try {
+            var d = typeof date === 'string' ? new Date(date) : date;
+            if (isNaN(d.getTime())) return String(date);
 
-        var defaultOptions = {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric'
-        };
+            var defaultOptions = {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            };
 
-        return d.toLocaleDateString('ru-RU', options || defaultOptions);
+            return d.toLocaleDateString('ru-RU', options || defaultOptions);
+        } catch (e) {
+            return String(date);
+        }
     }
 
     // =================================================================
@@ -204,5 +236,4 @@
     window.generateId = generateId;
     window.generateSlug = generateSlug;
     window.debounce = debounce;
-
 })();

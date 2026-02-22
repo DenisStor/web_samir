@@ -13,7 +13,11 @@
     font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background var(--transition-base), border-color var(--transition-base), color var(--transition-base), box-shadow var(--transition-base);
+    transition:
+        background var(--transition-base),
+        border-color var(--transition-base),
+        color var(--transition-base),
+        box-shadow var(--transition-base);
 }
 
 .btn svg {
@@ -120,38 +124,12 @@
 }
 
 @keyframes btn-spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .btn:disabled {
     cursor: not-allowed;
     opacity: 0.5;
-}
-
-/* Export button */
-.export-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    background: transparent;
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-md);
-    color: var(--text-gray);
-    font-family: inherit;
-    font-size: 0.85rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background var(--transition-base), border-color var(--transition-base), color var(--transition-base);
-}
-
-.export-btn:hover {
-    background: var(--content-bg);
-    border-color: var(--accent-green);
-    color: var(--accent-green);
-}
-
-.export-btn svg {
-    width: 16px;
-    height: 16px;
 }

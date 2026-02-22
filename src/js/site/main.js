@@ -6,7 +6,7 @@
  * Зависит от: utils.js
  */
 
-(function() {
+(function () {
     'use strict';
 
     var $ = SaysApp.$;
@@ -27,21 +27,23 @@
 
         if (!tabButtons.length) return;
 
-        tabButtons.forEach(function(button) {
-            on(button, 'click', function(e) {
+        tabButtons.forEach(function (button) {
+            on(button, 'click', function (e) {
                 e.preventDefault();
 
                 var targetTab = button.getAttribute('data-tab-target');
                 if (!targetTab) return;
 
                 // Убрать active со всех табов
-                tabButtons.forEach(function(btn) { toggleClass(btn, 'active', false); });
+                tabButtons.forEach(function (btn) {
+                    toggleClass(btn, 'active', false);
+                });
 
                 // Добавить active на кликнутый таб
                 toggleClass(button, 'active', true);
 
                 // Скрыть все контенты табов
-                $$('.service-tab-content').forEach(function(content) {
+                $$('.service-tab-content').forEach(function (content) {
                     toggleClass(content, 'active', false);
                 });
 
@@ -66,21 +68,23 @@
 
         if (!tabButtons.length) return;
 
-        tabButtons.forEach(function(button) {
-            on(button, 'click', function(e) {
+        tabButtons.forEach(function (button) {
+            on(button, 'click', function (e) {
                 e.preventDefault();
 
                 var targetTab = button.getAttribute('data-podology-target');
                 if (!targetTab) return;
 
                 // Убрать active со всех табов
-                $$('.podology-tab').forEach(function(btn) { toggleClass(btn, 'active', false); });
+                $$('.podology-tab').forEach(function (btn) {
+                    toggleClass(btn, 'active', false);
+                });
 
                 // Добавить active на кликнутый таб
                 toggleClass(button, 'active', true);
 
                 // Скрыть все контенты табов
-                $$('.podology-tab-content').forEach(function(content) {
+                $$('.podology-tab-content').forEach(function (content) {
                     toggleClass(content, 'active', false);
                 });
 
@@ -106,5 +110,4 @@
     // Запуск при готовности DOM
     ready(initServiceTabs);
     ready(initPodologyTabs);
-
 })();

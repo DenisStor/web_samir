@@ -8,7 +8,7 @@
  * Зависит от: utils.js
  */
 
-(function() {
+(function () {
     'use strict';
 
     var $ = SaysApp.$;
@@ -39,7 +39,7 @@
         lockScroll(true);
 
         // Скрыть все статьи
-        $$('.blog-modal-article').forEach(function(article) {
+        $$('.blog-modal-article').forEach(function (article) {
             article.style.display = 'none';
         });
 
@@ -85,7 +85,7 @@
 
         if (blogModal) {
             // Закрытие по клику на backdrop
-            on(blogModal, 'click', function(e) {
+            on(blogModal, 'click', function (e) {
                 if (e.target === blogModal) {
                     closeBlogModal();
                 }
@@ -121,5 +121,4 @@
     window.closeBlogModal = closeBlogModal;
     window.toggleFaq = toggleFaq;
     window.handleButtonKeydown = handleButtonKeydown;
-
 })();

@@ -8,7 +8,7 @@
  * Зависит от: utils.js
  */
 
-(function() {
+(function () {
     'use strict';
 
     var $ = SaysApp.$;
@@ -114,5 +114,4 @@
     // Экспорт глобальных функций для onclick в HTML
     window.toggleMenu = toggleMenu;
     window.closeMenu = closeMenu;
-
 })();
