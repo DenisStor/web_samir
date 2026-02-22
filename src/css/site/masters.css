@@ -208,126 +208,195 @@
     color: var(--accent-green);
     font-size: 0.85rem;
     font-weight: 600;
-    margin-bottom: 16px;
     letter-spacing: 0.05em;
     text-transform: uppercase;
     opacity: 0.9;
 }
 
+.master-role:not(:last-child) {
+    margin-bottom: 16px;
+}
+
 .master-specialization {
     color: var(--text-gray);
     font-size: 0.95rem;
-    margin-bottom: 20px;
     line-height: 1.6;
     letter-spacing: 0.01em;
 }
 
-.master-principles {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+/* =====================================================================
+   CTA Card — «Стать мастером»
+   ===================================================================== */
+
+.master-card--cta {
+    cursor: pointer;
+    border: 1px dashed var(--border-light);
+    background: linear-gradient(135deg, var(--content-bg) 0%, rgba(0, 255, 136, 0.03) 100%);
 }
 
-.master-principle {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    font-size: 0.85rem;
-    color: var(--text-gray-light);
-    line-height: 1.5;
-    padding: 8px 12px;
-    background: var(--white-ghost);
-    border-radius: 8px;
-    border-left: 2px solid transparent;
-    /* Оптимизировано: конкретные свойства вместо all */
-    transition:
-        color 0.3s ease,
-        background 0.3s ease,
-        border-color 0.3s ease,
-        transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-    position: relative;
-    overflow: hidden;
+.master-card--cta:hover {
+    border-style: solid;
 }
 
-.master-principle::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, var(--accent-green-muted), transparent);
-    opacity: 0;
-    transition: opacity 0.3s ease;
+.master-image--cta {
+    aspect-ratio: auto;
+    padding: 48px 24px 32px;
 }
 
-.master-principle span {
-    position: relative;
-    z-index: 1;
-    flex: 1;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    hyphens: auto;
+.master-image--cta::before,
+.master-image--cta::after {
+    display: none;
 }
 
-.master-card:hover .master-principle {
-    color: var(--text-white);
-    background: var(--white-faint);
-    border-left-color: var(--accent-green);
-    transform: translateX(4px);
-}
-
-.master-card:hover .master-principle::before {
-    opacity: 1;
-}
-
-/* Cascade animation for principles */
-.master-card:hover .master-principles > .master-principle:nth-child(1) {
-    transition-delay: 0s;
-}
-.master-card:hover .master-principles > .master-principle:nth-child(2) {
-    transition-delay: 0.05s;
-}
-
-.master-principle svg {
-    width: 18px;
-    height: 18px;
-    min-width: 18px;
+.join-icon {
     color: var(--accent-green);
-    flex-shrink: 0;
-    margin-top: 1px;
-    /* Оптимизировано: упрощён easing и конкретные свойства */
-    transition:
-        transform 0.3s ease-out,
-        filter 0.3s ease;
-    position: relative;
-    z-index: 1;
-    filter: drop-shadow(0 0 0 transparent);
+    opacity: 0.8;
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.3s ease;
+    filter: drop-shadow(0 0 12px var(--accent-green-glow));
 }
 
-.master-card:hover .master-principle svg {
-    transform: scale(1.2) rotate(5deg);
-    filter: drop-shadow(0 0 6px var(--accent-green-glow-strong));
+.master-card--cta:hover .join-icon {
+    transform: scale(1.15);
+    opacity: 1;
+    filter: drop-shadow(0 0 24px var(--accent-green-glow-strong));
 }
 
-/* Master Extra (reveal on hover via grid animation) */
-.master-extra {
-    display: grid;
-    grid-template-rows: 0fr;
-    opacity: 0;
-    transition:
-        grid-template-rows 0.4s ease,
-        opacity 0.3s ease;
-}
-
-.master-extra-inner {
-    overflow: hidden;
-    min-height: 0;
+.master-content--cta {
+    text-align: center;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    align-items: center;
 }
 
-.master-card:hover .master-extra {
-    grid-template-rows: 1fr;
+.join-cta-btn {
+    margin-top: 16px;
+}
+
+/* =====================================================================
+   Join Modal — Модалка «Стать мастером»
+   ===================================================================== */
+
+.join-modal {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-modal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--overlay-heavy);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    padding: 24px;
+}
+
+@supports (backdrop-filter: blur(8px)) {
+    .join-modal {
+        backdrop-filter: blur(8px);
+    }
+}
+
+.join-modal.active {
     opacity: 1;
+    visibility: visible;
+}
+
+.join-modal-content {
+    background: var(--content-bg);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-xl);
+    width: 100%;
+    max-width: 440px;
+    padding: 32px;
+    position: relative;
+    transform: translateY(20px) scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.join-modal.active .join-modal-content {
+    transform: translateY(0) scale(1);
+}
+
+.join-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.join-modal-header h3 {
+    font-size: 1.3rem;
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    margin: 0;
+}
+
+.join-modal-close {
+    background: none;
+    border: none;
+    color: var(--text-gray);
+    cursor: pointer;
+    font-size: 1.4rem;
+    line-height: 1;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    transition: color 0.2s ease, background 0.2s ease;
+    flex-shrink: 0;
+}
+
+.join-modal-close:hover {
+    color: var(--text-white);
+    background: var(--white-muted);
+}
+
+.join-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.join-form input {
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    color: var(--text-white);
+    font-size: 1rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+}
+
+.join-form input::placeholder {
+    color: var(--text-gray);
+}
+
+.join-form input:focus {
+    border-color: var(--accent-green);
+    box-shadow: 0 0 0 3px var(--accent-green-subtle);
+}
+
+.join-form .btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 1rem;
+}
+
+.join-form-success {
+    text-align: center;
+    padding: 24px 16px;
+    color: var(--accent-green);
+    font-size: 1.05rem;
+    line-height: 1.5;
+}
+
+.join-form-error {
+    color: var(--color-danger-light);
+    font-size: 0.85rem;
+    text-align: center;
+    margin-top: -8px;
 }
 
 /* Responsive */
@@ -362,21 +431,6 @@
 
     .master-specialization {
         font-size: 0.95rem;
-        margin-bottom: 20px;
         line-height: 1.6;
-    }
-
-    .master-principles {
-        gap: 12px;
-    }
-
-    .master-principle {
-        font-size: 0.85rem;
-        gap: 10px;
-    }
-
-    .master-principle svg {
-        width: 16px;
-        height: 16px;
     }
 }

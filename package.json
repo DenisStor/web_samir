@@ -7,8 +7,11 @@
     "build:watch": "python3 scripts/build.py --watch",
     "build:admin": "python3 scripts/build.py --admin-only",
     "start": "python3 run.py",
-    "lint": "eslint src/js/ --ext .js",
-    "lint:fix": "eslint src/js/ --ext .js --fix",
+    "lint": "eslint src/js/ --ext .js && stylelint 'src/css/**/*.css'",
+    "lint:css": "stylelint 'src/css/**/*.css'",
+    "lint:css:fix": "stylelint 'src/css/**/*.css' --fix",
+    "lint:js": "eslint src/js/ --ext .js",
+    "lint:fix": "eslint src/js/ --ext .js --fix && stylelint 'src/css/**/*.css' --fix",
     "format": "prettier --write 'src/js/**/*.js' 'src/css/**/*.css'",
     "format:check": "prettier --check 'src/js/**/*.js' 'src/css/**/*.css'",
     "test": "npm run test:python && npm run test:js",
@@ -26,7 +29,9 @@
     "eslint": "^8.57.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
-    "prettier": "^3.2.0"
+    "prettier": "^3.2.0",
+    "stylelint": "^17.3.0",
+    "stylelint-config-standard": "^40.0.0"
   },
   "engines": {
     "node": ">=16.0.0"

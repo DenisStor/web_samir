@@ -10,7 +10,7 @@
 
 .shop-search input {
     width: 100%;
-    padding: 12px 44px 12px 44px;
+    padding: 12px 44px;
     background: var(--content-bg);
     border: 2px solid var(--border-subtle);
     border-radius: var(--radius-full);

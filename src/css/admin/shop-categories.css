@@ -83,7 +83,7 @@
     font-size: 1rem;
     font-weight: 600;
     color: var(--text-white);
-    margin: 0 0 4px 0;
+    margin: 0 0 4px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -110,7 +110,7 @@
 .category-card-description {
     font-size: 0.8rem;
     color: var(--text-gray);
-    margin: 0 0 8px 0;
+    margin: 0 0 8px;
     line-height: 1.4;
     display: -webkit-box;
     -webkit-line-clamp: 2;

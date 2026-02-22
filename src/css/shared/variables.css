@@ -17,7 +17,7 @@
     --content-bg-light: #242424;
 
     /* Акцентный цвет (зелёный) */
-    --accent-green: #00ff88;
+    --accent-green: #0f8;
     --accent-green-dim: #00cc6a;
     --accent-green-glow: rgba(0, 255, 136, 0.3);
     --accent-green-glow-strong: rgba(0, 255, 136, 0.45);
@@ -28,13 +28,13 @@
     --accent-green-ghost: rgba(0, 255, 136, 0.03);
 
     /* Текст */
-    --text-white: #ffffff;
+    --text-white: #fff;
     --text-gray: #a0a0a0;
     --text-gray-light: #c0c0c0;
     --text-light: #d0d0d0;
 
     /* Цвета для бейджей */
-    --badge-green: #00ff88;
+    --badge-green: #0f8;
     --badge-pink: #ff6b9d;
     --badge-blue: #4d7cff;
 
@@ -73,7 +73,7 @@
 
     /* Цвета для danger/error состояний */
     --color-danger: #ff4757;
-    --color-danger-hover: #ff3344;
+    --color-danger-hover: #f34;
     --color-danger-light: #ff6b6b;
     --color-danger-lighter: #ff8a8a;
     --color-danger-subtle: rgba(255, 71, 87, 0.15);
@@ -83,7 +83,7 @@
        ЦВЕТА - Подологическая секция (светлая тема)
        ================================================================= */
     --medical-bg: #f5f7f5;
-    --medical-bg-gradient-start: #ffffff;
+    --medical-bg-gradient-start: #fff;
     --medical-bg-gradient-mid: #f0fdf4;
     --medical-bg-gradient-end: #e8f5ed;
     --medical-text-dark: #0d3320;
