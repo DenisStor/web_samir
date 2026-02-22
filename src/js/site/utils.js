@@ -154,22 +154,7 @@ SaysApp.onEscape = function (callback) {
 /**
  * Форматировать дату — делегирует в SharedHelpers
  */
-SaysApp.formatDate = window.SharedHelpers
-    ? SharedHelpers.formatDate
-    : function (dateStr) {
-          if (!dateStr) return '';
-          try {
-              var date = dateStr instanceof Date ? dateStr : new Date(dateStr);
-              if (isNaN(date.getTime())) return String(dateStr);
-              return date.toLocaleDateString('ru-RU', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric'
-              });
-          } catch (e) {
-              return String(dateStr);
-          }
-      };
+SaysApp.formatDate = SharedHelpers.formatDate;
 
 /**
  * Форматировать дату кратко (ДД.ММ.ГГГГ)
@@ -196,19 +181,7 @@ SaysApp.formatDateShort = function (dateStr) {
 /**
  * Debounce — делегирует в SharedHelpers
  */
-SaysApp.debounce = window.SharedHelpers
-    ? SharedHelpers.debounce
-    : function (fn, delay) {
-          var timeoutId = null;
-          return function () {
-              var context = this;
-              var args = arguments;
-              clearTimeout(timeoutId);
-              timeoutId = setTimeout(function () {
-                  fn.apply(context, args);
-              }, delay);
-          };
-      };
+SaysApp.debounce = SharedHelpers.debounce;
 
 /**
  * Throttle функция
