@@ -1,0 +1,15 @@
+/* =====================================================================
+   EDUCATION/INDEX.CSS - Стили страницы обучения (education.html)
+   =====================================================================
+   Импортирует модули.
+   ===================================================================== */
+
+/* Shared variables - единый источник CSS переменных */
+@import "../shared/variables.css";
+@import "../shared/base.css";
+@import "../shared/utilities.css";
+@import "../shared/navigation.css";
+@import "../shared/components.css";
+@import "../site/faq.css";
+@import "../site/footer.css";
+@import "education.css";

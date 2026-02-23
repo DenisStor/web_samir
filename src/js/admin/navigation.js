@@ -12,7 +12,6 @@ var AdminNavigation = (function () {
         masters: 'Мастера',
         services: 'Услуги',
         articles: 'Статьи',
-        principles: 'Принципы',
         faq: 'FAQ',
         social: 'Соцсети'
     };

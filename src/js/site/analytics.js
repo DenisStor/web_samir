@@ -11,6 +11,13 @@
         return;
     }
 
+    // Не запускать без согласия на cookies
+    try {
+        if (localStorage.getItem('cookie_consent') !== '1') return;
+    } catch (e) {
+        return;
+    }
+
     var API_URL = '/api/stats/visit';
     var SESSION_KEY = 'says_session_id';
 
@@ -102,7 +109,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data),
                 keepalive: true
-            }).catch(() => {});
+            }).catch(function () {});
         }
     }
 

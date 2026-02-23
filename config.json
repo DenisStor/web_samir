@@ -27,6 +27,10 @@
     "dangerLight": "#ff6b6b",
     "dangerSubtle": "rgba(255, 71, 87, 0.15)"
   },
+  "telegram_bot": {
+    "token": "",
+    "chat_id": ""
+  },
   "idPrefixes": {
     "master": "master_",
     "article": "article_",

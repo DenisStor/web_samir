@@ -134,8 +134,8 @@
     <!-- Security: DOMPurify for XSS protection -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.2.3/purify.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- CSS Modules -->
-    <link rel="stylesheet" href="/src/css/shared/index.css?v=3edfdda3">
-    <link rel="stylesheet" href="/src/css/site/index.css?v=570ee872">
+    <link rel="stylesheet" href="/src/css/shared/index.css?v=e3b8dd66">
+    <link rel="stylesheet" href="/src/css/site/index.css?v=ca7be251">
 </head>
 <body>
 
@@ -152,6 +152,7 @@
                 <li><a href="#location">Контакты</a></li>
                 <li><a href="#blog">Блог</a></li>
                 <li><a href="#faq">FAQ</a></li>
+                <li><a href="/education">Обучение</a></li>
                 <li><a href="/shop">Магазин</a></li>
             </ul>
             <a href="#booking" class="nav-cta">Онлайн-запись</a>
@@ -171,6 +172,7 @@
         <a href="#location" onclick="closeMenu()">Контакты</a>
         <a href="#blog" onclick="closeMenu()">Блог</a>
         <a href="#faq" onclick="closeMenu()">FAQ</a>
+        <a href="/education" onclick="closeMenu()">Обучение</a>
         <a href="/shop" onclick="closeMenu()">Магазин</a>
         <a href="#booking" onclick="closeMenu()">Онлайн-запись</a>
     </div>
@@ -296,11 +298,11 @@
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>
                         Основные услуги
                     </h3>
-                    <p class="category-description">Классические и современные стрижки, работа с бородой и бритьё</p>
                     <div class="service-list">
                         <div class="service-item">
                             <div>
                                 <div class="service-name">Стрижка мужская</div>
+                                <div class="service-note">1 ч 15 мин · подбор стиля, мытьё головы, стрижка, укладка волос, рекомендации по уходу</div>
                             </div>
                             <div class="service-prices">
                                 <span class="price-tag price-green">1000 ₽</span>
@@ -311,6 +313,7 @@
                         <div class="service-item">
                             <div>
                                 <div class="service-name">Оформление бороды</div>
+                                <div class="service-note">1 ч · моделирование, распаривание горячими полотенцами, подбривание контуров</div>
                             </div>
                             <div class="service-prices">
                                 <span class="price-tag price-green">800 ₽</span>
@@ -321,7 +324,7 @@
                         <div class="service-item">
                             <div>
                                 <div class="service-name">Стрижка детская</div>
-                                <div class="service-note">до 11 лет</div>
+                                <div class="service-note">1 ч 15 мин · с 3 до 11 лет включительно</div>
                             </div>
                             <div class="service-prices">
                                 <span class="price-tag price-green">800 ₽</span>
@@ -332,7 +335,7 @@
                         <div class="service-item">
                             <div>
                                 <div class="service-name">Опасное бритьё</div>
-                                <div class="service-note">головы / лица</div>
+                                <div class="service-note">1 ч · подготовка к бритью премиальной косметикой, распаривание горячими полотенцами, бритье шаветкой, обработка кожи</div>
                             </div>
                             <div class="service-prices">
                                 <span class="price-tag price-green">800 ₽</span>
@@ -343,7 +346,7 @@
                         <div class="service-item">
                             <div>
                                 <div class="service-name">Фейд</div>
-                                <div class="service-note">под машинку</div>
+                                <div class="service-note">1 ч · баз кат, цезарь. Верх под насадку, плавный переход с нуля на височной и затылочной зонах</div>
                             </div>
                             <div class="service-prices">
                                 <span class="price-tag price-green">800 ₽</span>
@@ -354,7 +357,7 @@
                         <div class="service-item">
                             <div>
                                 <div class="service-name">Стрижка под машинку</div>
-                                <div class="service-note">до двух насадок</div>
+                                <div class="service-note">45 мин</div>
                             </div>
                             <div class="service-prices">
                                 <span class="price-tag price-green">600 ₽</span>
@@ -365,7 +368,7 @@
                         <div class="service-item">
                             <div>
                                 <div class="service-name">Борода под машинку</div>
-                                <div class="service-note">под одну насадку, без контуров</div>
+                                <div class="service-note">15 мин · под одну длину, без контуров</div>
                             </div>
                             <div class="service-prices">
                                 <span class="price-tag price-green">300 ₽</span>
@@ -382,11 +385,11 @@
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
                         Комплексные услуги
                     </h3>
-                    <p class="category-description">Выгодные комбинации услуг для полного преображения</p>
                     <div class="service-list">
                         <div class="service-item">
                             <div>
                                 <div class="service-name">Стрижка + оформление бороды</div>
+                                <div class="service-note">2 ч 30 мин</div>
                             </div>
                             <div class="service-prices">
                                 <span class="price-tag price-green">1500 ₽</span>
@@ -397,6 +400,7 @@
                         <div class="service-item">
                             <div>
                                 <div class="service-name">Стрижка + стрижка детская</div>
+                                <div class="service-note">2 ч 30 мин</div>
                             </div>
                             <div class="service-prices">
                                 <span class="price-tag price-green">1600 ₽</span>
@@ -407,6 +411,7 @@
                         <div class="service-item">
                             <div>
                                 <div class="service-name">Стрижка + бритьё опасное</div>
+                                <div class="service-note">2 ч 15 мин</div>
                             </div>
                             <div class="service-prices">
                                 <span class="price-tag price-green">1500 ₽</span>
@@ -417,6 +422,7 @@
                         <div class="service-item">
                             <div>
                                 <div class="service-name">Оформление бороды + окантовка головы</div>
+                                <div class="service-note">1 ч 15 мин</div>
                             </div>
                             <div class="service-prices">
                                 <span class="price-tag price-green">1000 ₽</span>
@@ -427,6 +433,7 @@
                         <div class="service-item">
                             <div>
                                 <div class="service-name">Стрижка + камуфляж седины</div>
+                                <div class="service-note">2 ч 30 мин</div>
                             </div>
                             <div class="service-prices">
                                 <span class="price-tag price-green">1500 ₽</span>
@@ -437,6 +444,7 @@
                         <div class="service-item">
                             <div>
                                 <div class="service-name">Оформление бороды + камуфляж седины</div>
+                                <div class="service-note">1 ч 30 мин</div>
                             </div>
                             <div class="service-prices">
                                 <span class="price-tag price-green">1300 ₽</span>
@@ -453,12 +461,11 @@
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                         Дополнительные услуги
                     </h3>
-                    <p class="category-description">Уход, укладка и специальные процедуры</p>
                     <div class="service-list">
                         <div class="service-item">
                             <div>
                                 <div class="service-name">Уход за кожей лица</div>
-                                <div class="service-note">очищение и увлажнение косметикой Volcano, 6 этапов ухода, массаж</div>
+                                <div class="service-note">1 ч · очищение и увлажнение косметикой Volcano, 6 этапов ухода, массаж</div>
                             </div>
                             <div class="service-prices">
                                 <span class="price-tag price-green">1100 ₽</span>
@@ -469,6 +476,7 @@
                         <div class="service-item">
                             <div>
                                 <div class="service-name">Уход за кожей головы и волосами</div>
+                                <div class="service-note">15 мин · процедура выполняется на косметике Volcano</div>
                             </div>
                             <div class="service-prices">
                                 <span class="price-tag price-green">400 ₽</span>
@@ -479,7 +487,7 @@
                         <div class="service-item">
                             <div>
                                 <div class="service-name">Камуфляж седины</div>
-                                <div class="service-note">голова или борода</div>
+                                <div class="service-note">1 ч · тонирование седых волос на голове или бороде</div>
                             </div>
                             <div class="service-prices">
                                 <span class="price-tag price-green">700 ₽</span>
@@ -490,7 +498,7 @@
                         <div class="service-item">
                             <div>
                                 <div class="service-name">Окантовка головы</div>
-                                <div class="service-note">оформление контуров триммером</div>
+                                <div class="service-note">30 мин · придание формы контуров триммером</div>
                             </div>
                             <div class="service-prices">
                                 <span class="price-tag price-green">400 ₽</span>
@@ -501,6 +509,7 @@
                         <div class="service-item">
                             <div>
                                 <div class="service-name">Мытьё и укладка волос</div>
+                                <div class="service-note">30 мин</div>
                             </div>
                             <div class="service-prices">
                                 <span class="price-tag price-green">300 ₽</span>
@@ -511,7 +520,7 @@
                         <div class="service-item">
                             <div>
                                 <div class="service-name">Удаление волос воском</div>
-                                <div class="service-note">одна зона — нос / уши</div>
+                                <div class="service-note">15 мин · нос / уши</div>
                             </div>
                             <div class="service-prices">
                                 <span class="price-tag price-green">300 ₽</span>
@@ -552,6 +561,59 @@
         </div>
     </section>
 
+
+    <!-- Education Teaser Section -->
+    <section class="section education-teaser" id="education">
+        <div class="container">
+            <div class="education-teaser-content">
+                <div class="section-header fade-in">
+                    <span class="section-tag">Обучение</span>
+                    <h2 class="section-title">Курс БАРБЕР С 0</h2>
+                    <p class="section-subtitle">Научим стричь осознанно — с пониманием каждого действия</p>
+                </div>
+
+                <div class="education-teaser-card fade-in">
+                    <div class="education-teaser-stats">
+                        <div class="education-teaser-stat">
+                            <span class="education-teaser-stat-value">22</span>
+                            <span class="education-teaser-stat-label">занятия</span>
+                        </div>
+                        <div class="education-teaser-stat">
+                            <span class="education-teaser-stat-value">1,5</span>
+                            <span class="education-teaser-stat-label">месяца</span>
+                        </div>
+                        <div class="education-teaser-stat">
+                            <span class="education-teaser-stat-value">120 000</span>
+                            <span class="education-teaser-stat-label">рублей</span>
+                        </div>
+                    </div>
+
+                    <div class="education-teaser-features">
+                        <div class="education-teaser-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span>6 теоретических + 15 практических занятий</span>
+                        </div>
+                        <div class="education-teaser-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span>Практика на манекенах и моделях</span>
+                        </div>
+                        <div class="education-teaser-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span>Готовое портфолио на выходе</span>
+                        </div>
+                    </div>
+
+                    <a href="/education" class="btn btn-primary education-teaser-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                        </svg>
+                        Подробнее о курсе
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Masters Section -->
     <section class="section masters" id="masters">
@@ -862,17 +924,32 @@
     <div class="join-modal" id="joinModal" role="dialog" aria-modal="true" aria-labelledby="joinModalTitle" aria-hidden="true">
         <div class="join-modal-content">
             <div class="join-modal-header">
-                <h3 id="joinModalTitle">Стать мастером Say's Barbers</h3>
+                <div>
+                    <h3 id="joinModalTitle">Стать мастером</h3>
+                    <p class="join-modal-subtitle">Оставьте контакты — мы перезвоним</p>
+                </div>
                 <button class="join-modal-close" onclick="closeJoinModal()" aria-label="Закрыть" type="button">&times;</button>
             </div>
             <form id="joinForm" class="join-form" novalidate>
-                <input type="text" name="name" placeholder="Ваше имя" required autocomplete="name">
-                <input type="tel" name="phone" placeholder="+7 (___) ___-__-__" required autocomplete="tel">
+                <div class="join-form-group">
+                    <label class="join-form-label" for="joinName">Имя</label>
+                    <input type="text" id="joinName" name="name" placeholder="Как вас зовут?" required autocomplete="name">
+                </div>
+                <div class="join-form-group">
+                    <label class="join-form-label" for="joinPhone">Телефон</label>
+                    <input type="tel" id="joinPhone" name="phone" placeholder="+7 (___) ___-__-__" required autocomplete="tel" inputmode="tel">
+                </div>
                 <div id="joinFormError" class="join-form-error" style="display:none"></div>
+                <label class="consent-label">
+                    <input type="checkbox" name="consent" required>
+                    <span>Я согласен с <a href="/legal.html?page=privacy" target="_blank">политикой конфиденциальности</a></span>
+                </label>
                 <button type="submit" class="btn btn-primary">Отправить заявку</button>
             </form>
             <div id="joinFormSuccess" class="join-form-success" style="display:none">
-                Заявка отправлена! Мы свяжемся с вами.
+                <svg class="join-success-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                <div class="join-success-title">Заявка отправлена!</div>
+                <div class="join-success-text">Мы свяжемся с вами в ближайшее время</div>
             </div>
         </div>
     </div>
@@ -882,7 +959,7 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-info">
-                    <div class="footer-copy">© 2025 Say's Barbers. Все права защищены.</div>
+                    <div class="footer-copy">© 2026 Say's Barbers. Все права защищены.</div>
                     <div class="footer-legal">
                         <div>ИП Маллаева А.И.</div>
                         <div>ИНН 540698711802</div>
@@ -894,11 +971,25 @@
                     <a href="legal.html?page=privacy">Политика конфиденциальности</a>
                     <a href="legal.html?page=terms">Пользовательское соглашение</a>
                     <a href="index.html">На главную</a>
+                    <a href="/education">Обучение</a>
                     <a href="admin.html">Админ-панель</a>
                 </div>
             </div>
         </div>
     </footer>
+
+    <!-- Cookie Banner -->
+    <div class="cookie-banner" id="cookieBanner" role="dialog" aria-label="Уведомление о cookies" style="display:none">
+        <div class="cookie-banner-content">
+            <p class="cookie-banner-text">Мы используем файлы cookie и аналогичные технологии для аналитики. Продолжая, вы соглашаетесь с нашей <a href="/legal.html?page=cookies" target="_blank">политикой cookie</a>.</p>
+            <button class="btn btn-primary cookie-banner-accept" id="cookieAcceptBtn" type="button">Принять</button>
+        </div>
+    </div>
+
+    <!-- Phone FAB -->
+    <a href="tel:+79110701107" class="phone-fab" aria-label="Позвонить">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+    </a>
 
     <!-- JavaScript Modules -->
     <script src="/src/js/shared/helpers.js?v=6510dd12"></script>
@@ -909,11 +1000,11 @@
     <script src="/src/js/shared/icons.js?v=eeca8827"></script>
     <script src="/src/js/site/navigation.js?v=87d31578"></script>
     <script src="/src/js/site/animations.js?v=9998895f"></script>
-    <script src="/src/js/site/modals.js?v=ad391c7d"></script>
+    <script src="/src/js/site/modals.js?v=efa4f878"></script>
     <script src="/src/js/site/main.js?v=9a5ecd16"></script>
-    <script src="/src/js/site/templates.js?v=1e2e219b"></script>
+    <script src="/src/js/site/templates.js?v=6fbea22e"></script>
     <script src="/src/js/site/blog-modal.js?v=68752cdf"></script>
-    <script src="/src/js/site/data-loader.js?v=1270f768"></script>
-    <script src="/src/js/site/analytics.js?v=f41968cf"></script>
+    <script src="/src/js/site/data-loader.js?v=f89f0370"></script>
+    <script src="/src/js/site/cookie-banner.js?v=82e325f2"></script>
 </body>
 </html>

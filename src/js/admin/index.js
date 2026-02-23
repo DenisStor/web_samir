@@ -292,14 +292,6 @@ var AdminPanel = (function () {
             AdminImageHandler.removeImage(inputId);
         },
 
-        // Master principles
-        addPrinciple: function () {
-            AdminMasterForm.addPrinciple();
-        },
-        removePrinciple: function (btn) {
-            AdminMasterForm.removePrinciple(btn);
-        },
-
         // Shop categories
         editShopCategory: editShopCategory,
         deleteShopCategory: function (id) {

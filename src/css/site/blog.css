@@ -42,6 +42,8 @@
         border-color var(--transition-bounce),
         box-shadow var(--transition-bounce);
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
 }
 
 .blog-card:hover {
@@ -88,6 +90,9 @@
 
 .blog-content {
     padding: 32px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .blog-meta {
@@ -130,6 +135,11 @@
     color: var(--text-gray);
     font-size: 0.95rem;
     line-height: 1.7;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
     margin-bottom: 20px;
 }
 

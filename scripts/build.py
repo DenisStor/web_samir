@@ -34,6 +34,7 @@ PAGES = {
             'hero.html',
             'services.html',
             'podology.html',
+            'education-teaser.html',
             'masters.html',
             'location.html',
             'social.html',
@@ -43,6 +44,8 @@ PAGES = {
             'blog-modal.html',
             'join-modal.html',
             'shared/footer.html',
+            'shared/cookie-banner.html',
+            'shared/phone-button.html',
             'scripts.html',
         ],
         'output': 'index.html',
@@ -56,6 +59,7 @@ PAGES = {
             'shared/footer.html',
             'lightbox.html',
             'mobile-filter.html',
+            'shared/cookie-banner.html',
             'scripts.html',
         ],
         'output': 'shop.html',
@@ -80,9 +84,26 @@ PAGES = {
             'header.html',
             'main.html',
             'shared/footer.html',
+            'shared/cookie-banner.html',
             'scripts.html',
         ],
         'output': 'legal.html',
+    },
+    'education': {
+        'sections_dir': 'education',
+        'sections': [
+            'head.html',
+            'navigation.html',
+            'hero.html',
+            'program.html',
+            'advantages.html',
+            'faq.html',
+            'form.html',
+            'shared/footer.html',
+            'shared/cookie-banner.html',
+            'scripts.html',
+        ],
+        'output': 'education.html',
     },
 }
 
@@ -153,6 +174,7 @@ CSS_BUNDLES = {
     '/src/css/shop/index.css',
     '/src/css/admin/index.css',
     '/src/css/legal/index.css',
+    '/src/css/education/index.css',
 }
 
 

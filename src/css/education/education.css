@@ -1,0 +1,525 @@
+/* =====================================================================
+   EDUCATION.CSS - Стили страницы курса обучения
+   Использует переменные из shared/variables.css
+   ===================================================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Text selection */
+::selection {
+    background: var(--accent-green);
+    color: var(--bg-dark);
+    text-shadow: none;
+}
+
+::-moz-selection {
+    background: var(--accent-green);
+    color: var(--bg-dark);
+    text-shadow: none;
+}
+
+body {
+    font-family:
+        "Manrope",
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-light);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* =================================================================
+   HERO
+   ================================================================= */
+
+.edu-hero {
+    padding-top: 80px;
+    background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.edu-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        ellipse 60% 80% at 50% 0%,
+        var(--accent-green-muted) 0%,
+        transparent 60%
+    );
+    pointer-events: none;
+}
+
+.edu-hero-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 80px 24px;
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    text-align: left;
+}
+
+.edu-hero-content {
+    flex: 1;
+}
+
+.edu-hero-tag {
+    display: inline-block;
+    padding: 6px 16px;
+    background: var(--accent-green-subtle);
+    color: var(--accent-green);
+    border-radius: var(--radius-full);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 24px;
+}
+
+.edu-hero-title {
+    font-family: "Unbounded", sans-serif;
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    font-weight: 900;
+    color: var(--text-white);
+    line-height: 1.1;
+    margin-bottom: 20px;
+}
+
+.edu-hero-subtitle {
+    font-size: 1.15rem;
+    color: var(--text-gray);
+    line-height: 1.6;
+    max-width: 550px;
+    margin-bottom: 48px;
+}
+
+/* Hero Photo */
+.edu-hero-photo {
+    flex-shrink: 0;
+    width: 380px;
+}
+
+.edu-hero-img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-xl);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+    display: block;
+    object-fit: cover;
+}
+
+/* Hero Meta (stats) */
+.edu-hero-meta {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 32px;
+    margin-bottom: 48px;
+}
+
+.edu-hero-meta-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.edu-hero-meta-value {
+    font-family: "Unbounded", sans-serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--accent-green);
+    line-height: 1.2;
+}
+
+.edu-hero-meta-label {
+    font-size: 0.85rem;
+    color: var(--text-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.edu-hero-meta-divider {
+    width: 1px;
+    height: 40px;
+    background: var(--border-subtle);
+}
+
+.edu-hero-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 48px;
+    font-size: 1.15rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
+    box-shadow: var(--shadow-glow-sm);
+}
+
+.edu-hero-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-glow-md);
+}
+
+/* =================================================================
+   SECTIONS COMMON
+   ================================================================= */
+
+.edu-section {
+    padding: 80px 0;
+}
+
+.edu-section--dark {
+    background: var(--bg-darker);
+}
+
+.edu-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.edu-section-title {
+    font-family: "Unbounded", sans-serif;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 700;
+    color: var(--text-white);
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.edu-section-subtitle {
+    text-align: center;
+    color: var(--text-gray);
+    font-size: 1.05rem;
+    margin-top: -32px;
+    margin-bottom: 48px;
+}
+
+/* =================================================================
+   PROGRAM
+   ================================================================= */
+
+.edu-program-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.edu-program-card {
+    background: var(--content-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-xl);
+    padding: 32px 24px;
+    text-align: center;
+    transition:
+        border-color 0.3s ease,
+        transform 0.3s ease;
+}
+
+.edu-program-card:hover {
+    border-color: var(--border-accent);
+    transform: translateY(-4px);
+}
+
+.edu-program-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    background: var(--accent-green-subtle);
+    border-radius: 50%;
+    margin-bottom: 16px;
+    color: var(--accent-green);
+}
+
+.edu-program-number {
+    font-family: "Unbounded", sans-serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--accent-green);
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+.edu-program-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-white);
+    margin-bottom: 12px;
+}
+
+.edu-program-text {
+    font-size: 0.9rem;
+    color: var(--text-gray);
+    line-height: 1.6;
+}
+
+/* =================================================================
+   ADVANTAGES
+   ================================================================= */
+
+.edu-advantages-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.edu-advantage-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    background: var(--content-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    transition:
+        border-color 0.3s ease,
+        transform 0.3s ease;
+}
+
+.edu-advantage-item:hover {
+    border-color: var(--border-accent);
+    transform: translateX(4px);
+}
+
+.edu-advantage-number {
+    font-family: "Unbounded", sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent-green);
+    min-width: 36px;
+    padding-top: 2px;
+}
+
+.edu-advantage-content {
+    flex: 1;
+}
+
+.edu-advantage-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-white);
+    margin-bottom: 6px;
+}
+
+.edu-advantage-text {
+    font-size: 0.9rem;
+    color: var(--text-gray);
+    line-height: 1.6;
+}
+
+/* =================================================================
+   FORM
+   ================================================================= */
+
+.edu-form-card {
+    max-width: 480px;
+    margin: 0 auto;
+    background: var(--content-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-xl);
+    padding: 40px 32px;
+}
+
+.edu-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.edu-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.edu-form-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-light);
+}
+
+.edu-form input[type="text"],
+.edu-form input[type="tel"] {
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    color: var(--text-white);
+    font-size: 1rem;
+    font-family: inherit;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+    outline: none;
+}
+
+.edu-form input[type="text"]:focus,
+.edu-form input[type="tel"]:focus {
+    border-color: var(--accent-green);
+    box-shadow: 0 0 0 3px var(--accent-green-subtle);
+}
+
+.edu-form input[type="text"].invalid,
+.edu-form input[type="tel"].invalid {
+    border-color: var(--color-error, #ef4444);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.edu-form input[type="text"]::placeholder,
+.edu-form input[type="tel"]::placeholder {
+    color: var(--text-gray);
+    opacity: 0.6;
+}
+
+.edu-form-error {
+    color: var(--color-error, #ef4444);
+    font-size: 0.85rem;
+    padding: 8px 12px;
+    background: rgba(239, 68, 68, 0.1);
+    border-radius: var(--radius-md);
+}
+
+.edu-form-submit {
+    width: 100%;
+    justify-content: center;
+    padding: 16px;
+    font-size: 1rem;
+}
+
+/* Success state */
+.edu-form-success {
+    text-align: center;
+    padding: 32px 0;
+}
+
+.edu-success-icon {
+    width: 64px;
+    height: 64px;
+    color: var(--accent-green);
+    margin-bottom: 16px;
+}
+
+.edu-success-title {
+    font-family: "Unbounded", sans-serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-white);
+    margin-bottom: 8px;
+}
+
+.edu-success-text {
+    color: var(--text-gray);
+    font-size: 0.95rem;
+}
+
+/* =================================================================
+   BTN PRIMARY (local for edu page)
+   ================================================================= */
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    background: var(--accent-green);
+    color: var(--bg-dark);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px var(--accent-green-glow-strong);
+}
+
+/* =================================================================
+   RESPONSIVE
+   ================================================================= */
+
+@media (max-width: 768px) {
+    .edu-hero-inner {
+        flex-direction: column;
+        text-align: center;
+        padding: 60px 16px;
+    }
+
+    .edu-hero-meta {
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .edu-hero-meta-value {
+        font-size: 1.35rem;
+    }
+
+    .edu-hero-meta-divider {
+        height: 30px;
+    }
+
+    .edu-hero-photo {
+        display: none;
+    }
+
+    .edu-hero-btn {
+        padding: 16px 36px;
+        font-size: 1rem;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .edu-section {
+        padding: 60px 0;
+    }
+
+    .edu-program-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .edu-advantage-item {
+        padding: 20px 16px;
+    }
+
+    .edu-form-card {
+        padding: 32px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .edu-hero-meta {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .edu-hero-meta-divider {
+        width: 60px;
+        height: 1px;
+    }
+}

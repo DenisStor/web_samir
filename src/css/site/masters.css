@@ -230,46 +230,56 @@
 
 .master-card--cta {
     cursor: pointer;
-    border: 1px dashed var(--border-light);
-    background: linear-gradient(135deg, var(--content-bg) 0%, rgba(0, 255, 136, 0.03) 100%);
+    border: 1px solid var(--border-subtle);
+    background: linear-gradient(
+        135deg,
+        var(--content-bg) 0%,
+        rgba(0, 255, 136, 0.04) 50%,
+        var(--content-bg) 100%
+    );
 }
 
 .master-card--cta:hover {
-    border-style: solid;
+    border-color: var(--accent-green);
+    box-shadow:
+        0 0 0 1px var(--accent-green),
+        0 15px 30px var(--shadow-black-25),
+        0 0 30px var(--accent-green-subtle);
 }
 
-.master-image--cta {
-    aspect-ratio: auto;
-    padding: 48px 24px 32px;
+.master-card--cta .master-image {
+    background:
+        radial-gradient(circle at 50% 35%, rgba(0, 255, 136, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 20% 80%, rgba(0, 255, 136, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 80% 20%, rgba(77, 124, 255, 0.04) 0%, transparent 40%),
+        linear-gradient(180deg, var(--content-bg-light) 0%, var(--content-bg) 100%);
 }
 
-.master-image--cta::before,
-.master-image--cta::after {
-    display: none;
+.master-card--cta .master-avatar {
+    width: 120px;
+    height: 120px;
+    margin-top: -20px;
 }
 
-.join-icon {
-    color: var(--accent-green);
-    opacity: 0.8;
-    transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.3s ease;
-    filter: drop-shadow(0 0 12px var(--accent-green-glow));
+.master-card--cta .master-avatar svg {
+    width: 56px;
+    height: 56px;
 }
 
-.master-card--cta:hover .join-icon {
-    transform: scale(1.15);
-    opacity: 1;
-    filter: drop-shadow(0 0 24px var(--accent-green-glow-strong));
+.join-text {
+    position: absolute;
+    bottom: 16px;
+    left: 24px;
+    right: 24px;
+    z-index: 2;
 }
 
 .master-content--cta {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    padding: 24px 24px 20px;
 }
 
 .join-cta-btn {
-    margin-top: 16px;
+    margin-top: 0;
 }
 
 /* =====================================================================
@@ -319,7 +329,7 @@
 
 .join-modal-header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     margin-bottom: 24px;
 }
@@ -329,6 +339,12 @@
     line-height: 1.3;
     letter-spacing: -0.02em;
     margin: 0;
+}
+
+.join-modal-subtitle {
+    margin: 4px 0 0;
+    color: var(--text-gray);
+    font-size: 0.9rem;
 }
 
 .join-modal-close {
@@ -355,7 +371,19 @@
     gap: 16px;
 }
 
-.join-form input {
+.join-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.join-form-label {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.join-form input:not([type="checkbox"]) {
     width: 100%;
     padding: 14px 16px;
     background: var(--bg-dark);
@@ -369,27 +397,50 @@
     box-sizing: border-box;
 }
 
-.join-form input::placeholder {
+.join-form input:not([type="checkbox"])::placeholder {
     color: var(--text-gray);
 }
 
-.join-form input:focus {
+.join-form input:not([type="checkbox"]):focus {
     border-color: var(--accent-green);
     box-shadow: 0 0 0 3px var(--accent-green-subtle);
 }
 
+.join-form input:not([type="checkbox"]).invalid {
+    border-color: var(--color-danger-light);
+    box-shadow: 0 0 0 3px rgba(255, 68, 68, 0.1);
+}
+
 .join-form .btn {
     width: 100%;
+    justify-content: center;
     padding: 14px;
     font-size: 1rem;
+    margin-top: 4px;
 }
 
 .join-form-success {
     text-align: center;
-    padding: 24px 16px;
+    padding: 32px 16px;
+}
+
+.join-success-icon {
+    width: 48px;
+    height: 48px;
     color: var(--accent-green);
-    font-size: 1.05rem;
-    line-height: 1.5;
+    margin-bottom: 12px;
+}
+
+.join-success-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text-white);
+    margin-bottom: 4px;
+}
+
+.join-success-text {
+    color: var(--text-gray);
+    font-size: 0.95rem;
 }
 
 .join-form-error {

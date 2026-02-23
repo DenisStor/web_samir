@@ -88,6 +88,9 @@ def create_api_router():
     router.post('/api/auth/logout', 'handle_logout')
     router.post('/api/auth/check', 'handle_auth_check')
 
+    # Join (публичный, с rate limiting в handler)
+    router.post('/api/join', 'handle_join')
+
     # Stats (публичные)
     router.get('/api/stats', 'handle_get_stats')
     router.post('/api/stats/visit', 'handle_record_visit')

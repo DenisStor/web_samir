@@ -15,11 +15,46 @@
     // Конфигурация IntersectionObserver
     var OBSERVER_CONFIG = {
         threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
+        rootMargin: '0px'
     };
 
     // Глобальная ссылка на observer
     var fadeObserver = null;
+
+    // Задержка между элементами в пачке (мс)
+    var STAGGER_DELAY = 80;
+
+    // Очередь элементов для stagger-анимации
+    var staggerQueue = [];
+    var staggerTimer = null;
+
+    /**
+     * Обработать очередь stagger-анимаций через rAF
+     */
+    function processStaggerQueue() {
+        var queue = staggerQueue.slice();
+        staggerQueue = [];
+        staggerTimer = null;
+
+        queue.forEach(function (item, index) {
+            setTimeout(function () {
+                requestAnimationFrame(function () {
+                    item.classList.add('visible');
+                });
+            }, index * STAGGER_DELAY);
+        });
+    }
+
+    /**
+     * Добавить элемент в очередь stagger-анимации
+     */
+    function enqueueStagger(element) {
+        staggerQueue.push(element);
+
+        if (!staggerTimer) {
+            staggerTimer = requestAnimationFrame(processStaggerQueue);
+        }
+    }
 
     /**
      * Создать и запустить наблюдатель для анимаций
@@ -39,8 +74,7 @@
         fadeObserver = new IntersectionObserver(function (entries) {
             entries.forEach(function (entry) {
                 if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                    // Прекращаем наблюдение после появления (оптимизация)
+                    enqueueStagger(entry.target);
                     fadeObserver.unobserve(entry.target);
                 }
             });

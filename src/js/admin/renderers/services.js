@@ -160,6 +160,7 @@ var AdminServicesRenderer = (function () {
                     '</div>' +
                     '<span class="service-name">' +
                     escapeHtml(service.name) +
+                    (service.description ? '<span class="service-description">' + escapeHtml(service.description) + '</span>' : '') +
                     '</span>' +
                     '<div class="service-prices">' +
                     '<span class="price-tag price-green">' +
@@ -283,6 +284,9 @@ var AdminServicesRenderer = (function () {
                 var durationHtml = service.duration
                     ? '<span class="service-duration">' + escapeHtml(service.duration) + '</span>'
                     : '';
+                var descriptionHtml = service.description
+                    ? '<span class="service-description">' + escapeHtml(service.description) + '</span>'
+                    : '';
 
                 return (
                     '<div class="service-item' +
@@ -300,6 +304,7 @@ var AdminServicesRenderer = (function () {
                     '<span class="service-name">' +
                     escapeHtml(service.name) +
                     durationHtml +
+                    descriptionHtml +
                     '</span>' +
                     '<div class="service-prices">' +
                     '<span class="price-tag price-single">' +

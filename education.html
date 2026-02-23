@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no">
+    <title>Курс БАРБЕР С 0 — Обучение | Say's Barbers</title>
+    <meta name="description" content="Курс «БАРБЕР С 0» от Say's Barbers — 22 занятия за 1,5 месяца. Теория + практика на манекенах и моделях. Готовое портфолио на выходе. 120 000 ₽.">
+    <!-- Open Graph -->
+    <meta property="og:title" content="Курс БАРБЕР С 0 — Обучение | Say's Barbers">
+    <meta property="og:description" content="Курс «БАРБЕР С 0» — 22 занятия за 1,5 месяца. Теория + практика. Готовое портфолио на выходе.">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="ru_RU">
+    <meta property="og:image" content="https://saysbarbers.ru/uploads/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:url" content="https://saysbarbers.ru/education">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Курс БАРБЕР С 0 | Say's Barbers">
+    <meta name="twitter:description" content="Курс «БАРБЕР С 0» — 22 занятия за 1,5 месяца. Теория + практика. Готовое портфолио на выходе.">
+    <meta name="twitter:image" content="https://saysbarbers.ru/uploads/og-image.jpg">
+    <link rel="canonical" href="https://saysbarbers.ru/education">
+    <!-- Performance: preload -->
+    <link rel="preload" href="/src/css/shared/variables.css" as="style">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" href="/src/css/shared/variables.css?v=8caab1c6">
+    <link rel="stylesheet" href="/src/css/education/index.css?v=d735ba12">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="container nav-content">
+            <a href="/" class="logo">
+                Say's<span class="logo-accent">Barbers</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/#services">Услуги</a></li>
+                <li><a href="/#podology">Подологический кабинет</a></li>
+                <li><a href="/#masters">Мастера</a></li>
+                <li><a href="/#location">Контакты</a></li>
+                <li><a href="/#blog">Блог</a></li>
+                <li><a href="/#faq">FAQ</a></li>
+                <li><a href="/education" class="active">Обучение</a></li>
+                <li><a href="/shop">Магазин</a></li>
+            </ul>
+            <a href="/#booking" class="nav-cta">Онлайн-запись</a>
+            <button class="burger" type="button" aria-expanded="false" aria-controls="mobileMenu" aria-label="Открыть меню" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+        <a href="/#services" onclick="closeMenu()">Услуги</a>
+        <a href="/#podology" onclick="closeMenu()">Подологический кабинет</a>
+        <a href="/#masters" onclick="closeMenu()">Мастера</a>
+        <a href="/#location" onclick="closeMenu()">Контакты</a>
+        <a href="/#blog" onclick="closeMenu()">Блог</a>
+        <a href="/#faq" onclick="closeMenu()">FAQ</a>
+        <a href="/education" onclick="closeMenu()">Обучение</a>
+        <a href="/shop" onclick="closeMenu()">Магазин</a>
+        <a href="/#booking" onclick="closeMenu()">Онлайн-запись</a>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="edu-hero">
+        <div class="edu-hero-inner">
+            <div class="edu-hero-content">
+                <div class="edu-hero-tag">Курс обучения</div>
+                <h1 class="edu-hero-title">БАРБЕР С НУЛЯ</h1>
+                <p class="edu-hero-subtitle">Научим стричь осознанно — с пониманием каждого действия и уверенностью в результате</p>
+
+                <div class="edu-hero-meta">
+                    <div class="edu-hero-meta-item">
+                        <span class="edu-hero-meta-value">22</span>
+                        <span class="edu-hero-meta-label">занятия</span>
+                    </div>
+                    <div class="edu-hero-meta-divider"></div>
+                    <div class="edu-hero-meta-item">
+                        <span class="edu-hero-meta-value">1,5</span>
+                        <span class="edu-hero-meta-label">месяца</span>
+                    </div>
+                    <div class="edu-hero-meta-divider"></div>
+                    <div class="edu-hero-meta-item">
+                        <span class="edu-hero-meta-value">120 000 &#8381;</span>
+                        <span class="edu-hero-meta-label">стоимость</span>
+                    </div>
+                </div>
+
+                <a href="#edu-form" class="btn btn-primary edu-hero-btn">
+                    Записаться на курс
+                </a>
+            </div>
+            <div class="edu-hero-photo">
+                <img src="/uploads/education-course.jpg" alt="Курс БАРБЕР С НУЛЯ — обучение в Say's Barbers" class="edu-hero-img" width="675" height="1200" loading="eager">
+            </div>
+        </div>
+    </section>
+
+    <!-- Program Section -->
+    <section class="edu-section" id="edu-program">
+        <div class="edu-container">
+            <h2 class="edu-section-title">Программа курса</h2>
+
+            <div class="edu-program-grid">
+                <div class="edu-program-card">
+                    <div class="edu-program-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                        </svg>
+                    </div>
+                    <div class="edu-program-number">6</div>
+                    <h3 class="edu-program-title">Теоретических занятий</h3>
+                    <p class="edu-program-text">Фундамент профессии: инструменты, типы волос, формы головы, техники стрижки. Осознанный подход вместо интуитивного.</p>
+                </div>
+
+                <div class="edu-program-card">
+                    <div class="edu-program-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                        </svg>
+                    </div>
+                    <div class="edu-program-number">15</div>
+                    <h3 class="edu-program-title">Практических занятий</h3>
+                    <p class="edu-program-text">5 занятий на манекенах для отработки базы + 10 занятий на реальных моделях под руководством мастера.</p>
+                </div>
+
+                <div class="edu-program-card">
+                    <div class="edu-program-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                        </svg>
+                    </div>
+                    <div class="edu-program-number">1</div>
+                    <h3 class="edu-program-title">Готовое портфолио</h3>
+                    <p class="edu-program-text">На выходе — портфолио с реальными работами. Вы сможете начать карьеру сразу после окончания курса.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Advantages Section -->
+    <section class="edu-section edu-section--dark" id="edu-advantages">
+        <div class="edu-container">
+            <h2 class="edu-section-title">Что вы получите</h2>
+
+            <div class="edu-advantages-list">
+                <div class="edu-advantage-item">
+                    <div class="edu-advantage-number">01</div>
+                    <div class="edu-advantage-content">
+                        <h3 class="edu-advantage-title">Навык, который легко монетизировать</h3>
+                        <p class="edu-advantage-text">Барберинг — востребованная профессия. Клиенты есть всегда, независимо от сезона и экономики.</p>
+                    </div>
+                </div>
+
+                <div class="edu-advantage-item">
+                    <div class="edu-advantage-number">02</div>
+                    <div class="edu-advantage-content">
+                        <h3 class="edu-advantage-title">Прямое влияние на свой доход</h3>
+                        <p class="edu-advantage-text">Ваш заработок зависит только от вас — от количества клиентов и качества работы.</p>
+                    </div>
+                </div>
+
+                <div class="edu-advantage-item">
+                    <div class="edu-advantage-number">03</div>
+                    <div class="edu-advantage-content">
+                        <h3 class="edu-advantage-title">Уверенность в каждом действии</h3>
+                        <p class="edu-advantage-text">Теоретическая база даёт понимание «почему», а не только «как». Вы будете знать, что делаете и к чему это приведёт.</p>
+                    </div>
+                </div>
+
+                <div class="edu-advantage-item">
+                    <div class="edu-advantage-number">04</div>
+                    <div class="edu-advantage-content">
+                        <h3 class="edu-advantage-title">Огромная база знаний и навыков</h3>
+                        <p class="edu-advantage-text">Теория + практика в правильных пропорциях. То, что большинство осваивают годами — вы получите за 1,5 месяца.</p>
+                    </div>
+                </div>
+
+                <div class="edu-advantage-item">
+                    <div class="edu-advantage-number">05</div>
+                    <div class="edu-advantage-content">
+                        <h3 class="edu-advantage-title">Готовое портфолио на выходе</h3>
+                        <p class="edu-advantage-text">Реальные работы на реальных людях. Портфолио, с которым можно сразу начать работать.</p>
+                    </div>
+                </div>
+
+                <div class="edu-advantage-item">
+                    <div class="edu-advantage-number">06</div>
+                    <div class="edu-advantage-content">
+                        <h3 class="edu-advantage-title">Возможность работать в Say's Barbers</h3>
+                        <p class="edu-advantage-text">Лучшие выпускники получают предложение о трудоустройстве в нашем барбершопе.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="edu-section" id="edu-faq">
+        <div class="edu-container">
+            <h2 class="edu-section-title">Частые вопросы</h2>
+
+            <div class="faq-container">
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleEducationFaq(this)" role="button" tabindex="0" aria-expanded="false" onkeydown="handleEduKeydown(event, this)">
+                        <h3>Почему именно этот курс?</h3>
+                        <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                    <div class="faq-answer" role="region">
+                        <p>Упор на теоретическую часть. Большинство школ с первого дня делают упор на практику, из-за чего ученики теряются. Здесь — осознанная стрижка, а не интуитивная. Вы будете понимать каждое своё действие.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleEducationFaq(this)" role="button" tabindex="0" aria-expanded="false" onkeydown="handleEduKeydown(event, this)">
+                        <h3>Чему я научусь?</h3>
+                        <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                    <div class="faq-answer" role="region">
+                        <p>Осознанно стричь. Чётко понимать зачем выполняешь каждое действие и к чему оно приведёт. Избежать большинства ошибок на начальном этапе. Получить готовое портфолио с реальными работами.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleEducationFaq(this)" role="button" tabindex="0" aria-expanded="false" onkeydown="handleEduKeydown(event, this)">
+                        <h3>Что если не получится?</h3>
+                        <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                    <div class="faq-answer" role="region">
+                        <p>Вопрос мотивации и дисциплины. Если достаточно мотивации и понимаешь зачем тебе это — успех лишь вопрос времени. Программа построена так, чтобы довести до результата каждого ученика.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Application Form Section -->
+    <section class="edu-section edu-section--dark" id="edu-form">
+        <div class="edu-container">
+            <h2 class="edu-section-title">Записаться на курс</h2>
+            <p class="edu-section-subtitle">Оставьте контакты — мы свяжемся и расскажем подробности</p>
+
+            <div class="edu-form-card">
+                <form id="eduForm" class="edu-form" novalidate>
+                    <input type="hidden" name="source" value="education">
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="eduName">Имя</label>
+                        <input type="text" id="eduName" name="name" placeholder="Как вас зовут?" required autocomplete="name">
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="eduPhone">Телефон</label>
+                        <input type="tel" id="eduPhone" name="phone" placeholder="+7 (___) ___-__-__" required autocomplete="tel" inputmode="tel">
+                    </div>
+                    <div id="eduFormError" class="edu-form-error" style="display:none"></div>
+                    <label class="consent-label">
+                        <input type="checkbox" name="consent" required>
+                        <span>Я согласен с <a href="/legal.html?page=privacy" target="_blank">политикой конфиденциальности</a></span>
+                    </label>
+                    <button type="submit" class="btn btn-primary edu-form-submit">Отправить заявку</button>
+                </form>
+                <div id="eduFormSuccess" class="edu-form-success" style="display:none">
+                    <svg class="edu-success-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                    <div class="edu-success-title">Заявка отправлена!</div>
+                    <div class="edu-success-text">Мы свяжемся с вами в ближайшее время</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <div class="footer-copy">© 2026 Say's Barbers. Все права защищены.</div>
+                    <div class="footer-legal">
+                        <div>ИП Маллаева А.И.</div>
+                        <div>ИНН 540698711802</div>
+                        <div>ОГРНИП 322392600025470</div>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <a href="legal.html?page=cookies">Политика cookie</a>
+                    <a href="legal.html?page=privacy">Политика конфиденциальности</a>
+                    <a href="legal.html?page=terms">Пользовательское соглашение</a>
+                    <a href="index.html">На главную</a>
+                    <a href="/education">Обучение</a>
+                    <a href="admin.html">Админ-панель</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cookie Banner -->
+    <div class="cookie-banner" id="cookieBanner" role="dialog" aria-label="Уведомление о cookies" style="display:none">
+        <div class="cookie-banner-content">
+            <p class="cookie-banner-text">Мы используем файлы cookie и аналогичные технологии для аналитики. Продолжая, вы соглашаетесь с нашей <a href="/legal.html?page=cookies" target="_blank">политикой cookie</a>.</p>
+            <button class="btn btn-primary cookie-banner-accept" id="cookieAcceptBtn" type="button">Принять</button>
+        </div>
+    </div>
+
+    <!-- Shared Modules -->
+    <script src="/src/js/shared/helpers.js?v=6510dd12"></script>
+    <!-- Navigation -->
+    <script src="/src/js/site/utils.js?v=fe5c4c36"></script>
+    <script src="/src/js/site/navigation.js?v=87d31578"></script>
+    <!-- Education App -->
+    <script src="/src/js/education/education-app.js?v=f57e1aa5"></script>
+    <script src="/src/js/site/cookie-banner.js?v=82e325f2"></script>
+</body>
+</html>

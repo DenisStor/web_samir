@@ -5131,6 +5131,7 @@ var AdminServicesRenderer = (function () {
                     '</div>' +
                     '<span class="service-name">' +
                     escapeHtml(service.name) +
+                    (service.description ? '<span class="service-description">' + escapeHtml(service.description) + '</span>' : '') +
                     '</span>' +
                     '<div class="service-prices">' +
                     '<span class="price-tag price-green">' +
@@ -5254,6 +5255,9 @@ var AdminServicesRenderer = (function () {
                 var durationHtml = service.duration
                     ? '<span class="service-duration">' + escapeHtml(service.duration) + '</span>'
                     : '';
+                var descriptionHtml = service.description
+                    ? '<span class="service-description">' + escapeHtml(service.description) + '</span>'
+                    : '';
 
                 return (
                     '<div class="service-item' +
@@ -5271,6 +5275,7 @@ var AdminServicesRenderer = (function () {
                     '<span class="service-name">' +
                     escapeHtml(service.name) +
                     durationHtml +
+                    descriptionHtml +
                     '</span>' +
                     '<div class="service-prices">' +
                     '<span class="price-tag price-single">' +
@@ -6522,6 +6527,12 @@ var AdminServiceForm = (function () {
             '" placeholder="Введите название услуги" required>' +
             '</div>' +
             '<div class="form-group">' +
+            '<label class="form-label">Описание</label>' +
+            '<textarea class="form-input" id="serviceDescription" rows="2" placeholder="Краткое описание услуги">' +
+            window.escapeHtml((service && service.description) || '') +
+            '</textarea>' +
+            '</div>' +
+            '<div class="form-group">' +
             '<label class="form-label">Цены по уровням мастеров</label>' +
             '<div class="form-row">' +
             '<div class="form-group">' +
@@ -6596,6 +6607,12 @@ var AdminServiceForm = (function () {
             '" placeholder="1 час 30 минут">' +
             '</div>' +
             '<div class="form-group">' +
+            '<label class="form-label">Описание</label>' +
+            '<textarea class="form-input" id="podologyDescription" rows="2" placeholder="Краткое описание услуги">' +
+            window.escapeHtml((service && service.description) || '') +
+            '</textarea>' +
+            '</div>' +
+            '<div class="form-group">' +
             '<label class="form-label">Цена</label>' +
             '<input type="text" class="form-input" id="podologyPrice" value="' +
             window.escapeHtml((service && service.price) || '') +
@@ -6655,9 +6672,13 @@ var AdminServiceForm = (function () {
         var pricePink = parseInt(pinkEl ? pinkEl.value : 0, 10) || 0;
         var priceBlue = parseInt(blueEl ? blueEl.value : 0, 10) || 0;
 
+        var descEl = document.getElementById('serviceDescription');
+        var description = descEl ? descEl.value.trim() : '';
+
         var serviceData = {
             id: editing.service ? editing.service.id : SharedHelpers.generateId('service'),
             name: name,
+            description: description,
             priceGreen: priceGreen,
             pricePink: pricePink,
             priceBlue: priceBlue
@@ -6721,12 +6742,14 @@ var AdminServiceForm = (function () {
         }
 
         var durationEl = document.getElementById('podologyDuration');
+        var descriptionEl = document.getElementById('podologyDescription');
         var priceEl = document.getElementById('podologyPrice');
         var featuredEl = document.getElementById('podologyFeatured');
 
         var serviceData = {
             id: editing.service ? editing.service.id : SharedHelpers.generateId('pod'),
             name: name,
+            description: descriptionEl ? descriptionEl.value.trim() : '',
             duration: durationEl ? durationEl.value.trim() : '',
             price: priceEl ? priceEl.value.trim() : 'Уточняйте',
             featured: featuredEl ? featuredEl.checked : false

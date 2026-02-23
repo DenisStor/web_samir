@@ -23,7 +23,8 @@ var SiteTemplates = (function () {
         scissors:
             '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>',
         chevronDown:
-            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>'
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>',
+        user: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>'
     };
 
     // =================================================================
@@ -50,10 +51,6 @@ var SiteTemplates = (function () {
         };
         var badgeLabel = badgeLabelMap[master.badge] || 'Green';
 
-        // First 2 principles shown, rest in expandable section
-        var firstPrinciples = (master.principles || []).slice(0, 2);
-        var extraPrinciples = (master.principles || []).slice(2);
-
         // Sanitize user data
         var safeName = escapeHTML(master.name);
         var safeRole = escapeHTML(master.role || 'Мастер');
@@ -68,36 +65,6 @@ var SiteTemplates = (function () {
               escapeAttr(master.name) +
               '" class="master-photo" width="400" height="400" loading="lazy" decoding="async" data-smooth-load>'
             : '<div class="master-avatar">' + safeInitial + '</div>';
-
-        var principlesHtml = firstPrinciples
-            .map(function (p) {
-                return (
-                    '<div class="master-principle">' +
-                    icons.check +
-                    '<span>' +
-                    escapeHTML(p) +
-                    '</span></div>'
-                );
-            })
-            .join('');
-
-        var extraHtml = '';
-        if (extraPrinciples.length > 0) {
-            extraHtml =
-                '<div class="master-extra"><div class="master-extra-inner">' +
-                extraPrinciples
-                    .map(function (p) {
-                        return (
-                            '<div class="master-principle">' +
-                            icons.check +
-                            '<span>' +
-                            escapeHTML(p) +
-                            '</span></div>'
-                        );
-                    })
-                    .join('') +
-                '</div></div>';
-        }
 
         return (
             '<div class="master-card fade-in stagger-item">' +
@@ -116,13 +83,7 @@ var SiteTemplates = (function () {
             '<div class="master-role">' +
             safeRole +
             '</div>' +
-            '<p class="master-specialization">' +
-            safeSpec +
-            '</p>' +
-            '<div class="master-principles">' +
-            principlesHtml +
-            extraHtml +
-            '</div>' +
+            (safeSpec ? '<p class="master-specialization">' + safeSpec + '</p>' : '') +
             '</div>' +
             '</div>'
         );
@@ -139,11 +100,15 @@ var SiteTemplates = (function () {
         var pricePink = parseInt(service.pricePink, 10) || 0;
         var priceBlue = parseInt(service.priceBlue, 10) || 0;
 
+        var safeDesc = service.description ? escapeHTML(service.description) : '';
+
         return (
             '<div class="service-item">' +
             '<div><div class="service-name">' +
             safeName +
-            '</div></div>' +
+            '</div>' +
+            (safeDesc ? '<div class="service-note">' + safeDesc + '</div>' : '') +
+            '</div>' +
             '<div class="service-prices">' +
             '<span class="price-tag price-green">' +
             priceGreen +
@@ -204,6 +169,7 @@ var SiteTemplates = (function () {
         var safeName = escapeHTML(service.name);
         var safePrice = escapeHTML(service.price);
         var safeDuration = escapeHTML(service.duration || '');
+        var safeDescription = escapeHTML(service.description || '');
         var featuredClass = service.featured ? ' podology-service-featured' : '';
 
         return (
@@ -214,7 +180,9 @@ var SiteTemplates = (function () {
             '<h4>' +
             safeName +
             '</h4>' +
-            (safeDuration ? '<span>' + safeDuration + '</span>' : '') +
+            (safeDuration || safeDescription
+                ? '<span>' + safeDuration + (safeDuration && safeDescription ? ' · ' : '') + safeDescription + '</span>'
+                : '') +
             '</div>' +
             '<div class="podology-service-price">' +
             safePrice +
@@ -370,10 +338,32 @@ var SiteTemplates = (function () {
         );
     }
 
+    /**
+     * Создать CTA-карточку «Стать мастером»
+     * @returns {string} HTML карточки
+     */
+    function createJoinCard() {
+        return (
+            '<div class="master-card master-card--cta fade-in stagger-item">' +
+            '<div class="master-image">' +
+            '<div class="master-avatar">' + icons.user + '</div>' +
+            '<div class="join-text">' +
+            '<h3 class="master-name">Стань мастером</h3>' +
+            '<div class="master-role">Say\'s Barbers ждёт тебя</div>' +
+            '</div>' +
+            '</div>' +
+            '<div class="master-content master-content--cta">' +
+            '<button class="btn btn-primary join-cta-btn" onclick="openJoinModal()" type="button">Оставить заявку</button>' +
+            '</div>' +
+            '</div>'
+        );
+    }
+
     // Публичный API
     return {
         icons: icons,
         createMasterCard: createMasterCard,
+        createJoinCard: createJoinCard,
         createServiceItem: createServiceItem,
         createPodologyTab: createPodologyTab,
         createPodologyServiceItem: createPodologyServiceItem,

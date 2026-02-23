@@ -89,7 +89,7 @@
                     if (activeMasters.length > 0) {
                         mastersGrid.innerHTML = activeMasters
                             .map(SiteTemplates.createMasterCard)
-                            .join('');
+                            .join('') + SiteTemplates.createJoinCard();
                     } else {
                         mastersGrid.innerHTML =
                             '<p class="empty-message" style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,0.5); padding: 40px;">Информация о мастерах скоро появится</p>';
@@ -218,7 +218,9 @@
         }
         document.querySelectorAll('a[href^="tel:"]:not(#sitePhone)').forEach(function (link) {
             link.href = 'tel:' + phoneClean;
-            link.textContent = phone;
+            if (!link.classList.contains('phone-fab')) {
+                link.textContent = phone;
+            }
         });
     }
 

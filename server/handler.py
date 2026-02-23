@@ -13,6 +13,8 @@ import uuid
 import base64
 from pathlib import Path
 from urllib.parse import urlparse, parse_qs
+from urllib.request import urlopen, Request
+from urllib.error import URLError
 from datetime import datetime, timedelta
 import subprocess
 import sys
@@ -102,6 +104,20 @@ def load_config():
 
 CONFIG = load_config()
 
+# Telegram bot config — читаем из config.local.json (не в git), fallback на config.json
+TELEGRAM_CONFIG = {}
+_LOCAL_CONFIG = Path("config.local.json")
+for _cfg_path in (_LOCAL_CONFIG, CONFIG_FILE):
+    if _cfg_path.exists():
+        try:
+            with open(_cfg_path, 'r', encoding='utf-8') as f:
+                _tg = json.load(f).get('telegram_bot', {})
+                if _tg.get('token'):
+                    TELEGRAM_CONFIG = _tg
+                    break
+        except Exception:
+            pass
+
 # Инициализация сервисов (thread-safe)
 storage = Database()
 session_manager = SessionManager(timeout_hours=CONFIG['session_timeout_hours'])
@@ -110,6 +126,7 @@ login_limiter = RateLimiter(
     lockout_minutes=CONFIG['lockout_minutes']
 )
 upload_limiter = UploadRateLimiter(max_uploads=10, window_seconds=60)
+join_limiter = RateLimiter(max_attempts=1, lockout_minutes=1)
 router = get_router()
 
 SESSION_CLEANUP_INTERVAL = 3600  # 1 час
@@ -281,6 +298,9 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
             if path in ('/robots.txt', '/sitemap.xml', '/favicon.ico'):
                 self.path = '/public' + path
                 return super().do_GET()
+            elif path == '/education' or path.startswith('/education/'):
+                self.path = '/education.html'
+                return super().do_GET()
             elif path == '/legal' or path.startswith('/legal/'):
                 self.path = '/legal.html'
                 return super().do_GET()
@@ -369,6 +389,73 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
             })
         else:
             self.send_json_response({'valid': False})
+
+    # === Join handler ===
+
+    def handle_join(self):
+        """Обработка заявки на вступление в команду."""
+        try:
+            ip = self.get_client_ip()
+
+            if not join_limiter.check(ip):
+                self.send_error_response(429, 'Подождите минуту перед повторной отправкой')
+                return
+
+            content_length = int(self.headers.get('Content-Length', 0))
+            if content_length == 0:
+                self.send_error_response(400, 'Missing request body')
+                return
+
+            post_data = self.rfile.read(content_length)
+            data = json.loads(post_data.decode('utf-8'))
+
+            name = (data.get('name') or '').strip()
+            phone = (data.get('phone') or '').strip()
+
+            if not name or not phone:
+                self.send_error_response(400, 'Заполните имя и телефон')
+                return
+
+            if len(name) > 100 or len(phone) > 30:
+                self.send_error_response(400, 'Слишком длинные данные')
+                return
+
+            join_limiter.record(ip, False)
+
+            token = TELEGRAM_CONFIG.get('token', '')
+            chat_id = TELEGRAM_CONFIG.get('chat_id', '')
+
+            if not token or not chat_id:
+                logger.warning("Telegram bot не настроен (token/chat_id пустые)")
+                self.send_json_response({'success': True})
+                return
+
+            source = (data.get('source') or '').strip()
+            if source == 'education':
+                text = "📚 Заявка на курс «БАРБЕР С 0»\n\n👤 Имя: {}\n📞 Телефон: {}".format(name, phone)
+            else:
+                text = "📋 Новая заявка на вступление в команду\n\n👤 Имя: {}\n📞 Телефон: {}".format(name, phone)
+
+            tg_url = "https://api.telegram.org/bot{}/sendMessage".format(token)
+            tg_data = json.dumps({
+                'chat_id': chat_id,
+                'text': text,
+                'parse_mode': 'HTML'
+            }).encode('utf-8')
+
+            req = Request(tg_url, data=tg_data, headers={'Content-Type': 'application/json'})
+            try:
+                urlopen(req, timeout=5)
+            except URLError as e:
+                logger.warning("Telegram API error: %s", e)
+
+            self.send_json_response({'success': True})
+
+        except json.JSONDecodeError:
+            self.send_error_response(400, 'Invalid JSON')
+        except Exception as e:
+            logger.exception("Server error")
+            self.send_error_response(500, 'Internal server error')
 
     # === Data handlers ===
 
