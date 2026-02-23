@@ -432,7 +432,7 @@ class AdminAPIHandler(http.server.SimpleHTTPRequestHandler):
 
             source = (data.get('source') or '').strip()
             if source == 'education':
-                text = "📚 Заявка на курс «БАРБЕР С 0»\n\n👤 Имя: {}\n📞 Телефон: {}".format(name, phone)
+                text = "📚 Заявка на курс «БАРБЕР С НУЛЯ»\n\n👤 Имя: {}\n📞 Телефон: {}".format(name, phone)
             else:
                 text = "📋 Новая заявка на вступление в команду\n\n👤 Имя: {}\n📞 Телефон: {}".format(name, phone)
 
